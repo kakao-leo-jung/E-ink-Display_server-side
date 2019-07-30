@@ -9,6 +9,10 @@ router.post('/', function(req, res) {
     /*
 
         LoginToken 구글 로그인 받은 토큰을 분석해서 처리한다.
+        구현할 로직은 다음과 같다.
+
+        1. 받은 구글 토큰의 정보를 분석한다.
+        ...
 
     */
 
@@ -22,7 +26,7 @@ router.post('/', function(req, res) {
  
     //더 이상 데이터가 들어오지 않는다면 end 이벤트 실행
     req.on('end',function(){
-        console.log("token : "+googleAccessToken);
+        console.log("token : "+googleToken);
         res.writeHead(200);
     });
 
