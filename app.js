@@ -5,9 +5,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
-
 var app = express();
 
 // view engine setup
@@ -21,8 +18,26 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+/*
+
+    여기서 라우팅 한다.
+    app.use('/원하는받을URL경로', 변수);
+
+*/
+/*********************************************/
+/* 메인 '/' 라우팅 */
+var routes = require('./routes/index');
 app.use('/', routes);
+/*********************************************/
+/* 유저 '/users' 라우팅 */
+var users = require('./routes/users');
 app.use('/users', users);
+/*********************************************/
+/* 로그인 '/loginToken' 라우팅 */
+var login = require('./routes/login');
+app.use('/loginToken', login);
+/*********************************************/
+
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
