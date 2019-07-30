@@ -36,7 +36,7 @@ router.post('/', function(req, res) {
 
     */
  
-    res.write(googleToken); //OK라는 내용이 안드로이드의 ReadBuffer를 통해 result String으로 바뀜
+    res.write(googleToken.toString()); //OK라는 내용이 안드로이드의 ReadBuffer를 통해 result String으로 바뀜
     res.end();
 
 });
