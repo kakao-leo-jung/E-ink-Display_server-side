@@ -19,7 +19,7 @@ router.post('/', function(req, res) {
     /* 구글 토큰을 담는다. */
     var googleToken = req.body.id_token;
 
-    
+    console.log("로그인 시도 토큰 : "+googleToken);
 
     /*
 
