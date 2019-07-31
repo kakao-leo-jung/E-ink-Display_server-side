@@ -20,9 +20,12 @@ router.post('/', function(req, res) {
     var googleToken = "";
 
     /* data 를 googleToken에 넣음 */
-    req.on('data',function(data){
-        googleToken += data;
-    });
+    // req.on('data',function(data){
+    //     googleToken += data;
+    // });
+
+    googleToken = req.body.id_token;
+
  
     //더 이상 데이터가 들어오지 않는다면 end 이벤트 실행
     req.on('end',function(){
@@ -36,7 +39,7 @@ router.post('/', function(req, res) {
 
     */
  
-    res.write("JWT를 만들어서 발급한다!"); //OK라는 내용이 안드로이드의 ReadBuffer를 통해 result String으로 바뀜
+    res.write(googleToken); //OK라는 내용이 안드로이드의 ReadBuffer를 통해 result String으로 바뀜
     res.end();
 
 });
