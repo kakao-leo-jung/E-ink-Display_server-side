@@ -80,8 +80,14 @@ async function verify(token) {
     });
     const payload = ticket.getPayload();
     const userid = payload['sub'];
+    const exp = payload['exp'];
+    const email = payload['email'];
+    const name = payload['name'];
     console.log("userid : " + userid);
     console.log("payload : " + payload);
+    console.log("exp : " + exp);
+    console.log("email : " + email);
+    console.log("name : " + name);
     // If request specified a G Suite domain:
     //const domain = payload['hd'];
 }
