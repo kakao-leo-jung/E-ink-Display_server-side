@@ -94,12 +94,12 @@ async function verify(token) {
 
     /* 아래 코드는 verify 가 성공하였을 때 해야 할 역할 */
     const payload = ticket.getPayload();
-    const userid = payload['sub'];
-    const exp = payload['exp'];
-    const email = payload['email'];
-    const name = payload['name'];
+    const userid = payload.sub;
+    const exp = payload.exp;
+    const email = payload.email;
+    const name = payload.name;
+    console.log("payload : " + JSON.stringify(payload));
     console.log("userid : " + userid);
-    console.log("payload : " + payload.toString());
     console.log("exp : " + exp);
     console.log("email : " + email);
     console.log("name : " + name);
