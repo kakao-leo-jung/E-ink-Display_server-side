@@ -1,5 +1,6 @@
 var express = require('express');
 const { OAuth2Client } = require('google-auth-library');
+var User = require('../model/user');
 
 /* 구글 프로젝트에 등록한 안드로이드 어플리케이션의 웹 클라이언트ID 값 */
 const CLIENT_ID = "167626550583-ouo1ti55snfqphcgj63gm73a9n54rde8.apps.googleusercontent.com";
@@ -10,23 +11,51 @@ const client = new OAuth2Client(CLIENT_ID);
 /* TODO Author : 정근화 */
 
 /* GET login page. */
+/*
+
+    LoginToken 구글 로그인 받은 토큰을 분석해서 처리한다.
+    구현할 로직은 다음과 같다.
+
+    1. 받은 구글 토큰의 유효성을 검사하고 Payload를 불러온다.
+    2. userID 값을 이용해 DB를 조회한다.
+        - DB에 존재 : 토큰을 저장하고 
+
+*/
 router.post('/', function (req, res) {
 
-    /*
-
-        LoginToken 구글 로그인 받은 토큰을 분석해서 처리한다.
-        구현할 로직은 다음과 같다.
-
-        1. 받은 구글 토큰의 정보를 분석한다.
-        ...
-
-    */
-
     /* 구글 토큰을 담는다. */
-    var googleToken = req.body.id_token;
+    const googleToken = req.body.id_token;
 
-    /* 구글 토큰 유효성 검사 */
-    verify(googleToken).catch(console.error);
+    /* 구글 토큰 유효성 검사 및 payload 추출 */
+    const payload = verify(googleToken).catch(console.error);
+
+    /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
+    User.findOne({ user_id: payload.sub }, function (err, user) {
+        if (err) {
+            /* DB 조회 오류 */
+            console.error(err);
+        }
+        if (!user) {
+            /* DB 반환 값이 없음 */
+            /* DB 에 새 유저 등록 */
+
+        } else {
+            /* DB 결과 조회 성공 */
+
+        }
+    });
+    User.findOne({ user_id: payload.sub })
+        .then((result) => {
+            if(!result){
+                
+            }else{
+
+            }
+            return Users.update({ name: result.name }, { updated: true });
+        })
+        .catch((err) => {
+            console.error(err);
+        });
 
     /*
 
@@ -43,7 +72,8 @@ router.post('/', function (req, res) {
 
 /*
 
-    구글 토큰의 유효성을 검사하는 함수
+    구글 토큰의 유효성을 검사하는 함수, 유효하면 JSON 오브젝트 형태의 PAYLOAD 부분을 리턴한다.
+
     홈페이지 : https://developers.google.com/identity/sign-in/web/backend-auth
 
     After you receive the ID token by HTTPS POST, you must verify the integrity of the token.
@@ -73,9 +103,15 @@ router.post('/', function (req, res) {
 */
 async function verify(token) {
 
-    /* client.verifyIdToken 함수를 이용해 비동기적으로 ID토큰의 유효성을 검사한다. */
-    // The verifyIdToken function verifies the JWT signature,
-    // the aud claim, the exp claim, and the iss claim.
+    /* 
+    
+        client.verifyIdToken 함수를 이용해 비동기적으로 ID토큰의 유효성을 검사한다.
+        The verifyIdToken function verifies the JWT signature,
+        the aud claim, the exp claim, and the iss claim.
+
+        JWT Signature 확인, CLIENT_ID 일치 여부 확인, 만료여부 확인, 구글발급 확인
+
+    */
     const ticket = await client.verifyIdToken({
         idToken: token,
         audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
@@ -88,21 +124,47 @@ async function verify(token) {
         TODO
         위의 verifyIdToken 에서 JWT signature 와
         aud, exp, iss 를 검사하였는데, 이 입증의 결과의
-        성공/실패 유무를 어떻게 구분하는지 알아봐야 함.
+        성공/실패 유무를 어떻게 구분하는지 알아봐고 코드를 작성해야 함.
     
     */
 
+
+
+
+
+
+
     /* 아래 코드는 verify 가 성공하였을 때 해야 할 역할 */
+    /*
+
+        PAYLOAD -- (안드로이드에서 구글에 권한 요청할 때 일단 email, profile 옵션만 요청 함.)
+        aud(string)             : 토큰 대상자 - 웹 클라이언트ID(내가 구글에서 발급 받은) 일치해야함.
+        iss(string)             : 토큰 발급자 - 구글토큰사용(https://accounts.google.com)
+        sub(string)             : 유저 토큰 아이디 숫자 값
+        email(string)           : 유저 이메일
+        email_verified(bool)    : 이메일 유효성 검사 값
+        name(string)            : 유저 풀 네임
+        picture(string)         : 유저 사진 url
+        given_name(string)      : 유저 이름
+        family_name(string)     : 유저 이름(성)
+        locale(string)          : 지역(한국은 ko)
+        exp(string)             : 토큰만료시간
+        iat(string)             : 토큰발급시간 -> iat를 통해 토큰의 나이를 확인 가능
+
+    */
     const payload = ticket.getPayload();
-    const userid = payload.sub;
-    const exp = payload.exp;
-    const email = payload.email;
-    const name = payload.name;
     console.log("payload : " + JSON.stringify(payload));
-    console.log("userid : " + userid);
-    console.log("exp : " + exp);
-    console.log("email : " + email);
-    console.log("name : " + name);
+    return payload;
+
+    /*
+
+        아래와 같이 추출해서 사용 가능
+        const userid = payload.sub;
+        const exp = payload.exp;
+        const email = payload.email;
+        const name = payload.name;
+
+    */
     // If request specified a G Suite domain:
     //const domain = payload['hd'];
 }

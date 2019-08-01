@@ -29,14 +29,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 var routes = require('./routes/index');
 app.use('/', routes);
 /*********************************************/
-/* 유저 '/users' 라우팅 */
-var users = require('./routes/users');
-app.use('/users', users);
-/*********************************************/
 /* 로그인 '/loginToken' 라우팅 */
 var login = require('./routes/login');
 app.use('/loginToken', login);
 /*********************************************/
+
+
+/*
+
+    ./bin/dbConnect.js 에서 작성한
+    커스텀 DB 커넥터로 DB 연결
+
+    1. user_auth : 사용자 인증 DB 에 연결
+
+*/
+var dbConnect = require('./bin/dbConnect');
+dbConnect.connectLocalDB('user_auth');
 
 
 /// catch 404 and forwarding to error handler
