@@ -7,7 +7,7 @@ const CLIENT_ID = "167626550583-ouo1ti55snfqphcgj63gm73a9n54rde8.apps.googleuser
 var router = express.Router();
 const client = new OAuth2Client(CLIENT_ID);
 
-/* TODO Author : 정근화(수빈님 코드 참고) */
+/* TODO Author : 정근화 */
 
 /* GET login page. */
 router.post('/', function (req, res) {
@@ -72,19 +72,34 @@ router.post('/', function (req, res) {
 
 */
 async function verify(token) {
+
+    /* client.verifyIdToken 함수를 이용해 비동기적으로 ID토큰의 유효성을 검사한다. */
+    // The verifyIdToken function verifies the JWT signature,
+    // the aud claim, the exp claim, and the iss claim.
     const ticket = await client.verifyIdToken({
         idToken: token,
         audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
         // Or, if multiple clients access the backend:
         //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
     });
+
+    /*
+    
+        TODO
+        위의 verifyIdToken 에서 JWT signature 와
+        aud, exp, iss 를 검사하였는데, 이 입증의 결과의
+        성공/실패 유무를 어떻게 구분하는지 알아봐야 함.
+    
+    */
+
+    /* 아래 코드는 verify 가 성공하였을 때 해야 할 역할 */
     const payload = ticket.getPayload();
     const userid = payload['sub'];
     const exp = payload['exp'];
     const email = payload['email'];
     const name = payload['name'];
     console.log("userid : " + userid);
-    console.log("payload : " + payload);
+    console.log("payload : " + payload.toString());
     console.log("exp : " + exp);
     console.log("email : " + email);
     console.log("name : " + name);
