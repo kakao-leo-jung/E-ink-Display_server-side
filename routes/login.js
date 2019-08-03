@@ -27,10 +27,7 @@ router.post('/', function (req, res) {
     const googleToken = req.body.id_token;
 
     /* 토큰을 인증 및 DB 조회를 한다. */
-    const searchedUser = verifyAndGetUserDB(googleToken);
-
-    console.log("searchedUser --------------------");
-    console.log(searchedUser);
+    verifyAndGetUserDB(googleToken);
 
     /*
 
@@ -63,7 +60,10 @@ async function verifyAndGetUserDB(token) {
     const payload = await verify(token).catch(console.error);
 
     /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
-    return await searchDB(token, payload).catch(console.error);
+    const searchedUser = await searchDB(token, payload).catch(console.error);
+
+    console.log("searchedUser --------------------");
+    console.log(searchedUser);
 
 }
 
