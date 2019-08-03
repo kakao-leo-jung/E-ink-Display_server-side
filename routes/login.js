@@ -79,14 +79,20 @@ async function verifyAndGetUserDB(token) {
         },
         SECRET,
         {
-            expiresIn: '7d',
-            issuer: 'velopert.com',
-            subject: 'userInfo'
+            expiresIn: '24h',
+            issuer: 'com.jcp.magicapplication',
+            subject: 'userAuth'
         },
         (err, token) => {
-            if (err) reject(err)
-            resolve(token)
-        });
+            if (err){
+                reject(err);
+            }
+            resolve(token);
+        }
+    );
+
+    console.log("newJWT -----------------------------");
+    console.log(newJwt);
 
 }
 
