@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
     MongoDB 에 연결해주는 커스텀 DB 커넥션 모듈
 
 */
-var dbConnect = function connectLocalDB(dbName) {
+module.exports = function (dbName) {
     mongoose.Promise = global.Promise;
     var db = mongoose.connection;
     db.on('error', console.error);
@@ -15,5 +15,3 @@ var dbConnect = function connectLocalDB(dbName) {
     });
     mongoose.connect('mongodb://localhost/' + dbName);
 }
-
-module.exports = dbConnect;

@@ -44,7 +44,7 @@ app.use('/loginToken', login);
 
 */
 var dbConnect = require('./bin/dbConnect');
-dbConnect.connectLocalDB('user_auth');
+dbConnect('user_auth');
 
 
 /// catch 404 and forwarding to error handler
