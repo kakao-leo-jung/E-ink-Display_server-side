@@ -33,7 +33,7 @@ router.post('/', function (req, res) {
     const googleToken = req.body.id_token;
 
     /* 토큰을 인증 및 DB 조회를 한다. */
-    const jwt = verifyAndGetUserDB(googleToken);
+    verifyAndGetUserDB(googleToken, res);
 
     /*
 
@@ -48,10 +48,10 @@ router.post('/', function (req, res) {
     */
 
     /* 응답 설정 */
-    console.jwt("jwt : "+jwt);
-    res.writeHead(200);
-    res.write(jwt.toString());
-    res.end();
+    // console.jwt("jwt : " + jwt);
+    // res.writeHead(200);
+    // res.write(jwt.toString());
+    // res.end();
 
 });
 
@@ -61,7 +61,7 @@ router.post('/', function (req, res) {
     순차적으로 처리한다.
 
 */
-async function verifyAndGetUserDB(token) {
+async function verifyAndGetUserDB(token, res) {
 
     /* 구글 토큰 유효성 검사 및 payload 추출 */
     const payload = await verify(token).catch(console.error);
@@ -89,7 +89,10 @@ async function verifyAndGetUserDB(token) {
     console.log("newJWT -----------------------------");
     console.log(newJwt);
 
-    return newJwt;
+    /* 응답 설정 */
+    res.writeHead(200);
+    res.write(newJwt);
+    res.end();
 
 }
 
