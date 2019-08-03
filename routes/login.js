@@ -33,7 +33,7 @@ router.post('/', function (req, res) {
     const googleToken = req.body.id_token;
 
     /* 토큰을 인증 및 DB 조회를 한다. */
-    verifyAndGetUserDB(googleToken);
+    const jwt = verifyAndGetUserDB(googleToken);
 
     /*
 
@@ -49,7 +49,7 @@ router.post('/', function (req, res) {
 
     /* 응답 설정 */
     res.writeHead(200);
-    res.write(googleToken);
+    res.write(jwt);
     res.end();
 
 });
@@ -87,6 +87,8 @@ async function verifyAndGetUserDB(token) {
 
     console.log("newJWT -----------------------------");
     console.log(newJwt);
+
+    return newJwt;
 
 }
 
