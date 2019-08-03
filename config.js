@@ -5,6 +5,6 @@ module.exports = {
     WEB_CLIENT_ID : "167626550583-ouo1ti55snfqphcgj63gm73a9n54rde8.apps.googleusercontent.com",
 
     /* JWT 비밀 키값 */
-    secret : "dfdfdfd",
+    secret : "xjfkdjsibnslaJDKFsnksKDk",
 
 };

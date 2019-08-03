@@ -72,7 +72,7 @@ async function verifyAndGetUserDB(token) {
     console.log(searchedUser);
 
     /* JWT 를 생성한다. */
-    const newJwt = await Jwt.sign(
+    const newJwt = Jwt.sign(
         {
             _id: searchedUser._id,
             userId: searchedUser.userId
@@ -82,12 +82,6 @@ async function verifyAndGetUserDB(token) {
             expiresIn: '24h',
             issuer: 'com.jcp.magicapplication',
             subject: 'userAuth'
-        },
-        (err, token) => {
-            if (err){
-                reject(err);
-            }
-            resolve(token);
         }
     );
 
