@@ -29,6 +29,7 @@ router.post('/', function (req, res) {
     /* 토큰을 인증 및 DB 조회를 한다. */
     const searchedUser = verifyAndGetUserDB(googleToken);
 
+    console.log("searchedUser --------------------");
     console.log(searchedUser);
 
     /*
@@ -100,6 +101,7 @@ async function searchDB(token, payload) {
 
                 resultUser = await newUser.save();
 
+                console.log("DB- newUser(resultUser) ----------------------");
                 console.log(resultUser);
 
             } catch (err) {
@@ -113,6 +115,8 @@ async function searchDB(token, payload) {
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
         resultUser.googleToken = token;
         resultUser = await resultUser.save();
+
+        console.log("resultUser(googleToken set) --------------------");
 
         /* 조회한 유저 객체를 반환한다. */
         return resultUser;
