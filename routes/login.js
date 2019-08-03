@@ -27,7 +27,7 @@ router.post('/', function (req, res) {
     const googleToken = req.body.id_token;
 
     /* 토큰을 인증 및 DB 조회를 한다. */
-    const searchedUser = await verifyAndGetUserDB(googleToken);
+    const searchedUser = verifyAndGetUserDB(googleToken);
 
     console.log(searchedUser);
 
