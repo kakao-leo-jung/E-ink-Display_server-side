@@ -49,7 +49,7 @@ router.post('/', function (req, res) {
 
     /* 응답 설정 */
     res.writeHead(200);
-    res.write(jwt.toString());
+    res.write(jwt);
     res.end();
 
 });
