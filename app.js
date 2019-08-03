@@ -18,6 +18,9 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// set the secret key variable for jwt
+app.set('jwt-secret', config.secret);
+
 /*
 
     여기서 라우팅 한다.

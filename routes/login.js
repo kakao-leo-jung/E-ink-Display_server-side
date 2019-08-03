@@ -1,9 +1,15 @@
 var express = require('express');
 const { OAuth2Client } = require('google-auth-library');
 var User = require('../model/user');
+const Jwt = require('jsonwebtoken');
+const config = require('../config');
+
 
 /* 구글 프로젝트에 등록한 안드로이드 어플리케이션의 웹 클라이언트ID 값 */
-const CLIENT_ID = "167626550583-ouo1ti55snfqphcgj63gm73a9n54rde8.apps.googleusercontent.com";
+const CLIENT_ID = config.WEB_CLIENT_ID;
+
+/* JWT 발급을 위한 secret 키 */
+const SECRET = config.secret;
 
 var router = express.Router();
 const client = new OAuth2Client(CLIENT_ID);
@@ -65,6 +71,23 @@ async function verifyAndGetUserDB(token) {
     console.log("searchedUser --------------------");
     console.log(searchedUser);
 
+    /* JWT 를 생성한다. */
+    const newJwt = await Jwt.sign(
+        {
+            _id: searchedUser._id,
+            userId: searchedUser.userId
+        },
+        SECRET,
+        {
+            expiresIn: '7d',
+            issuer: 'velopert.com',
+            subject: 'userInfo'
+        },
+        (err, token) => {
+            if (err) reject(err)
+            resolve(token)
+        });
+
 }
 
 /*
@@ -117,6 +140,7 @@ async function searchDB(token, payload) {
         resultUser = await resultUser.save();
 
         console.log("resultUser(googleToken set) --------------------");
+        console.log(resultUser);
 
         /* 조회한 유저 객체를 반환한다. */
         return resultUser;
