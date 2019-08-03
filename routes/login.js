@@ -26,11 +26,8 @@ router.post('/', function (req, res) {
     /* 구글 토큰을 담는다. */
     const googleToken = req.body.id_token;
 
-    /* 구글 토큰 유효성 검사 및 payload 추출 */
-    const payload = await verify(googleToken).catch(console.error);
-
-    /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
-    const searchedUser = await searchDB(googleToken, payload).catch(console.error);
+    /* 토큰을 인증 및 DB 조회를 한다. */
+    const searchedUser = await verifyAndGetUserDB(googleToken);
 
     console.log(searchedUser);
 
@@ -55,41 +52,57 @@ router.post('/', function (req, res) {
 
 /*
 
+    모든 구글 토큰의 인증과정과 DB 생성 및 조회를
+    순차적으로 처리한다.
+
+*/
+async function verifyAndGetUserDB(token) {
+
+    /* 구글 토큰 유효성 검사 및 payload 추출 */
+    const payload = await verify(token).catch(console.error);
+
+    /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
+    return await searchDB(token, payload).catch(console.error);
+
+}
+
+/*
+
     인증한 토큰의 Payload 를 가지고 DB를 조회 하는 함수
     유저를 조회해보고 유저가 없으면 새 유저를 생성한다.
     결과적으로 userId와 일치하는 유저를 반환한다.
 
 */
-async function searchDB(token, payload){
+async function searchDB(token, payload) {
 
-    try{
+    try {
 
         /* userId 가 일치하는 유저가 DB에 존재하는지 조회한다. */
-        var resultUser = await User.findOne({userId : payload.sub});
+        var resultUser = await User.findOne({ userId: payload.sub });
 
         /* DB 에 기존 유저 없음 */
-        if(!resultUser){
+        if (!resultUser) {
 
             /* DB 에 새 유저 등록 */
-            try{
+            try {
 
                 const newUser = new User({
-                    userId : payload.sub,
-                    email : payload.email,
-                    name : payload.name,
-                    picture : payload.picture,
-                    given_name : payload.given_name,
-                    family_name : payload.family_name,
-                    locale : payload.locale,
-                    googleToken : "",
-                    mcToken : ""
+                    userId: payload.sub,
+                    email: payload.email,
+                    name: payload.name,
+                    picture: payload.picture,
+                    given_name: payload.given_name,
+                    family_name: payload.family_name,
+                    locale: payload.locale,
+                    googleToken: "",
+                    mcToken: ""
                 });
-    
+
                 resultUser = await newUser.save();
 
                 console.log(resultUser);
 
-            }catch(err){
+            } catch (err) {
 
                 console.error(err);
 
@@ -104,7 +117,7 @@ async function searchDB(token, payload){
         /* 조회한 유저 객체를 반환한다. */
         return resultUser;
 
-    }catch(err){
+    } catch (err) {
 
         console.error(err);
 
