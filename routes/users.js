@@ -56,3 +56,5 @@ router.post('/info', function(req, res){
     console.log(decoded.userId);
 
 });
+
+module.exports = router;
