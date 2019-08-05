@@ -17,6 +17,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 
 /*
 
@@ -32,6 +33,10 @@ app.use('/', routes);
 /* 로그인 '/loginToken' 라우팅 */
 var login = require('./routes/login');
 app.use('/loginToken', login);
+/*********************************************/
+/* 유저 정보 '/users' 라우팅 */
+var users = require('./routes/users');
+app.use('/users', users);
 /*********************************************/
 
 

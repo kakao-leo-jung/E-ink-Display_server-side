@@ -3,21 +3,28 @@ const { OAuth2Client } = require('google-auth-library');
 var User = require('../model/user');
 const Jwt = require('jsonwebtoken');
 const config = require('../config');
+var router = express.Router();
 
+/* TODO Author : 정근화 */
+
+/*
+
+    본 모듈은 /loginToken 으로 들어온 요청을 처리한다.
+    loginToken/ 은 googleToken 을 받아 인증절차를 거치고
+    새로 생성한 커스텀 JWT를 안드로이드와의 통신 인증 수단으로 발급한다.
+
+*/
 
 /* 구글 프로젝트에 등록한 안드로이드 어플리케이션의 웹 클라이언트ID 값 */
 const CLIENT_ID = config.WEB_CLIENT_ID;
+const client = new OAuth2Client(CLIENT_ID);
 
 /* JWT 발급을 위한 secret 키 */
 const SECRET = config.secret;
 
-var router = express.Router();
-const client = new OAuth2Client(CLIENT_ID);
-
-/* TODO Author : 정근화 */
-
-/* GET login page. */
 /*
+
+    /loginToken/
 
     LoginToken 구글 로그인 받은 토큰을 분석해서 처리한다.
     구현할 로직은 다음과 같다.
@@ -32,36 +39,28 @@ router.post('/', function (req, res) {
     /* 구글 토큰을 담는다. */
     const googleToken = req.body.id_token;
 
-    /* 토큰을 인증 및 DB 조회를 한다. */
-    verifyAndGetUserDB(googleToken, res);
-
     /*
-
-        
-
+    
+        googleToken 으로 로그인 절차를 행한다.
+        1. 구글토큰의 유효성을 검사한다.
+        2. 구글토큰을 추출하여 userId 값으로 DB를 검색한 후
+           googleToken 을 저장한다. (없으면 새 유저 추가)
+        3. 새로운 JWT를 생성하여 성공코드(200)과 함께 JWT를 response 한다.
+    
     */
-
-    /*
-
-        이 사이에 res를 보내기 전에 절차를 행한다.
-
-    */
-
-    /* 응답 설정 */
-    // console.jwt("jwt : " + jwt);
-    // res.writeHead(200);
-    // res.write(jwt.toString());
-    // res.end();
+    returnJWT(googleToken, res);
 
 });
 
 /*
 
-    모든 구글 토큰의 인증과정과 DB 생성 및 조회를
-    순차적으로 처리한다.
+    모든 구글 토큰의 인증과정과 DB 생성 및 조회,
+    리턴의 과정을 순차적으로 처리한다.
+
+    * 각 단계의 오류 및 예외 처리를 해주어야 함.
 
 */
-async function verifyAndGetUserDB(token, res) {
+async function returnJWT(token, res) {
 
     /* 구글 토큰 유효성 검사 및 payload 추출 */
     const payload = await verify(token).catch(console.error);
@@ -89,7 +88,7 @@ async function verifyAndGetUserDB(token, res) {
     console.log("newJWT -----------------------------");
     console.log(newJwt);
 
-    /* 응답 설정 */
+    /* JWT를 리턴한다. */
     res.writeHead(200);
     res.write(newJwt);
     res.end();
