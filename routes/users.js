@@ -53,8 +53,14 @@ router.post('/info', function(req, res){
 
     */
     var decoded = Jwt.verify(reqJwt, SECRET);
-    
     console.log(decoded.userId);
+    
+    var testObj = {
+        name : "jkhk"
+    };
+
+    res.writeHead(200);
+    res.json(testObj);
 
 });
 
