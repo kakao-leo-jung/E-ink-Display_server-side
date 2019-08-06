@@ -1,5 +1,6 @@
 var express = require('express');
 const Jwt = require('jsonwebtoken');
+const config = require('../config');
 var router = express.Router();
 
 /* TODO Author : 정근화 */
