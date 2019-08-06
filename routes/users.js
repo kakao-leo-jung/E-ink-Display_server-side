@@ -28,7 +28,7 @@ const SECRET = config.secret;
 router.post('/info', function(req, res){
 
     /* 헤더로 부터 JWT 를 수신한다. */
-    var reqJwt = req.headers.jwt;
+    //var reqJwt = req.headers.jwt;
 
     /* 받아온 JWT 를 검사한다. */
     /*
@@ -37,12 +37,12 @@ router.post('/info', function(req, res){
         - 토큰이 존재하지 않음(로그인 안된 상태) 403 반환
 
     */
-    if(!reqJwt) {
-        return res.status(403).json({
-            success: false,
-            message: 'not logged in'
-        })
-    }
+    // if(!reqJwt) {
+    //     return res.status(403).json({
+    //         success: false,
+    //         message: 'not logged in'
+    //     })
+    // }
 
     /*
     
@@ -51,9 +51,9 @@ router.post('/info', function(req, res){
         유효하면 디코딩된 값을 추출한다.
 
     */
-    var decoded = Jwt.verify(reqJwt, SECRET);
+    //var decoded = Jwt.verify(reqJwt, SECRET);
     
-    console.log(decoded.userId);
+    //console.log(decoded.userId);
 
 });
 
