@@ -1,6 +1,7 @@
 var express = require('express');
 const Jwt = require('jsonwebtoken');
 const config = require('../config');
+var User = require('../model/user');
 var router = express.Router();
 
 /* TODO Author : 정근화 */
@@ -49,17 +50,40 @@ router.post('/info', function(req, res){
     
         token exixt
         - 토큰 존재, 토큰의 유효성을 검증하고
-        유효하면 디코딩된 값을 추출한다.
+        유효하면 디코딩된 값에서 userId 값을 추출한다.
 
     */
     var decoded = Jwt.verify(reqJwt, SECRET);
     console.log("decoded UserId : "+decoded.userId);
     
-    var testObj = {
-        name : "jkhk"
+    /*
+
+        userId 값을 통해 db를 조회하고 필요한 정보를
+        가져와 Object 로 생성한다.
+        userId(string)          : 유저 토큰 아이디 숫자 값(token 의 sub 값)
+        email(string)           : 유저 이메일
+        name(string)            : 유저 풀 네임
+        picture(string)         : 유저 사진 url
+        given_name(string)      : 유저 이름
+        family_name(string)     : 유저 이름(성)
+        locale(string)          : 지역(한국은 ko)
+
+    */
+    var resultUser = await User.findOne({ userId: decoded.userId });
+    var ret = {
+
+        userId : resultUser.userId,
+        email : resultUser.email,
+        name : resultUser.name,
+        picture : resultUser.picture,
+        given_name : resultUser.given_name,
+        family_name : resultUser.family_name,
+        locale : resultUser.locale
+
     };
 
-    res.json(testObj);
+    /* 객체를 리턴한다 */
+    res.json(ret);
 
 });
 
