@@ -69,21 +69,30 @@ router.post('/info', function(req, res){
         locale(string)          : 지역(한국은 ko)
 
     */
-    var resultUser = User.findOne({ userId: decoded.userId });
-    var ret = {
+    User.findOne({ userId: decoded.userId }, function(err, resultUser){
+        if(!err){
 
-        userId : resultUser.userId,
-        email : resultUser.email,
-        name : resultUser.name,
-        picture : resultUser.picture,
-        given_name : resultUser.given_name,
-        family_name : resultUser.family_name,
-        locale : resultUser.locale
+            var ret = {
 
-    };
+                userId : resultUser.userId,
+                email : resultUser.email,
+                name : resultUser.name,
+                picture : resultUser.picture,
+                given_name : resultUser.given_name,
+                family_name : resultUser.family_name,
+                locale : resultUser.locale
+        
+            };
 
-    /* 객체를 리턴한다 */
-    res.json(ret);
+            /* 객체를 리턴한다 */
+            res.json(ret);
+
+        }else{
+            console.error(err);
+            res.status(500);
+            res.end();
+        }
+    });
 
 });
 
