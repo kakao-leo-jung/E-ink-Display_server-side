@@ -69,7 +69,7 @@ router.post('/info', function(req, res){
         locale(string)          : 지역(한국은 ko)
 
     */
-    var resultUser = await User.findOne({ userId: decoded.userId });
+    var resultUser = User.findOne({ userId: decoded.userId });
     var ret = {
 
         userId : resultUser.userId,
