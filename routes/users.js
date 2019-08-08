@@ -14,7 +14,7 @@ var router = express.Router();
 */
 
 /* JWT 인증을 위한 secret 키 */
-const SECRET = config.secret;
+const SECRET = config.JWT_SECRET;
 
 /*
 

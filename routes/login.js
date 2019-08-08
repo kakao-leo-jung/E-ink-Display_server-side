@@ -20,7 +20,7 @@ const CLIENT_ID = config.WEB_CLIENT_ID;
 const client = new OAuth2Client(CLIENT_ID);
 
 /* JWT 발급을 위한 secret 키 */
-const SECRET = config.secret;
+const SECRET = config.JWT_SECRET;
 
 /*
 
@@ -64,6 +64,9 @@ async function returnJWT(token, res) {
 
     /* 구글 토큰 유효성 검사 및 payload 추출 */
     const payload = await verify(token).catch(console.error);
+
+    console.log("Token Payload -----------------------");
+    console.log(payload);
 
     /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
     const searchedUser = await searchDB(token, payload).catch(console.error);

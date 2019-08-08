@@ -7,4 +7,9 @@ module.exports = {
     /* JWT 비밀 키값 */
     secret : "xjfkdjsibnslaJDKFsnksKDk",
 
+    /* Calendar Api 호출을 위한 키값, 원본파일 : credentials.json */
+    CALENDAR_CLIENT_ID : "658164600931-g182cuuinb9uo0n9scc0h3c52418cpvi.apps.googleusercontent.com",
+    CALENDAR_CLIENT_SECRET : "aPgHKjVnduDT0xVDhYSlBIhD",
+    CALENDAR_REDIRECT_URIS : "urn:ietf:wg:oauth:2.0:oob",
+
 };

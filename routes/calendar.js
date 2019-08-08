@@ -15,10 +15,17 @@ var router = express.Router();
     google calendar api 호출을 사용하여
     개인의 달략에 관한 요청값을 반환한다.
 
+    참고 : https://developers.google.com/calendar/quickstart/nodejs
+
 */
 
 /* JWT 인증을 위한 secret 키 */
-const SECRET = config.secret;
+const SECRET = config.JWT_SECRET;
+
+/* google calendar 를 위한 credential 인증 정보 */
+const CLIENT_ID = config.CALENDAR_CLIENT_ID;
+const CLIENT_SECRET = config.CALENDAR_CLIENT_SECRET;
+const CLIENT_REDIRECT_URIS = config.CALENDAR_REDIRECT_URIS;
 
 /* 달력 호출을 위한 Scope 설정 */
 const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
@@ -73,16 +80,20 @@ router.post('/next', function (req, res) {
     var gToken = getToken(decoded.userId);
     if (!gToken) {
 
-        /* 구글 토큰 */
-        /**
-         * Create an OAuth2 client with the given credentials, and then execute the
-         * given callback function.
-         * @param {Object} credentials The authorization client credentials.
-         * @param {function} callback The callback to call with the authorized client.
-         */
-        const { client_secret, client_id, redirect_uris } = credentials.installed;
+        /* 구글 토큰 존재 */
+        /*
+
+            credential 정보로 OAuth 클라이언트 객체를 생성하고
+            객체에 토큰 값을 담는다.
+
+            Create an OAuth2 client with the given credentials, and then execute the
+            given callback function.
+            @param {Object} credentials The authorization client credentials.
+            @param {function} callback The callback to call with the authorized client.
+        
+        */
         const oAuth2Client = new google.auth.OAuth2(
-            client_id, client_secret, redirect_uris[0]);
+            CLIENT_ID, CLIENT_SECRET, CLIENT_REDIRECT_URIS);
 
         // Check if we have previously stored a token.
         fs.readFile(TOKEN_PATH, (err, token) => {
