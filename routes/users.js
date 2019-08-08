@@ -13,7 +13,7 @@ var router = express.Router();
 
 */
 
-/* JWT 발급을 위한 secret 키 */
+/* JWT 인증을 위한 secret 키 */
 const SECRET = config.secret;
 
 /*

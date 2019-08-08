@@ -39,6 +39,10 @@ app.use('/loginToken', login);
 var users = require('./routes/users');
 app.use('/users', users);
 /*********************************************/
+/* 달력 정보 '/calendar' 라우팅 */
+var calendar = require('./routes/calendar');
+app.use('/calendar', calendar);
+/*********************************************/
 
 
 /*
