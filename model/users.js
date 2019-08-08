@@ -11,7 +11,6 @@ var userSchema = mongoose.Schema({
     type:String,
     required:[true,"Password is required!"],
     select:false //DB에서 값을 읽어올 때 해당 값을 읽어오라고 하는 경우에만 값을 읽어옴
-
   },
   username:{
     type:String,
