@@ -96,6 +96,7 @@ router.post('/next', function (req, res) {
             CLIENT_ID, CLIENT_SECRET, CLIENT_REDIRECT_URIS);
 
         // Check if we have previously stored a token.
+        oAuth2Client.setCredentials()
         fs.readFile(TOKEN_PATH, (err, token) => {
             if (err) return getAccessToken(oAuth2Client, callback);
             oAuth2Client.setCredentials(JSON.parse(token));
