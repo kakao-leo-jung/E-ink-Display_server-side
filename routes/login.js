@@ -65,9 +65,6 @@ async function returnJWT(token, res) {
     /* 구글 토큰 유효성 검사 및 payload 추출 */
     const payload = await verify(token).catch(console.error);
 
-    console.log("Token Payload -----------------------");
-    console.log(payload);
-
     /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
     const searchedUser = await searchDB(token, payload).catch(console.error);
 
@@ -244,7 +241,8 @@ async function verify(token) {
 
     */
     const payload = ticket.getPayload();
-    console.log("payload : " + JSON.stringify(payload));
+    console.log("Token Payload -----------------------");
+    console.log(payload);
     return payload;
 
     /*
