@@ -67,9 +67,9 @@ router.post('/', function (req, res) {
 async function returnJWT(authCode, res) {
 
     /* authCode 로 부터 토큰을 추출해 낸다. */
-    //const {tokens} = await client.getToken(authCode);
+    const {tokens} = await client.getToken(authCode);
 
-    console.log("getToken** : " + tokens);
+    console.log("getToken** : " + tokens.toString());
 
     // /* 구글 토큰 유효성 검사 및 payload 추출 */
     // const payload = await verify(token).catch(console.error);
