@@ -51,7 +51,7 @@ router.post('/', function (req, res) {
         3. 새로운 JWT를 생성하여 성공코드(200)과 함께 JWT를 response 한다.
     
     */
-    //returnJWT(googleToken, res);
+    returnJWT(authCode, res);
 
 });
 
