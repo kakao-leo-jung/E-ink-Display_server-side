@@ -29,15 +29,18 @@ const SECRET = config.JWT_SECRET;
     LoginToken 구글 로그인 받은 토큰을 분석해서 처리한다.
     구현할 로직은 다음과 같다.
 
-    1. 받은 구글 토큰의 유효성을 검사하고 Payload를 불러온다.
+    0. authCode 를 받아 accessToken, refreshToken, idToken 으로 분리한다.
+    1. 받은 아이디 토큰의 유효성을 검사하고 Payload를 불러온다.
     2. userID 값을 이용해 DB를 조회한다.
         - DB에 존재안함 : 새 user를 등록 한다.
 
 */
 router.post('/', function (req, res) {
 
-    /* 구글 토큰을 담는다. */
-    const googleToken = req.body.id_token;
+    /* 인증 코드를 담는다. */
+    const authCode = req.body.authCode;
+
+    console.log("Receive AuthCode from client : " + authCode);
 
     /*
     
@@ -48,7 +51,7 @@ router.post('/', function (req, res) {
         3. 새로운 JWT를 생성하여 성공코드(200)과 함께 JWT를 response 한다.
     
     */
-    returnJWT(googleToken, res);
+    //returnJWT(googleToken, res);
 
 });
 
