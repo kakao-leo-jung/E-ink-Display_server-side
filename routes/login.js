@@ -43,10 +43,6 @@ router.post('/', function (req, res) {
 
     console.log("Receive AuthCode from client : " + authCode);
 
-    const tt = getAccessTokenFromCode(authCode);
-
-    console.logf("tttttttt : " + tt);
-
     /*
     
         googleToken 으로 로그인 절차를 행한다.
@@ -62,29 +58,18 @@ router.post('/', function (req, res) {
 
 /*
 
-    클라이언트로 부터 받은 AuthCode 를 분석하여
-    AccessToken, RefreshToken, idToken 을 추출한다.
-
-*/
-async function getAccessTokenFromCode(code){
-
-    const {tokens} = await client.getToken(code);
-
-    console.log("getAccessTokenFromCode : " + tokens);
-
-    return tokens;
-
-}
-
-/*
-
     모든 구글 토큰의 인증과정과 DB 생성 및 조회,
     리턴의 과정을 순차적으로 처리한다.
 
     * 각 단계의 오류 및 예외 처리를 해주어야 함.
 
 */
-async function returnJWT(token, res) {
+async function returnJWT(authCode, res) {
+
+    /* authCode 로 부터 토큰을 추출해 낸다. */
+    const {tokens} = await client.getToken(authCode);
+
+    console.log("getToken** : " + tokens);
 
     /* 구글 토큰 유효성 검사 및 payload 추출 */
     const payload = await verify(token).catch(console.error);
