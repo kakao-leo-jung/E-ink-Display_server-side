@@ -1,5 +1,6 @@
 var express = require('express');
 const { OAuth2Client } = require('google-auth-library');
+const {google} = require('googleapis');
 var User = require('../model/user');
 const Jwt = require('jsonwebtoken');
 const config = require('../config');
@@ -42,6 +43,10 @@ router.post('/', function (req, res) {
 
     console.log("Receive AuthCode from client : " + authCode);
 
+    const tt = getAccessTokenFromCode(authCode);
+
+    console.logf("tttttttt : " + tt);
+
     /*
     
         googleToken 으로 로그인 절차를 행한다.
@@ -54,6 +59,22 @@ router.post('/', function (req, res) {
     returnJWT(authCode, res);
 
 });
+
+/*
+
+    클라이언트로 부터 받은 AuthCode 를 분석하여
+    AccessToken, RefreshToken, idToken 을 추출한다.
+
+*/
+async function getAccessTokenFromCode(code){
+
+    const {tokens} = await client.getToken(code);
+
+    console.log("getAccessTokenFromCode : " + tokens);
+
+    return tokens;
+
+}
 
 /*
 
