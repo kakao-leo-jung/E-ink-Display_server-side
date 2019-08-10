@@ -81,8 +81,9 @@ async function returnJWT(authCode, res) {
     const { tokens } = await oauth2Client.getToken(authCode);
     oauth2Client.setCredentials(tokens);
 
-    console.log("afterGetToken*** : " + tokens);
-
+    console.log("ACCESS_TOKEN*** : " + tokens.access_token);
+    console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
+    console.log("ID_TOKEN*** : " + tokens.id_token);
 
     // /* 구글 토큰 유효성 검사 및 payload 추출 */
     // const payload = await verify(token).catch(console.error);
@@ -112,7 +113,7 @@ async function returnJWT(authCode, res) {
 
     /* JWT를 리턴한다. */
     res.writeHead(200);
-    res.write(newJwt);
+    res.write(access_token);
     res.end();
 
 }
