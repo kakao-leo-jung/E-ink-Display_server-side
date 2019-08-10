@@ -22,8 +22,8 @@ var Schema = mongoose.Schema;
     given_name(string)      : 유저 이름
     family_name(string)     : 유저 이름(성)
     locale(string)          : 지역(한국은 ko)
-    googleToken(string)     : 구글에서 발급받은 id_token
-    mcToken(string)         : 우리쪽에서 새로 생성해서 발급한 JWT token
+    access_token(string)    : 구글에서 발급받은 id_token
+    refresh_token(string)   : 우리쪽에서 새로 생성해서 발급한 JWT token
 
 */
 var userSchema = new Schema({
@@ -35,8 +35,8 @@ var userSchema = new Schema({
     given_name : String,
     family_name : String,
     locale : String,
-    googleToken : String,
-    mcToken : String
+    access_token : String,
+    refresh_token : String
 
 });
 

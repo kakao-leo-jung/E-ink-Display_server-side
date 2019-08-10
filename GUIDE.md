@@ -7,5 +7,9 @@ http port   | 80
 #### 서버 DB 접속
 $ mongo
 $ db
+$ use user_auth
+$ show collections
+$ db.users.find().pretty()
+
 
 #### user_auth > user 콜렉션 구조

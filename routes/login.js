@@ -87,39 +87,47 @@ async function returnJWT(authCode, res) {
     const { tokens } = await oAuth2Client.getToken(authCode);
     oAuth2Client.setCredentials(tokens);
 
-    console.log("ACCESS_TOKEN*** : " + tokens.access_token);
-    console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
-    console.log("ID_TOKEN*** : " + tokens.id_token);
+    /* refreshToken 을 발급받는다. */
+    oauth2Client.on(tokens, (tokens) => {
+        if (tokens.refresh_token) {
+          // store the refresh_token in my database!
+          console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
+        }
+        
+        console.log("ACCESS_TOKEN*** : " + tokens.access_token);
+        console.log("ID_TOKEN*** : " + tokens.id_token);
 
-    // /* 구글 토큰 유효성 검사 및 payload 추출 */
-    // const payload = await verify(token).catch(console.error);
+    });
 
-    // /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
-    // const searchedUser = await searchDB(token, payload).catch(console.error);
+    /* 구글 토큰 유효성 검사 및 payload 추출 */
+    const payload = await verify(tokens).catch(console.error);
 
-    // console.log("searchedUser --------------------");
-    // console.log(searchedUser);
+    /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
+    const searchedUser = await searchDB(tokens, payload).catch(console.error);
 
-    // /* JWT 를 생성한다. */
-    // const newJwt = Jwt.sign(
-    //     {
-    //         _id: searchedUser._id,
-    //         userId: searchedUser.userId
-    //     },
-    //     SECRET,
-    //     {
-    //         expiresIn: '24h',
-    //         issuer: 'com.jcp.magicapplication',
-    //         subject: 'userAuth'
-    //     }
-    // );
+    console.log("searchedUser --------------------");
+    console.log(searchedUser);
 
-    // console.log("newJWT -----------------------------");
-    // console.log(newJwt);
+    /* JWT 를 생성한다. */
+    const newJwt = Jwt.sign(
+        {
+            _id: searchedUser._id,
+            userId: searchedUser.userId
+        },
+        SECRET,
+        {
+            expiresIn: '24h',
+            issuer: 'com.jcp.magicapplication',
+            subject: 'userAuth'
+        }
+    );
+
+    console.log("newJWT -----------------------------");
+    console.log(newJwt);
 
     /* JWT를 리턴한다. */
     res.writeHead(200);
-    res.write(access_token);
+    res.write(newJwt);
     res.end();
 
 }
@@ -131,7 +139,7 @@ async function returnJWT(authCode, res) {
     결과적으로 userId와 일치하는 유저를 반환한다.
 
 */
-async function searchDB(token, payload) {
+async function searchDB(tokens, payload) {
 
     try {
 
@@ -152,8 +160,8 @@ async function searchDB(token, payload) {
                     given_name: payload.given_name,
                     family_name: payload.family_name,
                     locale: payload.locale,
-                    googleToken: "",
-                    mcToken: ""
+                    access_token: "",
+                    refresh_token: ""
                 });
 
                 resultUser = await newUser.save();
@@ -170,7 +178,8 @@ async function searchDB(token, payload) {
         }
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.googleToken = token;
+        resultUser.access_token = tokens.access_token;
+        resultUser.refresh_token = tokens.refresh_token;
         resultUser = await resultUser.save();
 
         console.log("resultUser(googleToken set) --------------------");
@@ -218,10 +227,12 @@ async function searchDB(token, payload) {
 
 
 */
-async function verify(token) {
+async function verify(tokens) {
 
     /* 
     
+        verify 에서 tokens 로 넘어오는 객체는 access_token 과 refresh_token, id_token
+        을 지니고 있다. 여기서는
         client.verifyIdToken 함수를 이용해 비동기적으로 ID토큰의 유효성을 검사한다.
         The verifyIdToken function verifies the JWT signature,
         the aud claim, the exp claim, and the iss claim.
@@ -230,7 +241,7 @@ async function verify(token) {
 
     */
     const ticket = await client.verifyIdToken({
-        idToken: token,
+        idToken: tokens.id_token,
         audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
         // Or, if multiple clients access the backend:
         //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
