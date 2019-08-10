@@ -23,7 +23,7 @@ const CLIENT_REDIRECT_URIS = config.WEB_REDIRECT_URIS;
 const client = new OAuth2Client(CLIENT_ID);
 
 /* authCode 를 분석하기 위한 credentials.json 을 사용하여 authclient를 생성. */
-const oauth2Client = new google.auth.OAuth2(
+const oAuth2Client = new google.auth.OAuth2(
     CLIENT_ID,
     CLIENT_SECRET,
     CLIENT_REDIRECT_URIS
@@ -84,8 +84,8 @@ async function returnJWT(authCode, res) {
     console.log("beforeGetToken***");
 
     /* authCode 로 부터 토큰을 추출해 낸다. */
-    const { tokens } = await oauth2Client.getToken(authCode);
-    oauth2Client.setCredentials(tokens);
+    const { tokens } = await oAuth2Client.getToken(authCode);
+    oAuth2Client.setCredentials(tokens);
 
     console.log("ACCESS_TOKEN*** : " + tokens.access_token);
     console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
