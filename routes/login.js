@@ -27,18 +27,6 @@ const oauth2Client = new google.auth.OAuth2(
     config.CALENDAR_REDIRECT_URIS
 );
 
-const scopes = [
-    'https://www.googleapis.com/auth/calendar'
-];
-
-const url = oauth2Client.generateAuthUrl({
-    // 'online' (default) or 'offline' (gets refresh_token)
-    access_type: 'offline',
-
-    // If you only need one scope you can pass it as a string
-    scope: scopes
-});
-
 /* JWT 발급을 위한 secret 키 */
 const SECRET = config.JWT_SECRET;
 
@@ -88,8 +76,8 @@ async function returnJWT(authCode, res) {
     console.log("beforeGetToken***");
 
     /* authCode 로 부터 토큰을 추출해 낸다. */
-    const { tokens } = await oauth2Client.getToken(authCode);
-    oauth2Client.setCredentials(tokens);
+    const { tokens } = await client.getToken(authCode);
+    //oauth2Client.setCredentials(tokens);
 
     console.log("afterGetToken*** : " + tokens.access_token);
 
