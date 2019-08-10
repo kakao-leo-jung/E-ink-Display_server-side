@@ -18,13 +18,15 @@ var router = express.Router();
 
 /* 구글 프로젝트에 등록한 안드로이드 어플리케이션의 웹 클라이언트ID 값 */
 const CLIENT_ID = config.WEB_CLIENT_ID;
+const CLIENT_SECRET = config.WEB_CLIENT_SECRET;
+const CLIENT_REDIRECT_URIS = config.WEB_REDIRECT_URIS;
 const client = new OAuth2Client(CLIENT_ID);
 
 /* authCode 를 분석하기 위한 credentials.json 을 사용하여 authclient를 생성. */
 const oauth2Client = new google.auth.OAuth2(
-    config.CALENDAR_CLIENT_ID,
-    config.CALENDAR_CLIENT_SECRET,
-    config.CALENDAR_REDIRECT_URIS
+    CLIENT_ID,
+    CLIENT_SECRET,
+    CLIENT_REDIRECT_URIS
 );
 
 /* JWT 발급을 위한 secret 키 */
@@ -76,10 +78,10 @@ async function returnJWT(authCode, res) {
     console.log("beforeGetToken***");
 
     /* authCode 로 부터 토큰을 추출해 낸다. */
-    const { tokens } = await client.getToken(authCode);
-    //oauth2Client.setCredentials(tokens);
+    const { tokens } = await oauth2Client.getToken(authCode);
+    oauth2Client.setCredentials(tokens);
 
-    console.log("afterGetToken*** : " + tokens.access_token);
+    console.log("afterGetToken*** : " + tokens);
 
 
     // /* 구글 토큰 유효성 검사 및 payload 추출 */
