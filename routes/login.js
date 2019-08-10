@@ -88,7 +88,7 @@ async function returnJWT(authCode, res) {
     oAuth2Client.setCredentials(tokens);
 
     /* refreshToken 을 발급받는다. */
-    oauth2Client.on(tokens, (tokens) => {
+    oAuth2Client.on(tokens, (tokens) => {
         if (tokens.refresh_token) {
           // store the refresh_token in my database!
           console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
