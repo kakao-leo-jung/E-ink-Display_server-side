@@ -66,6 +66,8 @@ router.post('/', function (req, res) {
 */
 async function returnJWT(authCode, res) {
 
+    console.log("beforeGetToken***");
+
     /* authCode 로 부터 토큰을 추출해 낸다. */
     const {tokens} = await client.getToken(authCode);
 
