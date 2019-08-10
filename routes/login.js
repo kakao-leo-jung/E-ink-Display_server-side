@@ -71,31 +71,31 @@ async function returnJWT(authCode, res) {
 
     console.log("getToken** : " + tokens);
 
-    /* 구글 토큰 유효성 검사 및 payload 추출 */
-    const payload = await verify(token).catch(console.error);
+    // /* 구글 토큰 유효성 검사 및 payload 추출 */
+    // const payload = await verify(token).catch(console.error);
 
-    /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
-    const searchedUser = await searchDB(token, payload).catch(console.error);
+    // /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
+    // const searchedUser = await searchDB(token, payload).catch(console.error);
 
-    console.log("searchedUser --------------------");
-    console.log(searchedUser);
+    // console.log("searchedUser --------------------");
+    // console.log(searchedUser);
 
-    /* JWT 를 생성한다. */
-    const newJwt = Jwt.sign(
-        {
-            _id: searchedUser._id,
-            userId: searchedUser.userId
-        },
-        SECRET,
-        {
-            expiresIn: '24h',
-            issuer: 'com.jcp.magicapplication',
-            subject: 'userAuth'
-        }
-    );
+    // /* JWT 를 생성한다. */
+    // const newJwt = Jwt.sign(
+    //     {
+    //         _id: searchedUser._id,
+    //         userId: searchedUser.userId
+    //     },
+    //     SECRET,
+    //     {
+    //         expiresIn: '24h',
+    //         issuer: 'com.jcp.magicapplication',
+    //         subject: 'userAuth'
+    //     }
+    // );
 
-    console.log("newJWT -----------------------------");
-    console.log(newJwt);
+    // console.log("newJWT -----------------------------");
+    // console.log(newJwt);
 
     /* JWT를 리턴한다. */
     res.writeHead(200);
