@@ -20,6 +20,13 @@ var router = express.Router();
 const CLIENT_ID = config.WEB_CLIENT_ID;
 const client = new OAuth2Client(CLIENT_ID);
 
+/* authCode 를 분석하기 위한 credentials.json 을 사용하여 authclient를 생성. */
+const oauth2Client = new google.auth.OAuth2(
+    config.CALENDAR_CLIENT_ID,
+    config.CALENDAR_CLIENT_SECRET,
+    config.CALENDAR_REDIRECT_URIS
+  );
+
 /* JWT 발급을 위한 secret 키 */
 const SECRET = config.JWT_SECRET;
 
@@ -69,9 +76,11 @@ async function returnJWT(authCode, res) {
     console.log("beforeGetToken***");
 
     /* authCode 로 부터 토큰을 추출해 낸다. */
-    const {tokens} = await client.getToken(authCode);
+    const {tokens} = await oauth2Client.getToken(authCode);
+    oauth2Client.setCredentials(tokens);
 
-    console.log("getToken** : " + tokens.toString());
+    console.log("afterGetToken*** : " + tokens.access_token);
+
 
     // /* 구글 토큰 유효성 검사 및 payload 추출 */
     // const payload = await verify(token).catch(console.error);
