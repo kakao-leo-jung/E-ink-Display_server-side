@@ -29,6 +29,12 @@ const oauth2Client = new google.auth.OAuth2(
     CLIENT_REDIRECT_URIS
 );
 
+/* Refresh Token 을 받기위한 offline 설정 */
+const authorizeUrl = oAuth2Client.generateAuthUrl({
+    // To get a refresh token, you MUST set access_type to `offline`.
+    access_type: 'offline',
+});
+
 /* JWT 발급을 위한 secret 키 */
 const SECRET = config.JWT_SECRET;
 
