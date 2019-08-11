@@ -17,6 +17,11 @@ var router = express.Router();
 
     참고 : https://developers.google.com/calendar/quickstart/nodejs
 
+    * 호출 과정
+    1. 먼저 요청의 헤더로 부터 jwt를 수신한다.
+    2. jwt 를 verify 하고 jwt 로 부터 user_id 검출한다.
+    3. user_id 로 DB 를 조회하여 access_token 을 조회한다.
+
 */
 
 /* JWT 인증을 위한 secret 키 */
@@ -77,8 +82,8 @@ router.post('/next', function (req, res) {
         googleToken 값을 조회한다.
 
     */
-    var gToken = getToken(decoded.userId);
-    if (!gToken) {
+    var gAccessToken = getToken(decoded.userId);
+    if (!gAccessToken) {
 
         /* 구글 토큰 존재 */
         /*
@@ -94,17 +99,14 @@ router.post('/next', function (req, res) {
         */
         const oAuth2Client = new google.auth.OAuth2(
             CLIENT_ID, CLIENT_SECRET, CLIENT_REDIRECT_URIS);
+        oAuth2Client.setCredentials(JSON.parse(gAccessToken));
 
-        // Check if we have previously stored a token.
-        oAuth2Client.setCredentials()
-        fs.readFile(TOKEN_PATH, (err, token) => {
-            if (err) return getAccessToken(oAuth2Client, callback);
-            oAuth2Client.setCredentials(JSON.parse(token));
-            callback(oAuth2Client);
-        });
-
+        listEvents(oAuth2Client);
 
     } else {
+
+        /* 구글 토큰 미존재 */
+
         res.set(500);
         res.end();
     }
@@ -114,7 +116,7 @@ router.post('/next', function (req, res) {
 /*
 
     User DB 에서 user_id 를 사용하여 해당 유저의
-    googleToken 을 반환한다.
+    access_Token 을 반환한다.
 
 */
 async function getToken(user_id) {
@@ -122,11 +124,43 @@ async function getToken(user_id) {
     var resultUser = await User.findOne({ userId: user_id }).catch(console.error);
 
     if (!resultUser) {
-        return resultUser.googleToken;
+        return resultUser.access_token;
     } else {
         return null;
     }
 
+}
+
+/*
+
+    다음 10개의 이벤트를 유저의 primary 달력에서 가져온다.
+
+    Lists the next 10 events on the user's primary calendar.
+    @param {google.auth.OAuth2} auth An authorized OAuth2 client.
+
+*/
+function listEvents(auth) {
+    
+    const calendar = google.calendar({ version: 'v3', auth });
+    calendar.events.list({
+        calendarId: 'primary',
+        timeMin: (new Date()).toISOString(),
+        maxResults: 10,
+        singleEvents: true,
+        orderBy: 'startTime',
+    }, (err, res) => {
+        if (err) return console.log('The API returned an error: ' + err);
+        const events = res.data.items;
+        if (events.length) {
+            console.log('Upcoming 10 events:');
+            events.map((event, i) => {
+                const start = event.start.dateTime || event.start.date;
+                console.log(`${start} - ${event.summary}`);
+            });
+        } else {
+            console.log('No upcoming events found.');
+        }
+    });
 }
 
 module.exports = router;

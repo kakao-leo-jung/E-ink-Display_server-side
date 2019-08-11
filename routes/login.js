@@ -81,17 +81,28 @@ router.post('/', function (req, res) {
 */
 async function returnJWT(authCode, res) {
 
-    console.log("beforeGetToken***");
-
     /* authCode 로 부터 토큰을 추출해 낸다. */
     const { tokens } = await oAuth2Client.getToken(authCode);
     oAuth2Client.setCredentials(tokens);
 
-    /* refreshToken 을 발급받는다. */
+    /*
+    
+        accessToken 의 만료시점이 다가올 경우 감지하여 refreshToken 을 발급받는다.
+        refreshToken 을 발급받아 DB 에 토큰으로 저장한다.
+    
+    */
     oAuth2Client.on(tokens, (tokens) => {
         if (tokens.refresh_token) {
-          // store the refresh_token in my database!
-          console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
+
+            // store the refresh_token in my database!
+            console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
+
+            /* userId 가 일치하는 유저가 DB에 존재하는지 조회한다. */
+            var resultUser = await User.findOne({ userId: payload.sub });
+
+            /* 조회한 유저의 구글 토큰값을 갱신한다. */
+            resultUser.access_token = tokens.refresh_token;
+            resultUser = await resultUser.save();
         }
         
         console.log("ACCESS_TOKEN*** : " + tokens.access_token);
@@ -160,8 +171,7 @@ async function searchDB(tokens, payload) {
                     given_name: payload.given_name,
                     family_name: payload.family_name,
                     locale: payload.locale,
-                    access_token: "",
-                    refresh_token: ""
+                    access_token: ""
                 });
 
                 resultUser = await newUser.save();
@@ -179,7 +189,6 @@ async function searchDB(tokens, payload) {
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
         resultUser.access_token = tokens.access_token;
-        resultUser.refresh_token = tokens.refresh_token;
         resultUser = await resultUser.save();
 
         console.log("resultUser(googleToken set) --------------------");
