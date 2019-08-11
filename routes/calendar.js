@@ -82,10 +82,23 @@ router.post('/next', function (req, res) {
         googleToken 값을 조회한다.
 
     */
-    var gAccessToken = getToken(decoded.userId);
-    console.log("gAccessToken : " + gAccessToken.toString());
+    getToken(decoded.userId, res);
 
-    if (!gAccessToken) {
+});
+
+/*
+
+    User DB 에서 user_id 를 사용하여 해당 유저의
+    access_Token 을 반환한다.
+
+*/
+async function getToken(user_id, res) {
+
+    var resultUser = await User.findOne({ userId: user_id }).catch(console.error);
+
+    console.log("resultUser.access_token : " + resultUser.access_token);
+
+    if (!resultUser) {
 
         /* 구글 토큰 존재 */
         /*
@@ -114,22 +127,6 @@ router.post('/next', function (req, res) {
         res.set(500);
         res.end();
     }
-
-});
-
-/*
-
-    User DB 에서 user_id 를 사용하여 해당 유저의
-    access_Token 을 반환한다.
-
-*/
-async function getToken(user_id) {
-
-    var resultUser = await User.findOne({ userId: user_id }).catch(console.error);
-
-    console.log("resultUser.access_token : " + resultUser.access_token);
-
-    return resultUser.access_token;
 
 }
 
