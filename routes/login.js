@@ -97,20 +97,7 @@ async function returnJWT(authCode, res) {
             // store the refresh_token in my database!
             console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
 
-            try {
-
-                /* userId 가 일치하는 유저가 DB에 존재하는지 조회한다. */
-                var resultUser = await User.findOne({ userId: payload.sub });
-
-                /* 조회한 유저의 구글 토큰값을 갱신한다. */
-                resultUser.access_token = tokens.refresh_token;
-                resultUser = await resultUser.save();
-
-            } catch (err) {
-
-                console.error(err);
-
-            }
+            refreshToken(tokens.refreshToken);
 
         }
 
@@ -149,6 +136,32 @@ async function returnJWT(authCode, res) {
     res.writeHead(200);
     res.write(newJwt);
     res.end();
+
+}
+
+/*
+
+    accessToken 은 기한이 만료된다.
+    oAuthClient.on 으로 기한이 만료되면 다음 refreshToken 을
+    보급한다. 이때 토큰을 DB 에 갱신하여 저장해준다.
+
+*/
+async function refreshToken(refreshToken) {
+
+    try {
+
+        /* userId 가 일치하는 유저가 DB에 존재하는지 조회한다. */
+        var resultUser = await User.findOne({ userId: payload.sub });
+
+        /* 조회한 유저의 구글 토큰값을 갱신한다. */
+        resultUser.access_token = refreshToken;
+        resultUser = await resultUser.save();
+
+    } catch (err) {
+
+        console.error(err);
+
+    }
 
 }
 
