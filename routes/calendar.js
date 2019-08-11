@@ -83,7 +83,7 @@ router.post('/next', function (req, res) {
 
     */
     var gAccessToken = getToken(decoded.userId);
-    console.log("gAccessToken : " + gAccessToken);
+    console.log("gAccessToken : " + gAccessToken.toString());
 
     if (!gAccessToken) {
 
@@ -99,9 +99,12 @@ router.post('/next', function (req, res) {
             @param {function} callback The callback to call with the authorized client.
         
         */
+        console.log("!gAccessToken");
         const oAuth2Client = new google.auth.OAuth2(
             CLIENT_ID, CLIENT_SECRET, CLIENT_REDIRECT_URIS);
         oAuth2Client.setCredentials(JSON.parse(gAccessToken));
+
+        console.log("!gAccessToken end");
 
         listEvents(oAuth2Client);
 
