@@ -117,7 +117,7 @@ async function getToken(user_id, res) {
             console.log("!gAccessToken");
             const oAuth2Client = new google.auth.OAuth2(
                 CLIENT_ID, CLIENT_SECRET, CLIENT_REDIRECT_URIS);
-            oAuth2Client.setCredentials(JSON.parse(gAccessToken));
+            oAuth2Client.setCredentials(JSON.parse(resultUser.access_token));
 
             console.log("!gAccessToken end");
 
