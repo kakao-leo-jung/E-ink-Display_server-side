@@ -127,9 +127,13 @@ async function getToken(user_id) {
 
     var resultUser = await User.findOne({ userId: user_id }).catch(console.error);
 
+    console.log("resultUser.access_token : " + resultUser.access_token);
+
     if (!resultUser) {
+        console.log("return resultUser.access_token");
         return resultUser.access_token;
     } else {
+        console.log("return null");
         return null;
     }
 
