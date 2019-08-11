@@ -28,12 +28,12 @@ var router = express.Router();
 const SECRET = config.JWT_SECRET;
 
 /* google calendar 를 위한 credential 인증 정보 */
-const CLIENT_ID = config.WEB_CLIENT_ID;
-const CLIENT_SECRET = config.WEB_CLIENT_SECRET;
-const CLIENT_REDIRECT_URIS = config.WEB_REDIRECT_URIS;
+const CLIENT_ID = config.CALENDAR_CLIENT_ID;
+const CLIENT_SECRET = config.CALENDAR_CLIENT_SECRET;
+const CLIENT_REDIRECT_URIS = config.CALENDAR_REDIRECT_URIS;
 
 /* 달력 호출을 위한 Scope 설정 */
-const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
+const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
 /*
 
