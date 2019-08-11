@@ -83,6 +83,8 @@ router.post('/next', function (req, res) {
 
     */
     var gAccessToken = getToken(decoded.userId);
+    console.log("gAccessToken : " + gAccessToken);
+
     if (!gAccessToken) {
 
         /* 구글 토큰 존재 */
@@ -106,7 +108,6 @@ router.post('/next', function (req, res) {
     } else {
 
         /* 구글 토큰 미존재 */
-
         res.set(500);
         res.end();
     }
@@ -140,7 +141,9 @@ async function getToken(user_id) {
 
 */
 function listEvents(auth) {
-    
+
+    console.log("entered listEvent, Auth : " + auth.toString());
+
     const calendar = google.calendar({ version: 'v3', auth });
     calendar.events.list({
         calendarId: 'primary',
