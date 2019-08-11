@@ -100,7 +100,7 @@ async function getToken(user_id, res) {
 
         console.log("resultUser.access_token : " + resultUser.access_token);
 
-        if (!resultUser) {
+        if (resultUser) {
 
             /* 구글 토큰 존재 */
             /*
