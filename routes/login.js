@@ -97,14 +97,23 @@ async function returnJWT(authCode, res) {
             // store the refresh_token in my database!
             console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
 
-            /* userId 가 일치하는 유저가 DB에 존재하는지 조회한다. */
-            var resultUser = await User.findOne({ userId: payload.sub });
+            try {
 
-            /* 조회한 유저의 구글 토큰값을 갱신한다. */
-            resultUser.access_token = tokens.refresh_token;
-            resultUser = await resultUser.save();
+                /* userId 가 일치하는 유저가 DB에 존재하는지 조회한다. */
+                var resultUser = await User.findOne({ userId: payload.sub });
+
+                /* 조회한 유저의 구글 토큰값을 갱신한다. */
+                resultUser.access_token = tokens.refresh_token;
+                resultUser = await resultUser.save();
+
+            } catch (err) {
+
+                console.error(err);
+
+            }
+
         }
-        
+
         console.log("ACCESS_TOKEN*** : " + tokens.access_token);
         console.log("ID_TOKEN*** : " + tokens.id_token);
 
