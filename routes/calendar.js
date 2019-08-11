@@ -94,38 +94,46 @@ router.post('/next', function (req, res) {
 */
 async function getToken(user_id, res) {
 
-    var resultUser = await User.findOne({ userId: user_id }).catch(console.error);
+    try {
 
-    console.log("resultUser.access_token : " + resultUser.access_token);
+        var resultUser = await User.findOne({ userId: user_id }).catch(console.error);
 
-    if (!resultUser) {
+        console.log("resultUser.access_token : " + resultUser.access_token);
 
-        /* 구글 토큰 존재 */
-        /*
+        if (!resultUser) {
 
-            credential 정보로 OAuth 클라이언트 객체를 생성하고
-            객체에 토큰 값을 담는다.
+            /* 구글 토큰 존재 */
+            /*
+    
+                credential 정보로 OAuth 클라이언트 객체를 생성하고
+                객체에 토큰 값을 담는다.
+    
+                Create an OAuth2 client with the given credentials, and then execute the
+                given callback function.
+                @param {Object} credentials The authorization client credentials.
+                @param {function} callback The callback to call with the authorized client.
+            
+            */
+            console.log("!gAccessToken");
+            const oAuth2Client = new google.auth.OAuth2(
+                CLIENT_ID, CLIENT_SECRET, CLIENT_REDIRECT_URIS);
+            oAuth2Client.setCredentials(JSON.parse(gAccessToken));
 
-            Create an OAuth2 client with the given credentials, and then execute the
-            given callback function.
-            @param {Object} credentials The authorization client credentials.
-            @param {function} callback The callback to call with the authorized client.
-        
-        */
-        console.log("!gAccessToken");
-        const oAuth2Client = new google.auth.OAuth2(
-            CLIENT_ID, CLIENT_SECRET, CLIENT_REDIRECT_URIS);
-        oAuth2Client.setCredentials(JSON.parse(gAccessToken));
+            console.log("!gAccessToken end");
 
-        console.log("!gAccessToken end");
+            listEvents(oAuth2Client);
 
-        listEvents(oAuth2Client);
+        } else {
 
-    } else {
+            /* 구글 토큰 미존재 */
+            res.set(500);
+            res.end();
+        }
 
-        /* 구글 토큰 미존재 */
-        res.set(500);
-        res.end();
+    } catch (err) {
+
+        console.error(err);
+
     }
 
 }
