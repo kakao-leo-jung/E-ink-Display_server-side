@@ -129,13 +129,7 @@ async function getToken(user_id) {
 
     console.log("resultUser.access_token : " + resultUser.access_token);
 
-    if (!resultUser.access_token) {
-        console.log("return resultUser.access_token");
-        return resultUser.access_token;
-    } else {
-        console.log("return null");
-        return null;
-    }
+    return resultUser.access_token;
 
 }
 
