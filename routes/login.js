@@ -112,7 +112,7 @@ async function returnJWT(authCode, res) {
     const payload = await verify(tokens).catch(console.error);
 
     /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
-    const searchedUser = await searchDB(authCode, payload).catch(console.error);
+    const searchedUser = await searchDB(tokens, payload).catch(console.error);
 
     console.log("searchedUser --------------------");
     console.log(searchedUser);
