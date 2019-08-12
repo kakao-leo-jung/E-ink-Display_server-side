@@ -116,7 +116,9 @@ async function getAuthCode(user_id, res) {
             console.log("OAuth start");
             const oAuth2Client = new google.auth.OAuth2(
                 CLIENT_ID, CLIENT_SECRET, CLIENT_REDIRECT_URIS);
+            console.log("OAuth2Client is created!");
             const { tokens } = await oAuth2Client.getToken(resultUser.google_authCode);
+            console.log("oAuth2Client.getToken success! : " + tokens.toString());
             oAuth2Client.setCredentials(tokens);
             console.log("OAuth finish");
 
