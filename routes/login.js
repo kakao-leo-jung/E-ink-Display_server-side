@@ -86,10 +86,6 @@ async function returnJWT(authCode, res) {
     console.log("getToken Method Result [tokens] : " + tokens);
     oAuth2Client.setCredentials(tokens);
 
-    console.log("::getToken analysis ACCESS : " + tokens.access_token);
-    console.log("::getToken analysis REFRESH : " + tokens.refresh_token);
-    console.log("::getToken analysis ID : " + tokens.id_token);
-
     /*
     
         accessToken 의 만료시점이 다가올 경우 감지하여 refreshToken 을 발급받는다.
@@ -159,7 +155,7 @@ async function refreshToken(refreshToken) {
         var resultUser = await User.findOne({ userId: payload.sub });
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.access_token = refreshToken;
+        resultUser.google_authCode = refreshToken;
         resultUser = await resultUser.save();
 
     } catch (err) {
@@ -198,13 +194,10 @@ async function searchDB(tokens, payload) {
                     given_name: payload.given_name,
                     family_name: payload.family_name,
                     locale: payload.locale,
-                    access_token: ""
+                    google_authCode: ""
                 });
 
                 resultUser = await newUser.save();
-
-                console.log("DB- newUser(resultUser) ----------------------");
-                console.log(resultUser);
 
             } catch (err) {
 
@@ -215,7 +208,7 @@ async function searchDB(tokens, payload) {
         }
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.access_token = tokens.access_token;
+        resultUser.google_authCode = tokens;
         resultUser = await resultUser.save();
 
         console.log("resultUser(googleToken set) --------------------");
