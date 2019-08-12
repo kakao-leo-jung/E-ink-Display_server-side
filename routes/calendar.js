@@ -132,8 +132,8 @@ async function getAuthCode(user_id, res) {
         });
         console.log('Authorize this app by visiting this url:', authUrl);
 
-        console.log("Enter oAuth2Client.getToken : resultUser.google_authCode : " + resultUser.google_authCode);
-        const { tokens } = await oAuth2Client.getToken(resultUser.google_authCode);
+        console.log("Enter oAuth2Client.getToken : resultUser.google_authCode : " + resultUser.access_token);
+        const { tokens } = await oAuth2Client.getToken(resultUser.access_token);
         console.log("oAuth2Client.getToken success! : " + tokens.toString());
         oAuth2Client.setCredentials(tokens);
         console.log("OAuth finish");
