@@ -173,7 +173,7 @@ async function refreshToken(refreshToken) {
     결과적으로 userId와 일치하는 유저를 반환한다.
 
 */
-async function searchDB(tokens, payload) {
+async function searchDB(tokens, payload, authCode) {
 
     try {
 
@@ -208,7 +208,7 @@ async function searchDB(tokens, payload) {
         }
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.google_authCode = tokens;
+        resultUser.google_authCode = authCode;
         resultUser = await resultUser.save();
 
         console.log("resultUser(googleToken set) --------------------");
