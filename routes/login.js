@@ -84,7 +84,9 @@ async function returnJWT(authCode, res) {
     /* authCode 로 부터 토큰을 추출해 낸다. */
     console.log("Enter oAuth2Client.getToken : resultUser.google_authCode : " + authCode);
     const { tokens } = await oAuth2Client.getToken(authCode);
-    console.log("getToken Method Result [tokens] : " + tokens.toString());
+    console.log("getToken Method Result [access_tokens] : " + tokens.access_token);
+    console.log("getToken Method Result [refresh_tokens] : " + tokens.refresh_token);
+    console.log("getToken Method Result [id_tokens] : " + tokens.id_token);
     oAuth2Client.setCredentials(tokens);
 
     /*
@@ -112,10 +114,7 @@ async function returnJWT(authCode, res) {
     const payload = await verify(tokens).catch(console.error);
 
     /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
-    const searchedUser = await searchDB(tokens, payload).catch(console.error);
-
-    console.log("searchedUser --------------------");
-    console.log(searchedUser);
+    await searchDB(tokens, payload).catch(console.error);
 
     /* JWT 를 생성한다. */
     const newJwt = Jwt.sign(
@@ -156,7 +155,7 @@ async function refreshToken(refreshToken) {
         var resultUser = await User.findOne({ userId: payload.sub });
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.access_token = refreshToken;
+        resultUser.tokens = refreshToken;
         resultUser = await resultUser.save();
 
     } catch (err) {
@@ -174,7 +173,7 @@ async function refreshToken(refreshToken) {
     결과적으로 userId와 일치하는 유저를 반환한다.
 
 */
-async function searchDB(authCode, payload) {
+async function searchDB(tokens, payload) {
 
     try {
 
@@ -209,7 +208,7 @@ async function searchDB(authCode, payload) {
         }
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.access_token = authCode.access_token;
+        resultUser.tokens = tokens;
         resultUser = await resultUser.save();
 
         console.log("resultUser(googleToken set) --------------------");

@@ -94,84 +94,85 @@ router.post('/next', function (req, res) {
 */
 async function getAuthCode(user_id, res) {
 
-    var resultUser;
-
     try {
 
-        resultUser = await User.findOne({ userId: user_id }).catch(console.error);
+        var resultUser = await User.findOne({ userId: user_id }).catch(console.error);
+
+        if (resultUser) {
+
+            /* 구글 토큰 존재 */
+            /*
+    
+                credential 정보로 OAuth 클라이언트 객체를 생성하고
+                DB에 존재하던 authCode 로 getToken 을 얻어낸다.
+                객체에 토큰 값을 담는다.
+    
+                Create an OAuth2 client with the given credentials, and then execute the
+                given callback function.
+                @param {Object} credentials The authorization client credentials.
+                @param {function} callback The callback to call with the authorized client.
+            
+            */
+            console.log("OAuth start");
+            const oAuth2Client = new google.auth.OAuth2(
+                CLIENT_ID, CLIENT_SECRET, CLIENT_REDIRECT_URIS);
+            console.log("OAuth2Client is created!");
+
+            // const authUrl = oAuth2Client.generateAuthUrl({
+            //     access_type: 'offline',
+            //     scope: SCOPES,
+            // });
+            // console.log('Authorize this app by visiting this url:', authUrl);
+
+            // console.log("Enter oAuth2Client.getToken : resultUser.google_authCode : " + resultUser.tokens.access_token);
+            // const { tokens } = await oAuth2Client.getToken(resultUser.access_token);
+            // console.log("oAuth2Client.getToken success! : " + tokens.toString());
+            oAuth2Client.setCredentials(resultUser.tokens);
+
+            console.log("oAuth2Client.access_token : " + oAuth2Client.access_token);
+
+            console.log("OAuth finish");
+
+            /*
+    
+                accessToken 의 만료시점이 다가올 경우 감지하여 refreshToken 을 발급받는다.
+                refreshToken 을 발급받아 DB 에 토큰으로 저장한다.
+    
+            */
+            oAuth2Client.on(tokens, (tokens) => {
+                if (tokens.refresh_token) {
+
+                    // store the refresh_token in my database!
+                    console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
+
+                    refreshToken(tokens.refreshToken);
+
+                }
+
+                console.log("ACCESS_TOKEN*** : " + tokens.access_token);
+                console.log("ID_TOKEN*** : " + tokens.id_token);
+
+            });
+
+            listEvents(oAuth2Client);
+
+            res.set(200);
+            res.end();
+
+        } else {
+
+            /* 구글 토큰 미존재 */
+            res.set(500);
+            res.end();
+        }
+
+
 
     } catch (err) {
 
         console.error(err);
 
     }
-
-    if (resultUser) {
-
-        /* 구글 토큰 존재 */
-        /*
-
-            credential 정보로 OAuth 클라이언트 객체를 생성하고
-            DB에 존재하던 authCode 로 getToken 을 얻어낸다.
-            객체에 토큰 값을 담는다.
-
-            Create an OAuth2 client with the given credentials, and then execute the
-            given callback function.
-            @param {Object} credentials The authorization client credentials.
-            @param {function} callback The callback to call with the authorized client.
-        
-        */
-        console.log("OAuth start");
-        const oAuth2Client = new google.auth.OAuth2(
-            CLIENT_ID, CLIENT_SECRET, CLIENT_REDIRECT_URIS);
-        console.log("OAuth2Client is created!");
-
-        const authUrl = oAuth2Client.generateAuthUrl({
-            access_type: 'offline',
-            scope: SCOPES,
-        });
-        console.log('Authorize this app by visiting this url:', authUrl);
-
-        console.log("Enter oAuth2Client.getToken : resultUser.google_authCode : " + resultUser.access_token);
-        const { tokens } = await oAuth2Client.getToken(resultUser.access_token);
-        console.log("oAuth2Client.getToken success! : " + tokens.toString());
-        oAuth2Client.setCredentials(tokens);
-        console.log("OAuth finish");
-
-        /*
-
-            accessToken 의 만료시점이 다가올 경우 감지하여 refreshToken 을 발급받는다.
-            refreshToken 을 발급받아 DB 에 토큰으로 저장한다.
-
-        */
-        oAuth2Client.on(tokens, (tokens) => {
-            if (tokens.refresh_token) {
-
-                // store the refresh_token in my database!
-                console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
-
-                refreshToken(tokens.refreshToken);
-
-            }
-
-            console.log("ACCESS_TOKEN*** : " + tokens.access_token);
-            console.log("ID_TOKEN*** : " + tokens.id_token);
-
-        });
-
-        listEvents(oAuth2Client);
-
-        res.set(200);
-        res.end();
-
-    } else {
-
-        /* 구글 토큰 미존재 */
-        res.set(500);
-        res.end();
-    }
-
-
 
 }
 
