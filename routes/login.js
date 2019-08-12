@@ -209,7 +209,7 @@ async function searchDB(authCode, payload) {
         }
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.access_token = authCode;
+        resultUser.access_token = authCode.access_token;
         resultUser = await resultUser.save();
 
         console.log("resultUser(googleToken set) --------------------");
