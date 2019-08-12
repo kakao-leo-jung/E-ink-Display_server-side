@@ -34,7 +34,7 @@ var userSchema = new Schema({
     given_name : String,
     family_name : String,
     locale : String,
-    google_authCode : String
+    google_authCode : Object
 
 });
 
