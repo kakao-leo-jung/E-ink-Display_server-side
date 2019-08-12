@@ -82,8 +82,9 @@ router.post('/', function (req, res) {
 async function returnJWT(authCode, res) {
 
     /* authCode 로 부터 토큰을 추출해 낸다. */
+    console.log("Enter oAuth2Client.getToken : resultUser.google_authCode : " + authCode);
     const { tokens } = await oAuth2Client.getToken(authCode);
-    console.log("getToken Method Result [tokens] : " + tokens);
+    console.log("getToken Method Result [tokens] : " + tokens.toString());
     oAuth2Client.setCredentials(tokens);
 
     /*
