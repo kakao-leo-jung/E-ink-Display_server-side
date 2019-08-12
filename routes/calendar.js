@@ -79,10 +79,10 @@ router.post('/next', function (req, res) {
     /*
 
         userId 값을 통해 db의
-        googleToken 값을 조회한다.
+        AuthCode 값을 조회한다.
 
     */
-    getToken(decoded.userId, res);
+    getAuthCode(decoded.userId, res);
 
 });
 
@@ -92,13 +92,13 @@ router.post('/next', function (req, res) {
     access_Token 을 반환한다.
 
 */
-async function getToken(user_id, res) {
+async function getAuthCode(user_id, res) {
 
     try {
 
         var resultUser = await User.findOne({ userId: user_id }).catch(console.error);
 
-        console.log("resultUser.google_authCode : " + resultUser.google_authCode);
+        console.log("resultUser.google_authCode : " + resultUser.google_authCode.access_token);
 
         if (resultUser) {
 
@@ -115,10 +115,12 @@ async function getToken(user_id, res) {
                 @param {function} callback The callback to call with the authorized client.
             
             */
+            console.log("OAuth start");
             const oAuth2Client = new google.auth.OAuth2(
                 CLIENT_ID, CLIENT_SECRET, CLIENT_REDIRECT_URIS);
             const { tokens } = await oAuth2Client.getToken(resultUser.google_authCode);
             oAuth2Client.setCredentials(tokens);
+            console.log("OAuth finish");
 
             /*
  
