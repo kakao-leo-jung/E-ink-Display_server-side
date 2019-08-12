@@ -86,6 +86,10 @@ async function returnJWT(authCode, res) {
     console.log("getToken Method Result [tokens] : " + tokens);
     oAuth2Client.setCredentials(tokens);
 
+    console.log("::getToken analysis ACCESS : " + tokens.access_token);
+    console.log("::getToken analysis REFRESH : " + tokens.refresh_token);
+    console.log("::getToken analysis ID : " + tokens.id_token);
+
     /*
     
         accessToken 의 만료시점이 다가올 경우 감지하여 refreshToken 을 발급받는다.
