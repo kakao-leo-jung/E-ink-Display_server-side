@@ -143,7 +143,7 @@ async function getAuthCode(user_id, res) {
                 refreshToken 을 발급받아 DB 에 토큰으로 저장한다.
     
             */
-            oAuth2Client.on(tokens, (tokens) => {
+            oAuth2Client.on(resultUser.tokens, (tokens) => {
                 if (tokens.refresh_token) {
 
                     // store the refresh_token in my database!
