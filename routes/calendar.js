@@ -132,13 +132,13 @@ async function getAuthCode(user_id, res) {
             console.log("oAuth2Client.refresh_token[pre] : " + oAuth2Client.credentials);
             // oAuth2Client.setCredentials(resultUser.tokens);
 
-            oauth2Client.credentials = {
+            oAuth2Client.credentials = {
                 refresh_token : resultUser.tokens.refresh_token,
                 access_token : resultUser.tokens.access_token
             };
-            // oauth2Client.refreshAccessToken(function (err, tokens) {
+            // oAuth2Client.refreshAccessToken(function (err, tokens) {
             //     console.log(tokens)
-            //     oauth2Client.credentials = { access_token: tokens.access_token }
+            //     oAuth2Client.credentials = { access_token: tokens.access_token }
             //     callback(oauth2Client);
             // });
 
