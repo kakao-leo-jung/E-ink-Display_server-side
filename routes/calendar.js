@@ -129,12 +129,14 @@ async function getAuthCode(user_id, res) {
             // console.log("oAuth2Client.getToken success! : " + tokens.toString());
 
             console.log("access_token : " + resultUser.tokens.access_token);
-
+            console.log("oAuth2Client.refresh_token[pre] : " + oAuth2Client.refresh_token);
             // oAuth2Client.setCredentials(resultUser.tokens);
+
             oAuth2Client.access_token = resultUser.tokens.access_token;
+            oAuth2Client.refresh_token = resultUser.tokens.refresh_token;
 
             console.log("oAuth2Client.access_token : " + oAuth2Client.access_token);
-
+            console.log("oAuth2Client.refresh_token : " + oAuth2Client.refresh_token);
             console.log("OAuth finish");
 
             /*
@@ -229,7 +231,7 @@ async function refreshToken(refreshToken) {
         var resultUser = await User.findOne({ userId: payload.sub });
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.access_token = refreshToken;
+        resultUser.tokens = refreshToken;
         resultUser = await resultUser.save();
 
     } catch (err) {
