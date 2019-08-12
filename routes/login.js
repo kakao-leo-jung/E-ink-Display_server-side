@@ -83,6 +83,7 @@ async function returnJWT(authCode, res) {
 
     /* authCode 로 부터 토큰을 추출해 낸다. */
     const { tokens } = await oAuth2Client.getToken(authCode);
+    console.log("getToken Method Result [tokens] : " + tokens);
     oAuth2Client.setCredentials(tokens);
 
     /*
