@@ -127,7 +127,11 @@ async function getAuthCode(user_id, res) {
             // console.log("Enter oAuth2Client.getToken : resultUser.google_authCode : " + resultUser.tokens.access_token);
             // const { tokens } = await oAuth2Client.getToken(resultUser.access_token);
             // console.log("oAuth2Client.getToken success! : " + tokens.toString());
-            oAuth2Client.setCredentials(resultUser.tokens);
+
+            console.log("access_token : " + resultUser.tokens.access_token);
+
+            // oAuth2Client.setCredentials(resultUser.tokens);
+            oAuth2Client.access_token = resultUser.tokens.access_token;
 
             console.log("oAuth2Client.access_token : " + oAuth2Client.access_token);
 
