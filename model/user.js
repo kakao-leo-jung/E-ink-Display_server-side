@@ -22,7 +22,7 @@ var Schema = mongoose.Schema;
     given_name(string)      : 유저 이름
     family_name(string)     : 유저 이름(성)
     locale(string)          : 지역(한국은 ko)
-    google_authCode(string) : 구글에서 발급받은 Code 로 [access_token, refresh_token, id_token] 을 지니고 있다.
+    access_token(string)    : 구글에서 발급받은 Code 로 [access_token, refresh_token, id_token] 을 지니고 있다.
 
 */
 var userSchema = new Schema({
@@ -34,7 +34,7 @@ var userSchema = new Schema({
     given_name : String,
     family_name : String,
     locale : String,
-    google_authCode : String
+    access_token : String
 
 });
 

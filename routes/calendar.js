@@ -224,7 +224,7 @@ async function refreshToken(refreshToken) {
         var resultUser = await User.findOne({ userId: payload.sub });
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.google_authCode = refreshToken;
+        resultUser.access_token = refreshToken;
         resultUser = await resultUser.save();
 
     } catch (err) {

@@ -156,7 +156,7 @@ async function refreshToken(refreshToken) {
         var resultUser = await User.findOne({ userId: payload.sub });
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.google_authCode = refreshToken;
+        resultUser.access_token = refreshToken;
         resultUser = await resultUser.save();
 
     } catch (err) {
@@ -195,7 +195,7 @@ async function searchDB(authCode, payload) {
                     given_name: payload.given_name,
                     family_name: payload.family_name,
                     locale: payload.locale,
-                    google_authCode: ""
+                    access_token: ""
                 });
 
                 resultUser = await newUser.save();
@@ -209,7 +209,7 @@ async function searchDB(authCode, payload) {
         }
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.google_authCode = authCode;
+        resultUser.access_token = authCode;
         resultUser = await resultUser.save();
 
         console.log("resultUser(googleToken set) --------------------");
