@@ -129,12 +129,12 @@ async function getAuthCode(user_id, res) {
             // console.log("oAuth2Client.getToken success! : " + tokens.toString());
 
             console.log("access_token : " + resultUser.tokens.access_token);
-            console.log("oAuth2Client.refresh_token[pre] : " + oAuth2Client.credentials);
+            console.log("oAuth2Client.refresh_token[pre] : " + JSON.stringify(oAuth2Client.credentials));
             // oAuth2Client.setCredentials(resultUser.tokens);
 
             oAuth2Client.credentials = {
-                refresh_token : resultUser.tokens.refresh_token,
-                access_token : resultUser.tokens.access_token
+                refresh_token: resultUser.tokens.refresh_token,
+                access_token: resultUser.tokens.access_token
             };
             // oAuth2Client.refreshAccessToken(function (err, tokens) {
             //     console.log(tokens)
@@ -142,52 +142,52 @@ async function getAuthCode(user_id, res) {
             //     callback(oauth2Client);
             // });
 
-                console.log("oAuth2Client.access_token : " + oAuth2Client.credentials.access_token);
-                console.log("oAuth2Client.refresh_token : " + oAuth2Client.credentials.refresh_token);
-                console.log("OAuth finish");
+            console.log("oAuth2Client.access_token : " + oAuth2Client.credentials.access_token);
+            console.log("oAuth2Client.refresh_token : " + oAuth2Client.credentials.refresh_token);
+            console.log("OAuth finish");
 
-                /*
-        
-                    accessToken 의 만료시점이 다가올 경우 감지하여 refreshToken 을 발급받는다.
-                    refreshToken 을 발급받아 DB 에 토큰으로 저장한다.
-        
-                */
-                oAuth2Client.on(resultUser.tokens, (tokens) => {
-                    if (tokens.refresh_token) {
+            /*
+    
+                accessToken 의 만료시점이 다가올 경우 감지하여 refreshToken 을 발급받는다.
+                refreshToken 을 발급받아 DB 에 토큰으로 저장한다.
+    
+            */
+            oAuth2Client.on(resultUser.tokens, (tokens) => {
+                if (tokens.refresh_token) {
 
-                        // store the refresh_token in my database!
-                        console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
+                    // store the refresh_token in my database!
+                    console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
 
-                        refreshToken(tokens.refreshToken);
+                    refreshToken(tokens.refreshToken);
 
-                    }
-
-                    console.log("ACCESS_TOKEN*** : " + tokens.access_token);
-                    console.log("ID_TOKEN*** : " + tokens.id_token);
-
-                });
-
-                listEvents(oAuth2Client);
-
-                res.set(200);
-                res.end();
-
-            } else {
-
-                    /* 구글 토큰 미존재 */
-                    res.set(500);
-                    res.end();
                 }
+
+                console.log("ACCESS_TOKEN*** : " + tokens.access_token);
+                console.log("ID_TOKEN*** : " + tokens.id_token);
+
+            });
+
+            listEvents(oAuth2Client, res);
+
+            // res.set(200);
+            // res.end();
+
+        } else {
+
+            /* 구글 토큰 미존재 */
+            res.set(500);
+            res.end();
+        }
 
 
 
     } catch (err) {
 
-            console.error(err);
-
-        }
+        console.error(err);
 
     }
+
+}
 
 /*
 
@@ -197,56 +197,64 @@ async function getAuthCode(user_id, res) {
     @param {google.auth.OAuth2} auth An authorized OAuth2 client.
 
 */
-function listEvents(auth) {
+function listEvents(auth, res) {
 
-        console.log("entered listEvent, Auth : " + auth);
+    console.log("entered listEvent, Auth : " + auth);
 
-        const calendar = google.calendar({ version: 'v3', auth });
-        calendar.events.list({
-            calendarId: 'primary',
-            timeMin: (new Date()).toISOString(),
-            maxResults: 10,
-            singleEvents: true,
-            orderBy: 'startTime',
-        }, (err, res) => {
-            if (err) return console.log('The API returned an error: ' + err);
-            const events = res.data.items;
-            if (events.length) {
-                console.log('Upcoming 10 events:');
-                events.map((event, i) => {
-                    const start = event.start.dateTime || event.start.date;
-                    console.log(`${start} - ${event.summary}`);
-                });
-            } else {
-                console.log('No upcoming events found.');
-            }
-        });
+    const calendar = google.calendar({ version: 'v3', auth });
+    calendar.events.list({
+        calendarId: 'primary',
+        timeMin: (new Date()).toISOString(),
+        maxResults: 10,
+        singleEvents: true,
+        orderBy: 'startTime',
+    }, (err, res) => {
+        if (err){
+            res.set(400);
+            res.end();
+            return console.log('The API returned an error: ' + err);
+        } 
+
+        /* 달력 이벤트 객체를 리턴 */
+        const events = res.data.items;
+        res.json(events);
+
+        // if (events.length) {
+        //     console.log('Upcoming 10 events:');
+        //     events.map((event, i) => {
+        //         const start = event.start.dateTime || event.start.date;
+        //         console.log(`${start} - ${event.summary}`);
+        //     });
+        // } else {
+        //     console.log('No upcoming events found.');
+        // }
+    });
+}
+
+/*
+ 
+    accessToken 은 기한이 만료된다.
+    oAuthClient.on 으로 기한이 만료되면 다음 refreshToken 을
+    보급한다. 이때 토큰을 DB 에 갱신하여 저장해준다.
+ 
+*/
+async function refreshToken(refreshToken) {
+
+    try {
+
+        /* userId 가 일치하는 유저가 DB에 존재하는지 조회한다. */
+        var resultUser = await User.findOne({ userId: payload.sub });
+
+        /* 조회한 유저의 구글 토큰값을 갱신한다. */
+        resultUser.tokens = refreshToken;
+        resultUser = await resultUser.save();
+
+    } catch (err) {
+
+        console.error(err);
+
     }
 
-    /*
-    
-        accessToken 은 기한이 만료된다.
-        oAuthClient.on 으로 기한이 만료되면 다음 refreshToken 을
-        보급한다. 이때 토큰을 DB 에 갱신하여 저장해준다.
-    
-    */
-    async function refreshToken(refreshToken) {
+}
 
-        try {
-
-            /* userId 가 일치하는 유저가 DB에 존재하는지 조회한다. */
-            var resultUser = await User.findOne({ userId: payload.sub });
-
-            /* 조회한 유저의 구글 토큰값을 갱신한다. */
-            resultUser.tokens = refreshToken;
-            resultUser = await resultUser.save();
-
-        } catch (err) {
-
-            console.error(err);
-
-        }
-
-    }
-
-    module.exports = router;
+module.exports = router;
