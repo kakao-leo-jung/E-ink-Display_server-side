@@ -197,7 +197,7 @@ async function getAuthCode(user_id, res) {
     @param {google.auth.OAuth2} auth An authorized OAuth2 client.
 
 */
-function listEvents(auth, res) {
+function listEvents(auth, response) {
 
     console.log("entered listEvent, Auth : " + auth);
 
@@ -210,14 +210,14 @@ function listEvents(auth, res) {
         orderBy: 'startTime',
     }, (err, res) => {
         if (err){
-            res.set(400);
-            res.end();
+            response.set(400);
+            response.end();
             return console.log('The API returned an error: ' + err);
         } 
 
         /* 달력 이벤트 객체를 리턴 */
         const events = res.data.items;
-        res.json(events);
+        response.json(events);
 
         // if (events.length) {
         //     console.log('Upcoming 10 events:');
