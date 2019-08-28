@@ -83,6 +83,7 @@ router.post('/next', function (req, res) {
 
     */
     var authClient = getAuthCode(decoded.userId);
+    console.log("authClient get : "+ authClient);
     if(authClient){
         listEvents(authClient, res);
     }else{
