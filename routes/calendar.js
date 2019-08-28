@@ -217,7 +217,10 @@ function listEvents(auth, response) {
 
         /* 달력 이벤트 객체를 리턴 */
         const events = res.data.items;
-        response.json(events);
+        var retObj = new Object();
+        retObj.days = events;
+        console.log("Calendar 10days return : " + JSON.stringify(retObj));
+        response.json(retObj);
 
         // if (events.length) {
         //     console.log('Upcoming 10 events:');
