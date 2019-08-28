@@ -80,16 +80,19 @@ router.post('/next', function (req, res) {
 
         userId 값을 통해 db의
         AuthCode 값을 조회한다.
+        authCode 조회 성공 후 인증된 auth클라이언트를 이용해
+        원하는 함수를 호출한다. (listEvents 실행)
 
     */
-    var authClient = await getAuthCode(decoded.userId);
-    console.log("authClient get : "+ authClient);
-    if(authClient){
-        listEvents(authClient, res);
-    }else{
-        res.set(500);
-        res.end();
-    }
+    getAuthCode(decoded.userId).then(authClient => {
+        console.log("authClient get : "+ authClient);
+        if(authClient){
+            listEvents(authClient, res);
+        }else{
+            res.set(500);
+            res.end();
+        }        
+    });
 
 });
 
