@@ -12,10 +12,14 @@ server-side 디렉토리 접근
 $ node ./bin/www
 
 ###### 계속 실행
-$ forever ./bin/www
+$ forever start ./bin/www
 
 ###### 재 실행
-$ forever ./bin/www
+$ forever restart ./bin/www
+
+###### 현재 서버가 돌아가고 있는지 확인하는 방법
+인터넷 브라우저에 들어가서 169.56.98.117 친다.
+MagicCalendar 페이지가 뜨면 서버가 돌아가고 있는 것.
 
 #### 서버 DB 접속
 $ mongo

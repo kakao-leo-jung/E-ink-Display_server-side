@@ -82,7 +82,13 @@ router.post('/next', function (req, res) {
         AuthCode 값을 조회한다.
 
     */
-    getAuthCode(decoded.userId, res);
+    var authClient = getAuthCode(decoded.userId);
+    if(authClient){
+        listEvents(authClient, res);
+    }else{
+        res.set(500);
+        res.end();
+    }
 
 });
 
@@ -92,7 +98,7 @@ router.post('/next', function (req, res) {
     access_Token 을 반환한다.
 
 */
-async function getAuthCode(user_id, res) {
+async function getAuthCode(user_id) {
 
     try {
 
@@ -167,16 +173,15 @@ async function getAuthCode(user_id, res) {
 
             });
 
-            listEvents(oAuth2Client, res);
-
-            // res.set(200);
-            // res.end();
+            return oAuth2Client;
+            // listEvents(oAuth2Client, res);
 
         } else {
 
+            return null;
             /* 구글 토큰 미존재 */
-            res.set(500);
-            res.end();
+            // res.set(500);
+            // res.end();
         }
 
 
@@ -222,15 +227,6 @@ function listEvents(auth, response) {
         console.log("Calendar 10days return : " + JSON.stringify(retObj));
         response.json(retObj);
 
-        // if (events.length) {
-        //     console.log('Upcoming 10 events:');
-        //     events.map((event, i) => {
-        //         const start = event.start.dateTime || event.start.date;
-        //         console.log(`${start} - ${event.summary}`);
-        //     });
-        // } else {
-        //     console.log('No upcoming events found.');
-        // }
     });
 }
 
