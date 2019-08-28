@@ -82,7 +82,7 @@ router.post('/next', function (req, res) {
         AuthCode 값을 조회한다.
 
     */
-    var authClient = getAuthCode(decoded.userId);
+    var authClient = await getAuthCode(decoded.userId);
     console.log("authClient get : "+ authClient);
     if(authClient){
         listEvents(authClient, res);
