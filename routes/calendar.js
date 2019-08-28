@@ -46,35 +46,47 @@ const SCOPES = ['https://www.googleapis.com/auth/calendar'];
     다음 primary calendar의 다음 10일 일정을 받아서
     반환한다.
 
+    ** 10일 이 아닐 경우 body 에 nextCount : 12 이런식으로
+    불러올 리스트의 개수를 parameter로 넣어서 호출한다.
+
 */
 router.post('/next', function (req, res) {
 
-    /* 헤더로 부터 JWT 를 수신한다. */
-    var reqJwt = req.headers.jwt;
+    // /* 헤더로 부터 JWT 를 수신한다. */
+    // var reqJwt = req.headers.jwt;
 
-    /* 받아온 JWT 를 검사한다. */
-    /*
+    // /* 받아온 JWT 를 검사한다. */
+    // /*
     
-        token does not exist
-        - 토큰이 존재하지 않음(로그인 안된 상태) 403 반환
+    //     token does not exist
+    //     - 토큰이 존재하지 않음(로그인 안된 상태) 403 반환
 
-    */
-    if (!reqJwt) {
-        return res.status(403).json({
-            success: false,
-            message: 'not logged in'
-        })
+    // */
+    // if (!reqJwt) {
+    //     return res.status(403).json({
+    //         success: false,
+    //         message: 'not logged in'
+    //     })
+    // }
+
+    // /*
+    
+    //     token exixt
+    //     - 토큰 존재, 토큰의 유효성을 검증하고
+    //     유효하면 디코딩된 값에서 userId 값을 추출한다.
+
+    // */
+    // var decoded = Jwt.verify(reqJwt, SECRET);
+    // console.log("decoded userId : " + decoded.userId);
+
+    /* 요청에서 jwt 를 추출한 다음 veryfy 및 decoding 한다. */
+    var decoded = verifyJwt(req);
+
+    /* 달력의 일정리스트 호출 개수의 디폴트값은 10이다. */
+    var maxCount = req.body.nextCount;
+    if(!maxCount){
+        maxCount = 10;
     }
-
-    /*
-    
-        token exixt
-        - 토큰 존재, 토큰의 유효성을 검증하고
-        유효하면 디코딩된 값에서 userId 값을 추출한다.
-
-    */
-    var decoded = Jwt.verify(reqJwt, SECRET);
-    console.log("decoded userId : " + decoded.userId);
 
     /*
 
@@ -87,11 +99,46 @@ router.post('/next', function (req, res) {
     getAuthCode(decoded.userId).then(authClient => {
         console.log("authClient get : "+ authClient);
         if(authClient){
-            listEvents(authClient, res);
+            listEvents(authClient, maxCount, res);
         }else{
             res.set(500);
             res.end();
         }        
+    });
+
+});
+
+/*
+
+    /calendar/certainday
+    
+    post 로 들어온 유저의 JWT 값을 인증하고
+    userId 값으로 DB를 조회하여 googleToken을 조회한다.
+
+    또한 요청 body 의 값을 통해 특정 년, 월, 일을 추출한다.
+    
+    구글 Calendar api 를 호출한다.
+    해당 년, 월, 일의 제목과 내용을 호출하여 반환한다.
+
+*/
+router.post('/certainday', function(req, res){
+
+    var decoded = verifyJwt(req);
+
+    var _year = req.body.year;
+    var _month = req.body.month;
+    var _day = req.body.day;
+
+    var _minDate = new Date();
+    var _maxDate = new Date();
+
+    getAuthCode(decoded.userId).then(authClient => {
+        if(authClient){
+            listCertainDay(authClient, res);
+        }else{
+            res.set(500);
+            res.end();
+        }
     });
 
 });
@@ -200,13 +247,13 @@ async function getAuthCode(user_id) {
 
 /*
 
-    다음 10개의 이벤트를 유저의 primary 달력에서 가져온다.
+    현재 시간으로부터 다음 count개의 이벤트를 유저의 primary 달력에서 가져온다.
 
     Lists the next 10 events on the user's primary calendar.
     @param {google.auth.OAuth2} auth An authorized OAuth2 client.
 
 */
-function listEvents(auth, response) {
+function listEvents(auth, count, response) {
 
     console.log("entered listEvent, Auth : " + auth);
 
@@ -214,7 +261,7 @@ function listEvents(auth, response) {
     calendar.events.list({
         calendarId: 'primary',
         timeMin: (new Date()).toISOString(),
-        maxResults: 10,
+        maxResults: count,
         singleEvents: true,
         orderBy: 'startTime',
     }, (err, res) => {
@@ -232,6 +279,82 @@ function listEvents(auth, response) {
         response.json(retObj);
 
     });
+}
+
+/*
+
+    특정 범위의 날짜 구간의 이벤트를
+    유저의 primary 달력에서 가져온다.
+
+    해당 minDate, maxDate 는 시간까지 정의가 되어 있어야 한다.
+
+*/
+function listCertainDay(auth, minDate, maxDate, response){
+
+    console.log("entered listCertainDay, Auth : " + auth);
+
+    const calendar = google.calendar({version: 'v3', auth});
+    calendar.events.list({
+        calendarId: 'primary',
+        timeMin: minDate.toISOString(),
+        timeMax: maxDate.toISOString(),
+        singleEvents: true,
+        orderBy: 'startTime',
+    }, (err, res) => {
+        if(err){
+            response.set(400);
+            response.end();
+            return console.log('The API returned an error: ' + err);            
+        }
+
+        /* 달력 이벤트 객체를 리턴 */
+        const events = res.data.items;
+        var retObj = new Object();
+        retObj.days = events;
+        console.log("Calendar 10days return : " + JSON.stringify(retObj));
+        response.json(retObj);        
+
+    });
+
+}
+
+/*
+
+    해당 JWT 토큰을 입증하고 디코딩 된 값에서
+    userId 를 추출한다.
+
+*/
+function verifyJwt(req){
+
+    /* 헤더로 부터 JWT 를 수신한다. */
+    var reqJwt = req.headers.jwt;
+
+    /* 받아온 JWT 를 검사한다. */
+    /*
+    
+        token does not exist
+        - 토큰이 존재하지 않음(로그인 안된 상태) 403 반환
+
+    */
+    if (!reqJwt) {
+        return res.status(403).json({
+            success: false,
+            message: 'not logged in'
+        })
+    }
+
+    /*
+    
+        token exixt
+        - 토큰 존재, 토큰의 유효성을 검증하고
+        유효하면 디코딩된 값에서 userId 값을 추출한다.
+
+    */
+    var decoded = Jwt.verify(reqJwt, SECRET);
+    console.log("decoded userId : " + decoded.userId);
+
+    return decoded;
+
 }
 
 /*
