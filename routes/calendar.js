@@ -317,7 +317,7 @@ function listCertainDay(auth, minDate, maxDate, response){
         const events = res.data.items;
         var retObj = new Object();
         retObj.days = events;
-        console.log("Calendar Certain days(" + minDate.toISOString + ") return : " + JSON.stringify(retObj));
+        console.log("Calendar Certain days(" + minDate.toISOString() + ") return : " + JSON.stringify(retObj));
         response.json(retObj);        
 
     });
