@@ -115,6 +115,10 @@ router.post('/next', function (req, res) {
     post 로 들어온 유저의 JWT 값을 인증하고
     userId 값으로 DB를 조회하여 googleToken을 조회한다.
 
+     - yyyy (4자리 int)
+     - m or mm (1 또는 2자리 int)
+     - d or dd (1 또는 2자리 int)
+
     또한 요청 body 의 값을 통해 특정 년, 월, 일을 추출한다.
     
     구글 Calendar api 를 호출한다.
@@ -129,12 +133,12 @@ router.post('/certainday', function(req, res){
     var _month = req.body.month;
     var _day = req.body.day;
 
-    var _minDate = new Date();
-    var _maxDate = new Date();
+    var _minDate = new Date(_year, _month - 1, _day, 0, 0, 0);
+    var _maxDate = new Date(_year, _month - 1, _day + 1, 0, 0, 0);
 
     getAuthCode(decoded.userId).then(authClient => {
         if(authClient){
-            listCertainDay(authClient, res);
+            listCertainDay(authClient, _minDate, _maxDate, res);
         }else{
             res.set(500);
             res.end();
@@ -311,7 +315,7 @@ function listCertainDay(auth, minDate, maxDate, response){
         const events = res.data.items;
         var retObj = new Object();
         retObj.days = events;
-        console.log("Calendar 10days return : " + JSON.stringify(retObj));
+        console.log("Calendar Certain days(" + minDate.toISOString + ") return : " + JSON.stringify(retObj));
         response.json(retObj);        
 
     });
