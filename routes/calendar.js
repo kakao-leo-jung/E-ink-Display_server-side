@@ -52,33 +52,6 @@ const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 */
 router.post('/next', function (req, res) {
 
-    // /* 헤더로 부터 JWT 를 수신한다. */
-    // var reqJwt = req.headers.jwt;
-
-    // /* 받아온 JWT 를 검사한다. */
-    // /*
-    
-    //     token does not exist
-    //     - 토큰이 존재하지 않음(로그인 안된 상태) 403 반환
-
-    // */
-    // if (!reqJwt) {
-    //     return res.status(403).json({
-    //         success: false,
-    //         message: 'not logged in'
-    //     })
-    // }
-
-    // /*
-    
-    //     token exixt
-    //     - 토큰 존재, 토큰의 유효성을 검증하고
-    //     유효하면 디코딩된 값에서 userId 값을 추출한다.
-
-    // */
-    // var decoded = Jwt.verify(reqJwt, SECRET);
-    // console.log("decoded userId : " + decoded.userId);
-
     /* 요청에서 jwt 를 추출한 다음 veryfy 및 decoding 한다. */
     var decoded = verifyJwt(req);
 
@@ -139,7 +112,6 @@ router.post('/certainday', function(req, res){
     if(_month > 12 || _month < 1 || _day > 31 || _day < 1){
         console.log("requested Day is invalid : response 400");
         res.set(400);
-        res.send("requested date is invalid");
         res.end();
     }
 
