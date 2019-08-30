@@ -135,6 +135,15 @@ router.post('/certainday', function(req, res){
 
     console.log("requested Certainday : " + _year + " / " + _month + " / " + _day);
 
+    /* 날짜 유효성 검사 */
+    if(_month > 12 || _month < 1 || _day > 31 || _day < 1){
+        console.log("requested Day is invalid : response 400");
+        res.set(400);
+        res.send("requested date is invalid");
+        res.end();
+    }
+
+    /* 특정 날짜 범위 설정 */
     var _minDate = new Date(_year, _month - 1, _day, 0, 0, 0);
     var _maxDate = new Date(_year, _month - 1, _day + 1, 0, 0, 0);
 
