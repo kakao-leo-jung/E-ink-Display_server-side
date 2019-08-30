@@ -133,6 +133,8 @@ router.post('/certainday', function(req, res){
     var _month = req.body.month;
     var _day = req.body.day;
 
+    console.log("requested Certainday : " + _year + " / " + _month + " / " + _day);
+
     var _minDate = new Date(_year, _month - 1, _day, 0, 0, 0);
     var _maxDate = new Date(_year, _month - 1, _day + 1, 0, 0, 0);
 
