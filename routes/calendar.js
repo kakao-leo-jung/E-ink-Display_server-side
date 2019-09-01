@@ -115,9 +115,16 @@ router.post('/certainday', function(req, res){
         res.end();
     }
 
-    /* 특정 날짜 범위 설정 */
-    var _minDate = new Date(_year, _month - 1, _day, 0, 0, 0);
-    var _maxDate = new Date(_year, _month - 1, _day + 1, 0, 0, 0);
+    /*
+    
+        특정 날짜 범위 설정
+        Google calendar 호출을 위해서는 UTC(GMT) 기준으로 시간을 설정해야 한다.
+        KST 시간 기준에서 9시간을 빼야 GMT 기준이 된다.
+
+    */
+
+    var _minDate = new Date(_year, _month - 1, _day - 1, 15, 0, 0);
+    var _maxDate = new Date(_year, _month - 1, _day, 0, 15, 0);
 
     getAuthCode(decoded.userId).then(authClient => {
         if(authClient){
@@ -291,14 +298,14 @@ function listCertainDay(auth, minDate, maxDate, response){
         if(err){
             response.set(400);
             response.end();
-            return console.log('The API returned an error: ' + err);            
+            return console.log('The API returned an error: ' + err);
         }
 
         /* 달력 이벤트 객체를 리턴 */
         const events = res.data.items;
         var retObj = new Object();
         retObj.days = events;
-        console.log("Calendar Certain days(" + minDate.toISOString() + ") return : " + JSON.stringify(retObj));
+        console.log("Calendar Certain days(" + minDate.toISOString() + " - " + maxDate.toISOString() + ") return : " + JSON.stringify(retObj));
         response.json(retObj);        
 
     });
