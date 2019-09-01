@@ -1,5 +1,4 @@
 ### 개발 가이드
-
 ip          | 169.56.98.117
 http port   | 80
 인증 DB      | user_auth | collection = "users"
@@ -8,7 +7,7 @@ http port   | 80
 forever 모듈 사용해서 항상 실행 중 상태 유지.
 server-side 디렉토리 접근
 
-###### 일시적인 실행
+###### 일시적인 실행 - 로그 확인
 $ node ./bin/www
 
 ###### 계속 실행
@@ -16,6 +15,9 @@ $ forever start ./bin/www
 
 ###### 재 실행
 $ forever restart ./bin/www
+
+###### forever 실행 중 종료
+$ forever stopall
 
 ###### 현재 서버가 돌아가고 있는지 확인하는 방법
 인터넷 브라우저에 들어가서 169.56.98.117 친다.
