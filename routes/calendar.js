@@ -32,9 +32,6 @@ const CLIENT_ID = config.WEB_CLIENT_ID;
 const CLIENT_SECRET = config.WEB_CLIENT_SECRET;
 const CLIENT_REDIRECT_URIS = config.WEB_REDIRECT_URIS;
 
-/* 달력 호출을 위한 Scope 설정 */
-const SCOPES = ['https://www.googleapis.com/auth/calendar'];
-
 /*
 
     /calendar/next
@@ -50,13 +47,13 @@ const SCOPES = ['https://www.googleapis.com/auth/calendar'];
     불러올 리스트의 개수를 parameter로 넣어서 호출한다.
 
 */
-router.get('/next', function (req, res) {
+router.get('/next/:nextCount', function (req, res) {
 
     /* 요청에서 jwt 를 추출한 다음 veryfy 및 decoding 한다. */
     var decoded = verifyJwt(req);
 
     /* 달력의 일정리스트 호출 개수의 디폴트값은 10이다. */
-    var maxCount = req.params('nextCount');
+    var maxCount = req.params.nextCount;
     if(!maxCount){
         maxCount = 10;
     }
@@ -98,13 +95,13 @@ router.get('/next', function (req, res) {
     해당 년, 월, 일의 제목과 내용을 호출하여 반환한다.
 
 */
-router.post('/certainday', function(req, res){
+router.get('/certainday/:year/:month/:day', function(req, res){
 
     var decoded = verifyJwt(req);
 
-    var _year = req.body.year;
-    var _month = req.body.month;
-    var _day = req.body.day;
+    var _year = req.params.year;
+    var _month = req.params.month;
+    var _day = req.params.day;
 
     console.log("requested Certainday : " + _year + " / " + _month + " / " + _day);
 

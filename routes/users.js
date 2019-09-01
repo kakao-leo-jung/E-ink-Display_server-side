@@ -27,7 +27,7 @@ const SECRET = config.JWT_SECRET;
     header : jwt : 'jdklsjfies'
 
 */
-router.post('/info', function(req, res){
+router.post('/', function(req, res){
 
     /* 헤더로 부터 JWT 를 수신한다. */
     var reqJwt = req.headers.jwt;
