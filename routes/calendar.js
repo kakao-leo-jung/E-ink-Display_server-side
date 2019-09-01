@@ -124,7 +124,7 @@ router.post('/certainday', function(req, res){
     */
 
     var _minDate = new Date(_year, _month - 1, _day - 1, 15, 0, 0);
-    var _maxDate = new Date(_year, _month - 1, _day, 0, 15, 0);
+    var _maxDate = new Date(_year, _month - 1, _day, 15, 0, 0);
 
     getAuthCode(decoded.userId).then(authClient => {
         if(authClient){
