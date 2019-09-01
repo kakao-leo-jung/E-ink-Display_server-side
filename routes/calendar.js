@@ -50,7 +50,7 @@ const SCOPES = ['https://www.googleapis.com/auth/calendar'];
     불러올 리스트의 개수를 parameter로 넣어서 호출한다.
 
 */
-router.get('/next}', function (req, res) {
+router.get('/next', function (req, res) {
 
     /* 요청에서 jwt 를 추출한 다음 veryfy 및 decoding 한다. */
     var decoded = verifyJwt(req);
