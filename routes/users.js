@@ -18,7 +18,7 @@ const SECRET = config.JWT_SECRET;
 
 /*
 
-    /users/info
+    /users/
     
     post 로 들어온 유저의 JWT 값을 인증하고
     userId 값으로 DB를 조회한 후에
@@ -27,7 +27,7 @@ const SECRET = config.JWT_SECRET;
     header : jwt : 'jdklsjfies'
 
 */
-router.post('/', function(req, res){
+router.get('/', function(req, res){
 
     /* 헤더로 부터 JWT 를 수신한다. */
     var reqJwt = req.headers.jwt;

@@ -21,7 +21,7 @@ var router = express.Router();
     1. 먼저 요청의 헤더로 부터 jwt를 수신한다.
     2. jwt 를 verify 하고 jwt 로 부터 user_id 검출한다.
     3. user_id 로 DB 를 조회하여 access_token 을 조회한다.
-``
+
 */
 
 /* JWT 인증을 위한 secret 키 */
