@@ -17,17 +17,15 @@ var headline = require('headline-news-naver');
 
 router.get('/', function(req, res){
 
-    var newsObj = getNews();
-
-    console.log("getNewsInfo : " + JSON.stringify(newsObj));
-
-    res.json(newsObj);
+    getNews(res);
 
 });
 
-async function getNews(){
+async function getNews(response){
 
-    return await headline.getNaverNews();
+    var newsObj = await headline.getNaverNews();
+    console.log("getNewsInfo : " + JSON.stringify(newsObj));
+    res.json(newsObj);
 
 }
 
