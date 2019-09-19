@@ -25,7 +25,7 @@ async function getNews(response){
 
     var newsObj = await headline.getNaverNews();
     console.log("getNewsInfo : " + JSON.stringify(newsObj));
-    res.json(newsObj);
+    response.json(newsObj);
 
 }
 
