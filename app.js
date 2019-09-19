@@ -48,6 +48,11 @@ app.use('/calendar', calendar);
 var todo = require('./routes/todo');
 app.use('/todo', todo);
 /*********************************************/
+/*********************************************/
+/* News 정보 '/news' 라우팅 */
+var news = require('./routes/news');
+app.use('/news', news);
+/*********************************************/
 
 /*
 

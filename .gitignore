@@ -2,3 +2,5 @@
 
 config.js
 credentials.json
+
+node_modules/
