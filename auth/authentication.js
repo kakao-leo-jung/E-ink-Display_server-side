@@ -47,9 +47,3 @@ exports.verifyJwt = (req, res) => {
     return decoded;
 
 }
-
-
-function verifyJwt(req) {
-
-
-}

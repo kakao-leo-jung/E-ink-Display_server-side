@@ -32,6 +32,8 @@ router.get('/', function(req, res){
 
     var decoded = authentication.verifyJwt(req, res);
     
+    console.log("decoded : " + decoded);
+
     /*
 
         userId 값을 통해 db를 조회하고 필요한 정보를

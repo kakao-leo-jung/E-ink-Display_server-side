@@ -100,6 +100,8 @@ router.get('/certainday/:year/:month/:day', function(req, res){
 
     var decoded = authentication.verifyJwt(req, res);
 
+    console.log("decoded : " + decoded);
+
     var _year = req.params.year;
     var _month = req.params.month;
     var _day = req.params.day;
