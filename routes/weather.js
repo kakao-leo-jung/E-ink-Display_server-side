@@ -32,6 +32,8 @@ router.get('/', function(req, res){
     var latitude = req.params.latitude;
     var longitude = req.params.longitude;
 
+    console.log("latitude / longitude : " + latitude + " / " + longitude);
+
     /* weathermap 호출 */
     var reqOption = {
         uri: API_URI,
