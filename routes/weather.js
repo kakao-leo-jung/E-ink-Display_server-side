@@ -54,8 +54,8 @@ router.get('/:latitude/:longitude', function(req, res){
 
         var resObj = {
             "city" : responseData.name,
-            "weather" : responseData.weather.main,
-            "weather_description" : responseData.weather.description,
+            "weather" : responseData.weather[0].main,
+            "weather_description" : responseData.weather[0].description,
             "temperature" : responseData.main.temp,
             "temperature_max" : responseData.main.temp_max,
             "temperature_min" : responseData.main.temp_min,
