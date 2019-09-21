@@ -5,6 +5,7 @@ const readline = require('readline');
 const { google } = require('googleapis');
 const config = require('../config');
 var User = require('../model/user');
+var authentication = require('../auth/authentication');
 var router = express.Router();
 
 /* TODO Author : 정근화 */
@@ -50,7 +51,7 @@ const CLIENT_REDIRECT_URIS = config.WEB_REDIRECT_URIS;
 router.get('/next/:nextCount', function (req, res) {
 
     /* 요청에서 jwt 를 추출한 다음 veryfy 및 decoding 한다. */
-    var decoded = verifyJwt(req);
+    var decoded = authentication.verifyJwt(req, res);
 
     /* 달력의 일정리스트 호출 개수의 디폴트값은 10이다. */
     var maxCount = req.params.nextCount;
@@ -97,7 +98,7 @@ router.get('/next/:nextCount', function (req, res) {
 */
 router.get('/certainday/:year/:month/:day', function(req, res){
 
-    var decoded = verifyJwt(req);
+    var decoded = authentication.verifyJwt(req, res);
 
     var _year = req.params.year;
     var _month = req.params.month;
@@ -306,45 +307,6 @@ function listCertainDay(auth, minDate, maxDate, response){
         response.json(retObj);        
 
     });
-
-}
-
-/*
-
-    해당 JWT 토큰을 입증하고 디코딩 된 값에서
-    userId 를 추출한다.
-
-*/
-function verifyJwt(req){
-
-    /* 헤더로 부터 JWT 를 수신한다. */
-    var reqJwt = req.headers.jwt;
-
-    /* 받아온 JWT 를 검사한다. */
-    /*
-    
-        token does not exist
-        - 토큰이 존재하지 않음(로그인 안된 상태) 403 반환
-
-    */
-    if (!reqJwt) {
-        return res.status(403).json({
-            success: false,
-            message: 'not logged in'
-        })
-    }
-
-    /*
-    
-        token exixt
-        - 토큰 존재, 토큰의 유효성을 검증하고
-        유효하면 디코딩된 값에서 userId 값을 추출한다.
-
-    */
-    var decoded = Jwt.verify(reqJwt, SECRET);
-    console.log("decoded userId : " + decoded.userId);
-
-    return decoded;
 
 }
 

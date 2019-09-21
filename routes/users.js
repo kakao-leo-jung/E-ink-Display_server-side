@@ -2,6 +2,7 @@ var express = require('express');
 const Jwt = require('jsonwebtoken');
 const config = require('../config');
 var User = require('../model/user');
+var authentication = require('../auth/authentication');
 var router = express.Router();
 
 /* TODO Author : 정근화 */
@@ -29,32 +30,7 @@ const SECRET = config.JWT_SECRET;
 */
 router.get('/', function(req, res){
 
-    /* 헤더로 부터 JWT 를 수신한다. */
-    var reqJwt = req.headers.jwt;
-
-    /* 받아온 JWT 를 검사한다. */
-    /*
-    
-        token does not exist
-        - 토큰이 존재하지 않음(로그인 안된 상태) 403 반환
-
-    */
-    if(!reqJwt) {
-        return res.status(403).json({
-            success: false,
-            message: 'not logged in'
-        })
-    }
-
-    /*
-    
-        token exixt
-        - 토큰 존재, 토큰의 유효성을 검증하고
-        유효하면 디코딩된 값에서 userId 값을 추출한다.
-
-    */
-    var decoded = Jwt.verify(reqJwt, SECRET);
-    console.log("decoded UserId : "+decoded.userId);
+    var decoded = authentication.verifyJwt(req, res);
     
     /*
 

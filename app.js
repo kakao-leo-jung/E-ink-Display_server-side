@@ -53,6 +53,11 @@ app.use('/todo', todo);
 var news = require('./routes/news');
 app.use('/news', news);
 /*********************************************/
+/*********************************************/
+/* Weather 정보 '/weather' 라우팅 */
+var weather = require('./routes/weather');
+app.use('/weather', weather);
+/*********************************************/
 
 /*
 
