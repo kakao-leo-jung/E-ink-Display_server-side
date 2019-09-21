@@ -1,3 +1,6 @@
+const Jwt = require('jsonwebtoken');
+const config = require('../config');
+
 /* TODO Author : 정근화 */
 
 /*
@@ -7,6 +10,8 @@
 
 */
 
+/* JWT 인증을 위한 secret 키 */
+const SECRET = config.JWT_SECRET;
 
 /*
 

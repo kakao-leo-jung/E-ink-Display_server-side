@@ -1,5 +1,4 @@
 var express = require('express');
-const Jwt = require('jsonwebtoken');
 const config = require('../config');
 var User = require('../model/user');
 var authentication = require('../auth/authentication');

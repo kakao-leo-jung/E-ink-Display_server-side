@@ -1,5 +1,4 @@
 var express = require('express');
-const Jwt = require('jsonwebtoken');
 const fs = require('fs');
 const readline = require('readline');
 const { google } = require('googleapis');
@@ -24,9 +23,6 @@ var router = express.Router();
     3. user_id 로 DB 를 조회하여 access_token 을 조회한다.
 
 */
-
-/* JWT 인증을 위한 secret 키 */
-const SECRET = config.JWT_SECRET;
 
 /* google calendar 를 위한 credential 인증 정보 */
 const CLIENT_ID = config.WEB_CLIENT_ID;
