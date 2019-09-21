@@ -52,6 +52,21 @@ router.get('/:latitude/:longitude', function(req, res){
         /* weather 수신 성공 */
         console.log(responseData);
 
+        var resObj = {
+            "city" : responseData.name,
+            "weather" : responseData.weather.main,
+            "weather_description" : responseData.weather.description,
+            "temperature" : responseData.main.temp,
+            "temperature_max" : responseData.main.temp_max,
+            "temperature_min" : responseData.main.temp_min,
+            "pressure" : responseData.main.pressure,
+            "humidity" : responseData.main.humidity,
+            "wind_speed" : responseData.wind.speed,
+            "clouds" : responseData.clouds.all
+        };
+
+        res.json(resObj);
+
     }).catch(function(err){
         /* weather 수신 실패 */
         console.log("OpenWeatherMap GET Failed : " + err);
