@@ -29,13 +29,15 @@ const CLIENT_ID = config.WEB_CLIENT_ID;
 const CLIENT_SECRET = config.WEB_CLIENT_SECRET;
 const CLIENT_REDIRECT_URIS = config.WEB_REDIRECT_URIS;
 
+
+
 /*
 
     /calendar/next
-    
+
     post 로 들어온 유저의 JWT 값을 인증하고
     userId 값으로 DB를 조회하여 googleToken을 조회한 후
-    
+
     구글 Calendar api 를 호출한다.
     다음 primary calendar의 다음 10일 일정을 받아서
     반환한다.
@@ -70,7 +72,7 @@ router.get('/next/:nextCount', function (req, res) {
         }else{
             res.set(500);
             res.end();
-        }        
+        }
     });
 
 });
@@ -78,7 +80,7 @@ router.get('/next/:nextCount', function (req, res) {
 /*
 
     /calendar/certainday
-    
+
     post 로 들어온 유저의 JWT 값을 인증하고
     userId 값으로 DB를 조회하여 googleToken을 조회한다.
 
@@ -87,7 +89,7 @@ router.get('/next/:nextCount', function (req, res) {
      - d or dd (1 또는 2자리 int)
 
     또한 요청 body 의 값을 통해 특정 년, 월, 일을 추출한다.
-    
+
     구글 Calendar api 를 호출한다.
     해당 년, 월, 일의 제목과 내용을 호출하여 반환한다.
 
@@ -112,7 +114,7 @@ router.get('/certainday/:year/:month/:day', function(req, res){
     }
 
     /*
-    
+
         특정 날짜 범위 설정
         Google calendar 호출을 위해서는 UTC(GMT) 기준으로 시간을 설정해야 한다.
         KST 시간 기준에서 9시간을 빼야 GMT 기준이 된다.
@@ -133,6 +135,37 @@ router.get('/certainday/:year/:month/:day', function(req, res){
 
 });
 
+
+/*
+
+  사용자의 캘린더 목록을 array로 가진 객체를 반환한다.
+
+
+*/
+
+router.get('/calendarList', function (req, res) {
+  var decoded = authentication.verifyJwt(req,res);
+
+  var maxCount = req.params.nextCount;
+  if(!maxCount){
+      maxCount = 5;
+  }
+
+  getAuthCode(decoded.userId).then(authClient => {
+      if(authClient){
+          listCalendars(authClient, res);
+      }else{
+          res.set(500);
+          res.end();
+      }
+  });
+
+});
+
+
+
+
+
 /*
 
     User DB 에서 user_id 를 사용하여 해당 유저의
@@ -149,16 +182,16 @@ async function getAuthCode(user_id) {
 
             /* 구글 토큰 존재 */
             /*
-    
+
                 credential 정보로 OAuth 클라이언트 객체를 생성하고
                 DB에 존재하던 authCode 로 getToken 을 얻어낸다.
                 객체에 토큰 값을 담는다.
-    
+
                 Create an OAuth2 client with the given credentials, and then execute the
                 given callback function.
                 @param {Object} credentials The authorization client credentials.
                 @param {function} callback The callback to call with the authorized client.
-            
+
             */
             console.log("OAuth start");
             const oAuth2Client = new google.auth.OAuth2(
@@ -194,10 +227,10 @@ async function getAuthCode(user_id) {
             console.log("OAuth finish");
 
             /*
-    
+
                 accessToken 의 만료시점이 다가올 경우 감지하여 refreshToken 을 발급받는다.
                 refreshToken 을 발급받아 DB 에 토큰으로 저장한다.
-    
+
             */
             oAuth2Client.on(resultUser.tokens, (tokens) => {
                 if (tokens.refresh_token) {
@@ -259,7 +292,7 @@ function listEvents(auth, count, response) {
             response.set(400);
             response.end();
             return console.log('The API returned an error: ' + err);
-        } 
+        }
 
         /* 달력 이벤트 객체를 리턴 */
         const events = res.data.items;
@@ -269,6 +302,32 @@ function listEvents(auth, count, response) {
         response.json(retObj);
 
     });
+}
+
+
+/*
+
+  사용자의 캘린더 리스트들을 가져온다.
+  key값은 retObj.calendarName
+
+*/
+function listCalendars(auth,response){
+    const calendar = google.calendar('v3');
+
+    calendar.calendarList.list({
+      auth: auth,
+      maxResults: 10
+    },
+    function(err, calendarList){
+      var retObj = new Object();
+      retObj.calendarName = new Array();
+      for(var i=0;i<calendarList.data.items.length;i++){
+        retObj.calendarName.push(calendarList.data.items[i].summary);
+      }
+      console.log("Calendar List : "+JSON.stringify(retObj));
+      response.json(retObj);
+    }
+  )
 }
 
 /*
@@ -302,18 +361,18 @@ function listCertainDay(auth, minDate, maxDate, response){
         var retObj = new Object();
         retObj.days = events;
         console.log("Calendar Certain days(" + minDate.toISOString() + " - " + maxDate.toISOString() + ") return : " + JSON.stringify(retObj));
-        response.json(retObj);        
+        response.json(retObj);
 
     });
 
 }
 
 /*
- 
+
     accessToken 은 기한이 만료된다.
     oAuthClient.on 으로 기한이 만료되면 다음 refreshToken 을
     보급한다. 이때 토큰을 DB 에 갱신하여 저장해준다.
- 
+
 */
 async function refreshToken(refreshToken) {
 
