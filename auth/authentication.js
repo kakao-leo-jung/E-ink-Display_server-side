@@ -15,6 +15,11 @@ const { google } = require('googleapis');
 /* JWT 인증을 위한 secret 키 */
 const SECRET = config.JWT_SECRET;
 
+/* google API 호출을 위한 credential 인증 정보 */
+const CLIENT_ID = config.WEB_CLIENT_ID;
+const CLIENT_SECRET = config.WEB_CLIENT_SECRET;
+const CLIENT_REDIRECT_URIS = config.WEB_REDIRECT_URIS;
+
 /*
 
     Request 받은 헤더에서
