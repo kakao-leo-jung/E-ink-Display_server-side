@@ -14,9 +14,9 @@ var router = express.Router();
  */
 
 /** Get List of Todo */
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
   // MongoDB 조회
-  Todo.find(function(err, data) {
+  Todo.find(function (err, data) {
     console.log(data);
     res.send(data);
   });
@@ -25,11 +25,13 @@ router.get('/', function(req, res) {
 /** Get Todo
  * id : todoId
  */
-router.get('/:id', function(req, res) {
+router.get('/:id', function (req, res) {
   // MongoDB ID로 조회
-  Todo.find(req.params.id, function(err, data) {
+  Todo.find(req.params.id, function (err, data) {
     console.log(data);
-    res.json({result:data});
+    res.json({
+      result: data
+    });
   });
 });
 
@@ -42,16 +44,20 @@ router.get('/:id', function(req, res) {
  *   title : String,
  *   selected : Boolean
 */
-router.post('/', function(req, res) {
+router.post('/', function (req, res) {
   const newTodo = new Todo(req.body);
-  newTodo.save(function(err){
-    if(err){
+  newTodo.save(function (err) {
+    if (err) {
       console.error(err);
-      res.json({result: 0});
+      res.json({
+        result: 0
+      });
       return;
     }
 
-    res.json({result:1});
+    res.json({
+      result: 1
+    });
 
   });
 
@@ -66,10 +72,22 @@ router.post('/', function(req, res) {
   userName과 title만 출력.
 
 */
-router.get('/:title', function(req,res){
-  Todo.find({title: req.params.title},{_id:0,userId:0,userName:1,title:1,selected:0}, function(err,data){
-    if(err) return res.status(500).json({error: err});
-    if(data.length==0) return res.status(404).json({error:'todo not found'})
+router.get('/:title', function (req, res) {
+  Todo.find({
+    title: req.params.title
+  }, {
+    _id: 0,
+    userId: 0,
+    userName: 1,
+    title: 1,
+    selected: 0
+  }, function (err, data) {
+    if (err) return res.status(500).json({
+      error: err
+    });
+    if (data.length == 0) return res.status(404).json({
+      error: 'todo not found'
+    })
     res.json(data);
   })
 })
@@ -78,24 +96,37 @@ router.get('/:title', function(req,res){
 /*
   todo 수정
 */
-router.put('/:id', function(req,res){
-  Todo.findById(req.params.id, function(err, todo){
-    if(err) return res.status(500).json({ error: 'database failure '});
-    if(!data) return res.status(404).json({ error : 'todo not found'});
+router.put('/:id', function (req, res) {
+  Todo.findById(req.params.id, function (err, todo) {
+    if (err) return res.status(500).json({
+      error: 'database failure '
+    });
+    if (!data) return res.status(404).json({
+      error: 'todo not found'
+    });
 
-    if(req.body.title) todo.title = req.body.title;
-    todo.save(function(err){
-      if(err) res.status(500).json({error: 'failed to update'});
-      res.json({message : 'todo updated'});
+    if (req.body.title) todo.title = req.body.title;
+    todo.save(function (err) {
+      if (err) res.status(500).json({
+        error: 'failed to update'
+      });
+      res.json({
+        message: 'todo updated'
+      });
     })
 
   })
 
 });
 
-router.delete('/:id', function(req, res) {,
-  Todo.remove({_id:req.params.id}, function(err,output){
-    if(err) return res.status(500).json({error: 'database failure'});
+router.delete('/:id', function (req, res) {
+  
+  Todo.remove({
+    _id: req.params.id
+  }, function (err, output) {
+    if (err) return res.status(500).json({
+      error: 'database failure'
+    });
 
     res.status(204).end();
   })

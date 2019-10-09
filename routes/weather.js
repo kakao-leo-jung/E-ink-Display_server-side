@@ -16,8 +16,6 @@ var authentication = require('../auth/authentication');
     jwt 인증을 거치는 이유는 OpenWeatherMap free티어(분당 60회))를 사용하고 있는데
     오픈소스로 공개할 경우 jwt 인증 없이 외부에서 무분별하게 호출이 가능하기 때문.
 
-    MODULE INFO : https://github.com/dfjung4254/headline-news-naver
-
 */
 
 const API_URI = config.OPENWEATHERMAP_API_URI;
