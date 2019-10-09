@@ -1,5 +1,6 @@
 const Jwt = require('jsonwebtoken');
 const config = require('../config');
+const User = require('../model/user');
 
 /* TODO Author : 정근화 */
 
