@@ -5,7 +5,6 @@ const {
     google
 } = require('googleapis');
 const config = require('../config');
-var User = require('../model/user');
 var authentication = require('../auth/authentication');
 var router = express.Router();
 
