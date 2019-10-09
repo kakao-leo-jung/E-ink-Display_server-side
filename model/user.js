@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-/* TODO Author : 정근화 */
+/* TODO: Author : 정근화 */
 /*
 
     구글 인증 시 유저정보를 조회하고 등록 할 스키마

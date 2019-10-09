@@ -24,10 +24,17 @@ $ forever stopall
 MagicCalendar 페이지가 뜨면 서버가 돌아가고 있는 것.
 
 #### 서버 DB 접속
+/* db 접속 */
 $ mongo
-$ db
-$ use user_auth
-$ show collections
-$ db.users.find().pretty()
+/* 현재 db 확인 */
+$ > db
+/* 전체 db 확인 */
+$ > show dbs
+/* 현재 db 전환 */
+$ > use user_auth
+/* 현재 db 의 콜렉션 확인 */
+$ > show collections
+/* 현재 db 의 콜렉션의 하위 Document 확인 */
+$ > db.users.find().pretty()
 
 #### user_auth > user 콜렉션 구조

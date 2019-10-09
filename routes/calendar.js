@@ -1,14 +1,11 @@
 var express = require('express');
-const fs = require('fs');
-const readline = require('readline');
 const {
     google
 } = require('googleapis');
-const config = require('../config');
 var authentication = require('../auth/authentication');
 var router = express.Router();
 
-/* TODO Author : 정근화 */
+/* TODO: Author : 정근화 */
 
 /*
 
@@ -24,11 +21,6 @@ var router = express.Router();
     3. user_id 로 DB 를 조회하여 access_token 을 조회한다.
 
 */
-
-/* google calendar 를 위한 credential 인증 정보 */
-const CLIENT_ID = config.WEB_CLIENT_ID;
-const CLIENT_SECRET = config.WEB_CLIENT_SECRET;
-const CLIENT_REDIRECT_URIS = config.WEB_REDIRECT_URIS;
 
 /*
 
@@ -58,8 +50,7 @@ router.get('/next/:nextCount', function (req, res) {
 
     /*
 
-        userId 값을 통해 db의
-        AuthCode 값을 조회한다.
+        userId 값을 통해 db의 AuthCode 값을 조회한다.
         authCode 조회 성공 후 인증된 auth클라이언트를 이용해
         원하는 함수를 호출한다. (listEvents 실행)
 
@@ -111,15 +102,8 @@ router.get('/certainday/:year/:month/:day', function (req, res) {
         res.set(400);
         res.end();
     }
-
-    /*
-
-        특정 날짜 범위 설정
-        Google calendar 호출을 위해서는 UTC(GMT) 기준으로 시간을 설정해야 한다.
-        KST 시간 기준에서 9시간을 빼야 GMT 기준이 된다.
-
-    */
-
+    
+    /* KST 시간 기준 9 시간 빼서 GMT 기준 설정 */
     var _minDate = new Date(_year, _month - 1, _day - 1, 15, 0, 0);
     var _maxDate = new Date(_year, _month - 1, _day, 15, 0, 0);
 
@@ -140,13 +124,8 @@ router.get('/certainday/:year/:month/:day', function (req, res) {
   사용자의 캘린더 목록을 array로 가진 객체를 반환한다.
 
 */
-router.get('/calendarList', function (req, res) {
+router.get('/calendar-list', function (req, res) {
     var decoded = authentication.verifyJwt(req, res);
-
-    var maxCount = req.params.nextCount;
-    if (!maxCount) {
-        maxCount = 5;
-    }
 
     authentication.getAuthCode(decoded.userId).then(authClient => {
         if (authClient) {
@@ -199,32 +178,6 @@ function listEvents(auth, count, response) {
     });
 }
 
-
-/*
-
-  사용자의 캘린더 리스트들을 가져온다.
-  key값은 retObj.calendarName
-
-*/
-function listCalendars(auth, response) {
-    const calendar = google.calendar('v3');
-
-    calendar.calendarList.list({
-            auth: auth,
-            maxResults: 10
-        },
-        function (err, calendarList) {
-            var retObj = new Object();
-            retObj.calendarName = new Array();
-            for (var i = 0; i < calendarList.data.items.length; i++) {
-                retObj.calendarName.push(calendarList.data.items[i].summary);
-            }
-            console.log("Calendar List : " + JSON.stringify(retObj));
-            response.json(retObj);
-        }
-    )
-}
-
 /*
 
     특정 범위의 날짜 구간의 이벤트를
@@ -263,6 +216,36 @@ function listCertainDay(auth, minDate, maxDate, response) {
 
     });
 
+}
+
+/*
+
+    사용자의 캘린더 리스트들을 가져온다.
+    key값은 retObj.calendarName
+
+*/
+function listCalendars(auth, response) {
+    const calendar = google.calendar('v3');
+
+    calendar.calendarList.list({
+            auth: auth,
+            maxResults: 10
+        },
+        function (err, calendarList) {
+            if(err){
+                response.set(400);
+                response.end();
+                return console.log('The API returned an error: ' + err);
+            }
+            var retObj = new Object();
+            retObj.calendarName = new Array();
+            for(const curItem of calendarList.data.items){
+                retObj.calendarName.push(curItem.summary);
+            }
+            console.log("Calendar List : " + JSON.stringify(retObj));
+            response.json(retObj);
+        }
+    )
 }
 
 module.exports = router;

@@ -4,7 +4,7 @@ var config = require('../config');
 var request_promise = require('request-promise');
 var authentication = require('../auth/authentication');
 
-/* TODO Author : 정근화 */
+/* TODO: Author : 정근화 */
 
 /*
 

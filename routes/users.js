@@ -4,7 +4,7 @@ var User = require('../model/user');
 var authentication = require('../auth/authentication');
 var router = express.Router();
 
-/* TODO Author : 정근화 */
+/* TODO: Author : 정근화 */
 
 /*
 
@@ -12,9 +12,6 @@ var router = express.Router();
     유저에 관한 데이터를 반환한다.
 
 */
-
-/* JWT 인증을 위한 secret 키 */
-const SECRET = config.JWT_SECRET;
 
 /*
 

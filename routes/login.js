@@ -6,7 +6,7 @@ const Jwt = require('jsonwebtoken');
 const config = require('../config');
 var router = express.Router();
 
-/* TODO Author : 정근화 */
+/* TODO: Author : 정근화 */
 
 /*
 
@@ -29,12 +29,6 @@ const oAuth2Client = new google.auth.OAuth2(
     CLIENT_REDIRECT_URIS
 );
 
-/* Refresh Token 을 받기위한 offline 설정 */
-const authorizeUrl = oAuth2Client.generateAuthUrl({
-    // To get a refresh token, you MUST set access_type to `offline`.
-    access_type: 'offline',
-});
-
 /* JWT 발급을 위한 secret 키 */
 const SECRET = config.JWT_SECRET;
 
@@ -55,18 +49,7 @@ router.post('/', function (req, res) {
 
     /* 인증 코드를 담는다. */
     const authCode = req.body.authCode;
-
     console.log("Receive AuthCode from client : " + authCode);
-
-    /*
-    
-        googleToken 으로 로그인 절차를 행한다.
-        1. 구글토큰의 유효성을 검사한다.
-        2. 구글토큰을 추출하여 userId 값으로 DB를 검색한 후
-           googleToken 을 저장한다. (없으면 새 유저 추가)
-        3. 새로운 JWT를 생성하여 성공코드(200)과 함께 JWT를 response 한다.
-    
-    */
     returnJWT(authCode, res);
 
 });
@@ -89,28 +72,7 @@ async function returnJWT(authCode, res) {
     console.log("getToken Method Result [id_tokens] : " + tokens.id_token);
     oAuth2Client.setCredentials(tokens);
 
-    /*
-    
-        accessToken 의 만료시점이 다가올 경우 감지하여 refreshToken 을 발급받는다.
-        refreshToken 을 발급받아 DB 에 토큰으로 저장한다.
-    
-    */
-    oAuth2Client.on(tokens, (tokens) => {
-        if (tokens.refresh_token) {
-
-            // store the refresh_token in my database!
-            console.log("REFRESH_TOKEN*** : " + tokens.refresh_token);
-
-            refreshToken(tokens.refreshToken);
-
-        }
-
-        console.log("ACCESS_TOKEN*** : " + tokens.access_token);
-        console.log("ID_TOKEN*** : " + tokens.id_token);
-
-    });
-
-    /* 구글 토큰 유효성 검사 및 payload 추출 */
+    /* 구글 ID 토큰 유효성 검사 및 payload 추출 */
     const payload = await verify(tokens).catch(console.error);
 
     /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
@@ -142,32 +104,6 @@ async function returnJWT(authCode, res) {
 
 /*
 
-    accessToken 은 기한이 만료된다.
-    oAuthClient.on 으로 기한이 만료되면 다음 refreshToken 을
-    보급한다. 이때 토큰을 DB 에 갱신하여 저장해준다.
-
-*/
-async function refreshToken(refreshToken) {
-
-    try {
-
-        /* userId 가 일치하는 유저가 DB에 존재하는지 조회한다. */
-        var resultUser = await User.findOne({ userId: payload.sub });
-
-        /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.tokens = refreshToken;
-        resultUser = await resultUser.save();
-
-    } catch (err) {
-
-        console.error(err);
-
-    }
-
-}
-
-/*
-
     인증한 토큰의 Payload 를 가지고 DB를 조회 하는 함수
     유저를 조회해보고 유저가 없으면 새 유저를 생성한다.
     결과적으로 userId와 일치하는 유저를 반환한다.
@@ -194,17 +130,14 @@ async function searchDB(tokens, payload) {
                     given_name: payload.given_name,
                     family_name: payload.family_name,
                     locale: payload.locale,
-                    access_token: ""
+                    tokens: ""
                 });
 
                 resultUser = await newUser.save();
 
             } catch (err) {
-
                 console.error(err);
-
             }
-
         }
 
         /* 조회한 유저의 구글 토큰값을 갱신한다. */
@@ -231,68 +164,8 @@ async function searchDB(tokens, payload) {
 
     홈페이지 : https://developers.google.com/identity/sign-in/web/backend-auth
 
-    After you receive the ID token by HTTPS POST, you must verify the integrity of the token.
-    To verify that the token is valid, ensure that the following criteria are satisfied:
-
-    The ID token is properly signed by Google.
-    Use Google's public keys (available in JWK or PEM format) to verify the token's signature.
-    These keys are regularly rotated;
-    examine the Cache-Control header in the response to determine when you should retrieve them again.
-    
-    The value of aud in the ID token is equal to one of your app's client IDs.
-    This check is necessary to prevent ID tokens issued to a malicious app
-    being used to access data about the same user on your app's backend server.
-    
-    The value of iss in the ID token is equal to accounts.google.com or https://accounts.google.com.
-    
-    The expiry time (exp) of the ID token has not passed.
-    
-    If you want to restrict access to only members of your G Suite domain,
-    verify that the ID token has an hd claim that matches your G Suite domain name.
-    Rather than writing your own code to perform these verification steps,
-    we strongly recommend using a Google API client library for your platform, or a general-purpose JWT library.
-    For development and debugging, you can call our tokeninfo validation endpoint.
-
-
-
 */
-async function verify(tokens) {
-
-    /* 
-    
-        verify 에서 tokens 로 넘어오는 객체는 access_token 과 refresh_token, id_token
-        을 지니고 있다. 여기서는
-        client.verifyIdToken 함수를 이용해 비동기적으로 ID토큰의 유효성을 검사한다.
-        The verifyIdToken function verifies the JWT signature,
-        the aud claim, the exp claim, and the iss claim.
-
-        JWT Signature 확인, CLIENT_ID 일치 여부 확인, 만료여부 확인, 구글발급 확인
-
-    */
-    const ticket = await client.verifyIdToken({
-        idToken: tokens.id_token,
-        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-        // Or, if multiple clients access the backend:
-        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
-    });
-
-    /*
-    
-        TODO
-        위의 verifyIdToken 에서 JWT signature 와
-        aud, exp, iss 를 검사하였는데, 이 입증의 결과의
-        성공/실패 유무를 어떻게 구분하는지 알아봐고 코드를 작성해야 함.
-    
-    */
-
-
-
-
-
-
-
-    /* 아래 코드는 verify 가 성공하였을 때 해야 할 역할 */
-    /*
+/*
 
         PAYLOAD -- (안드로이드에서 구글에 권한 요청할 때 일단 email, profile 옵션만 요청 함.)
         aud(string)             : 토큰 대상자 - 웹 클라이언트ID(내가 구글에서 발급 받은) 일치해야함.
@@ -308,23 +181,20 @@ async function verify(tokens) {
         exp(string)             : 토큰만료시간
         iat(string)             : 토큰발급시간 -> iat를 통해 토큰의 나이를 확인 가능
 
-    */
+*/
+async function verify(tokens) {
+
+    const ticket = await client.verifyIdToken({
+        idToken: tokens.id_token,
+        audience: CLIENT_ID, 
+    });
+
+    /* 아래 코드는 verify 가 성공하였을 때 해야 할 역할 */
     const payload = ticket.getPayload();
     console.log("Token Payload -----------------------");
     console.log(payload);
     return payload;
 
-    /*
-
-        아래와 같이 추출해서 사용 가능
-        const userid = payload.sub;
-        const exp = payload.exp;
-        const email = payload.email;
-        const name = payload.name;
-
-    */
-    // If request specified a G Suite domain:
-    //const domain = payload['hd'];
 }
 
 module.exports = router;

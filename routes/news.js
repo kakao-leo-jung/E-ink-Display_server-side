@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var headline = require('headline-news-naver');
 
-/* TODO Author : 정근화 */
+/* TODO: Author : 정근화 */
 
 /*
 
@@ -17,7 +17,7 @@ var headline = require('headline-news-naver');
 
 /*
 
-    TODO : 
+    TODO: 
     요청이 들어왔을 때 크롤링 하고 리턴하는 방식은
     지연율이 높음. 서버에서 주기적(예, 1분마다)으로
     headline-news-naver 를 실행시켜 파일을 가지고 있다가
