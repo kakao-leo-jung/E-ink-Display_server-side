@@ -52,13 +52,16 @@ router.post('/', function (req, res) {
     selected: req.body.selected
   });
 
-  var resTodo = newTodo;
-
   newTodo.save((err) => {
     if (err) {
       console.log("Todo DB Save Err : " + err);
       res.set(400);
       res.end();
+    }
+    var resTodo = {
+      _id : newTodo._id,
+      title : newTodo.title,
+      selected : newTodo.selected
     }
     res.json(resTodo);
   });
