@@ -16,18 +16,18 @@ var router = express.Router();
 
 /*
 
-  FIXME: Todo 구현에 관해.
-  todolist.js 스키마에 의해 user_auth db의 todos Collection에 Todo 들이 저장이 되면 됩니다.
+    FIXME: Todo 구현에 관해.
+    todolist.js 스키마에 의해 user_auth db의 todos Collection에 Todo 들이 저장이 되면 됩니다.
   
-  userId 변수는 구글에서 받아와 users Collection 에 저장한 유저정보의 id 숫자값이 들어가야 합니다.
-  그리고 userId 를 알 수 있는 것은 JWT를 파싱하여 얻은 decoded 값에 userId 값이 들어가있습니다.
-  [자세한 것은 authentication.js 의 veryfyJWT 함수를 참고.]
+    userId 변수는 구글에서 받아와 users Collection 에 저장한 유저정보의 id 숫자값이 들어가야 합니다.
+    그리고 userId 를 알 수 있는 것은 JWT를 파싱하여 얻은 decoded 값에 userId 값이 들어가있습니다.
+    [자세한 것은 authentication.js 의 veryfyJWT 함수를 참고.]
 
-  오직 안드로이드가 누구의 요청인지 인증하는 방식은 헤더에 실린 JWT로 하므로 다른 id 나 title값은 없어도 무방할겁니다.
-  안드로이드쪽 요청사항이 정확하지 않은데 영보님과 하영님이 만들고 계신 어플 구조를 보고, Issue 에 업로드한 안드로이드_요구사항.txt
-  를 참고하면 좋습니다.
- [단, userid 말씀하시는 거는 하영님이 잘못이해하셨는데 url에 싫는게 아니라 header 값에 싣는 jwt 를 말합니다.
-  안드로이드_요구사항.txt 의 userid는 무시하고진행 ]
+    오직 안드로이드가 누구의 요청인지 인증하는 방식은 헤더에 실린 JWT로 하므로 다른 id 나 title값은 없어도 무방할겁니다.
+    안드로이드쪽 요청사항이 정확하지 않은데 영보님과 하영님이 만들고 계신 어플 구조를 보고, Issue 에 업로드한 안드로이드_요구사항.txt
+    를 참고하면 좋습니다.
+    [단, userid 말씀하시는 거는 하영님이 잘못이해하셨는데 url에 싫는게 아니라 header 값에 싣는 jwt 를 말합니다.
+    안드로이드_요구사항.txt 의 userid는 무시하고진행 ]
 
 */
 /* FIXME: post 예시 구현 */

@@ -70,6 +70,15 @@ app.use('/weather', weather);
 var dbConnect = require('./bin/dbConnect');
 dbConnect('user_auth');
 
+/*
+
+    ./bin/mqttConnect.js 에서 작성한
+    mqtt 커넥터로 브로커 연결 및 라우팅
+
+*/
+var mqttConnect = require('./bin/mqttConnect');
+mqttConnect();
+
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
