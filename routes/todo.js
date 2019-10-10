@@ -58,8 +58,7 @@ router.post('/', function (req, res) {
       res.set(400);
       res.end();
     }
-    res.set(201);
-    res.end("todo save success");
+    res.json(newTodo);
   });
 
 });
