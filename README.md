@@ -26,6 +26,6 @@
 |`GET`|`/weather`<br/>`/:latitude(double)`<br/>`/:longitude(double)`|`Jwt`<br/>`(string)`|-|-|`weatherObj`<br/>`(json)`|`위도와 경도와 Jwt로 요청, 날씨 정보로 반환한다. (도시, 날씨, 날씨설명, 평균온도, 최고온도, 최저온도, 기압, 습도, 풍속, 구름량)`|
 |`POST`|`/todo`|`Jwt`<br/>`(string)`|`{`<br />`"title" : "Todo내용",`<br />`"selected" : (Boolean)`<br />`}`|-|`todoObject`<br/>`(json)`|`해당 유저의 Todo 목록을 DB에 저장하고 성공하면 저장된 todo 내용을 반환한다.`|
 |`GET`|`/todo`|`Jwt`<br/>`(string)`|-|-|`todoLists`<br />`(json)`|`해당 유저의 todo 목록을 todoLists 키 배열에 담아 반환한다.(_id, title, selected)`|
-|`PUT`|`/todo/:_id`|`Jwt`<br/>`(string)`|`{`<br />`"title" : "수정내용",`<br />`"selected" : (Boolean)`<br />`}`|-|`"todo update success!"`|`해당 유저의 특정 todo 의 내용을 body의 내용대로 수정한다. _id 는 GET을 통해 얻는 todo 고유ID 값`|
+|`PUT`|`/todo/:_id`|`Jwt`<br/>`(string)`|`{`<br />`"title" : "수정내용",`<br />`"selected" : (Boolean)`<br />`}`|-|`todoObject`<br/>`(json)`|`해당 유저의 특정 todo 의 내용을 body의 내용대로 수정하고 수정된 object를 반환한다. _id 는 GET을 통해 얻는 todo 고유ID 값`|
 |`DELETE`|`/todo/:_id`|`Jwt`<br/>`(string)`|-|-|`"todo delete success!"`|`해당 유저의 특정 todo를 DB에서 삭제하고 성공여부를 반환한다. `|
 

@@ -33,65 +33,65 @@ var router = express.Router();
 /* FIXME: post 예시 구현 */
 router.post('/', function (req, res) {
 
-  /* 보낸 주체가 누구인지 구분하기 위해서는 무조건 JWT 디코딩부터 해야합니다. */
-  var decoded = authentication.verifyJwt(req, res);
+    /* 보낸 주체가 누구인지 구분하기 위해서는 무조건 JWT 디코딩부터 해야합니다. */
+    var decoded = authentication.verifyJwt(req, res);
 
-  /*
+    /*
 
-      body 는 userId 빼고
-      title : String
-      selected : Boolean
-      값만 받음.
+        body 는 userId 빼고
+        title : String
+        selected : Boolean
+        값만 받음.
 
-      userId 값은 decoded 에서 userId 값 채워야함.
+        userId 값은 decoded 에서 userId 값 채워야함.
 
-  */
-  var newTodo = new Todo({
-    userId: decoded.userId,
-    title: req.body.title,
-    selected: req.body.selected
-  });
+    */
+    var newTodo = new Todo({
+        userId: decoded.userId,
+        title: req.body.title,
+        selected: req.body.selected
+    });
 
-  newTodo.save((err) => {
-    if (err) {
-      console.log("Todo DB Save Err : " + err);
-      res.set(400);
-      res.end();
-    }
-    var resTodo = {
-      _id : newTodo._id,
-      title : newTodo.title,
-      selected : newTodo.selected
-    }
-    res.json(resTodo);
-  });
+    newTodo.save((err, document) => {
+        if (err) {
+            console.log("Todo DB Save Err : " + err);
+            res.set(400);
+            res.end();
+        }
+        var resTodo = {
+            _id: document._id,
+            title: document.title,
+            selected: document.selected
+        }
+        res.json(resTodo);
+    });
 
 });
 
 /* FIXME: get 예시 구현 */
 router.get('/', function (req, res) {
 
-  var decoded = authentication.verifyJwt(req, res);
-  Todo.find({
-    userId: decoded.userId
-  }, function (err, todoLists) {
-    if (err) {
-      console.log("Todo DB Save Err : " + err);
-      res.set(400);
-      res.end();
-    }
-    var retObj = new Object();
-    retObj.todoLists = new Array();
-    for(var todo of todoLists){
-      var todoObj = {
-        "_id" : todo._id,
-        "title" : todo.title,
-        "selected" : todo.selected
-      };
-      retObj.todoLists.push(todoObj);
-    }
-    res.json(retObj);
-  });
+    var decoded = authentication.verifyJwt(req, res);
+    Todo.find({
+        userId: decoded.userId
+    }, function (err, todoLists) {
+        if (err) {
+            console.log("Todo DB Save Err : " + err);
+            res.set(400);
+            res.end();
+        }
+        var retObj = new Object();
+        retObj.todoLists = new Array();
+        for (var todo of todoLists) {
+            var todoObj = {
+                "_id": todo._id,
+                "title": todo.title,
+                "selected": todo.selected
+            };
+            retObj.todoLists.push(todoObj);
+        }
+        res.json(retObj);
+    });
 
 });
 
@@ -99,52 +99,65 @@ router.get('/', function (req, res) {
 /* _id 값은 해당 todo 모델의 고유 값 */
 router.put('/:_id', function (req, res) {
 
-  var decoded = authentication.verifyJwt(req, res);
+    var decoded = authentication.verifyJwt(req, res);
 
-  /* userId, _id, __v 값은 수정 불가능 req.body 에 있으면 안됨 */
-  if (req.body.hasOwnProperty('userId') || req.body.hasOwnProperty('_id')) {
-    res.set(400);
-    res.end("invalid body property is included! : userId or _id");
-    return;
-  }
-
-  /* 
-
-      _id 특정 글의 objectId 값과 해당 글의 userId 값이 요청한 측의 userId 값과 일치해야함.
-      그렇지 않을 경우 다른 계정의 _id 값을 알기만 하면 남의 글도 지울 수가 있음.
-      내가 올린 글만 수정할 수 있어야 함
-
-  */
-  Todo.findOneAndUpdate({
-    _id: req.params._id,
-    userId: decoded.userId
-  }, req.body, function (err, document) {
-    if (err) {
-      console.log("Todo DB Save Err : " + err);
-      res.set(500);
-      res.end();
+    /* userId, 값은 수정 불가능 req.body 에 있으면 안됨 */
+    if (req.body.hasOwnProperty('userId')) {
+        res.set(400);
+        res.end("invalid body property is included! : userId");
+        return;
     }
-    res.set(200);
-    res.end("todo update success!");
-  });
+
+    /* 
+
+        _id 특정 글의 objectId 값과 해당 글의 userId 값이 요청한 측의 userId 값과 일치해야함.
+        그렇지 않을 경우 다른 계정의 _id 값을 알기만 하면 남의 글도 지울 수가 있음.
+        내가 올린 글만 수정할 수 있어야 함
+
+    */
+    /* _id 값은 update 안함 */
+    var updateBody = {
+        title : req.body.title,
+        selected : req.body.selected
+    }
+
+    Todo.findOneAndUpdate({
+        _id: req.params._id,
+        userId: decoded.userId
+    }, updateBody, function (err, document) {
+        if (err) {
+            console.log("Todo DB Save Err : " + err);
+            res.set(500);
+            res.end();
+        }
+        var resTodo = {
+            _id: document._id,
+            title: updateBody.title,
+            selected: updateBody.selected
+        }
+        res.json(resTodo);
+    });
 
 });
 
 /* FIXME: delete 예시 구현 */
 router.delete('/:_id', function (req, res) {
 
-  var decoded = authentication.verifyJwt(req, res);
+    var decoded = authentication.verifyJwt(req, res);
 
-  /* PUT 과 마찬가지, userId 값이 동일한 사람인지 확인 */
-  Todo.findOneAndDelete({ _id : req.params._id, userId : decoded.userId},function(err, document){
-    if(err){
-      console.log("Todo DB Save Err : " + err);
-      res.set(500);
-      res.end();
-    }
-    res.set(200);
-    res.end("todo delete success!");
-  });
+    /* PUT 과 마찬가지, userId 값이 동일한 사람인지 확인 */
+    Todo.findOneAndDelete({
+        _id: req.params._id,
+        userId: decoded.userId
+    }, function (err, document) {
+        if (err) {
+            console.log("Todo DB Save Err : " + err);
+            res.set(500);
+            res.end();
+        }
+        res.set(200);
+        res.end("todo delete success!");
+    });
 
 });
 
