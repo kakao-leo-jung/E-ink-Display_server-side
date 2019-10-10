@@ -1,4 +1,3 @@
-
 const responseTopic = "/hw/weather";
 
 /* TODO: Author : 정근화 */
