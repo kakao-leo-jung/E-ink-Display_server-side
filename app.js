@@ -32,7 +32,7 @@ var routes = require('./routes/index');
 app.use('/', routes);
 /*********************************************/
 /* 로그인 '/loginToken' 라우팅 */
-var login = require('./routes/login');
+var login = require('./auth/login');
 app.use('/loginToken', login);
 /*********************************************/
 /* 유저 정보 '/users' 라우팅 */
@@ -67,7 +67,7 @@ app.use('/weather', weather);
     1. user_auth : 사용자 인증 DB 에 연결
 
 */
-var dbConnect = require('./bin/dbConnect');
+var dbConnect = require('./connect/dbConnect');
 dbConnect('user_auth');
 
 /*
@@ -76,7 +76,7 @@ dbConnect('user_auth');
     mqtt 커넥터로 브로커 연결 및 라우팅
 
 */
-var mqttConnect = require('./bin/mqttConnect');
+var mqttConnect = require('./connect/mqttConnect');
 mqttConnect();
 
 /// catch 404 and forwarding to error handler
