@@ -56,7 +56,7 @@ router.get('/next/:nextCount', function (req, res) {
     authentication.getAuthCode(decoded.userId).then(authClient => {
         console.log("authClient get : " + authClient);
         if (authClient) {
-            calendar_call.listEvents(authClient, maxCount, res);
+            calendar_call.listEvents(authClient, 'primary', new Date(), null, maxCount, res);
         } else {
             res.set(500);
             res.end();
@@ -101,35 +101,13 @@ router.get('/certainday/:year/:month/:day', function (req, res) {
         res.end();
     }
 
-    /* KST 시간 기준 9 시간 빼서 GMT 기준 설정 */
-    var _minDate = new Date(_year, _month - 1, _day - 1, 15, 0, 0);
-    var _maxDate = new Date(_year, _month - 1, _day, 15, 0, 0);
+    /* 시간 설정 */
+    var _minDate = new Date(_year, _month - 1, _day, 0, 0, 0);
+    var _maxDate = new Date(_year, _month - 1, _day, 24, 0, 0);
 
     authentication.getAuthCode(decoded.userId).then(authClient => {
         if (authClient) {
-            calendar_call.listCertainDay(authClient, _minDate, _maxDate, res);
-        } else {
-            res.set(500);
-            res.end();
-        }
-    });
-
-});
-
-
-/*
-
-    /calendar/calendar-list    
-
-    사용자의 캘린더 목록을 array로 가진 객체를 반환한다.
-
-*/
-router.get('/calendar-list', function (req, res) {
-    var decoded = authentication.verifyJwt(req, res);
-
-    authentication.getAuthCode(decoded.userId).then(authClient => {
-        if (authClient) {
-            calendar_call.listCalendars(authClient, res);
+            calendar_call.listEvents(authClient, 'primary', _minDate, _maxDate, null, res);
         } else {
             res.set(500);
             res.end();
@@ -151,7 +129,6 @@ router.get('/certainmonth/:year/:month', (req, res) => {
     var decoded = authentication.verifyJwt(req, res);
     var _year = req.params.year;
     var _month = req.params.month;
-    var _day = 1;
 
     if (_month > 12 || _month < 1) {
         console.log("requested Day is invalid : response 400");
@@ -159,12 +136,32 @@ router.get('/certainmonth/:year/:month', (req, res) => {
         res.end();
     }
 
-    var _minDate = new Date(_year, _month - 1, _day - 1, 15, 0, 0);
-    var _maxDate = new Date(_year, _month, _day - 1, 15, 0, 0);
+    var _minDate = new Date(_year, _month - 1, 1, 0, 0, 0);
+    var _maxDate = new Date(_year, _month, 1, 0, 0, 0);
 
     authentication.getAuthCode(decoded.userId).then(authClient => {
         if (authClient) {
-            calendar_call.listCertainMonth(authClient, _minDate, _maxDate, res);
+            calendar_call.listEvents(authClient, 'primary', _minDate, _maxDate, null, res);
+        } else {
+            res.set(500);
+            res.end();
+        }
+    });
+});
+
+/*
+
+    /calendar/calendar-list    
+
+    사용자의 캘린더 목록을 array로 가진 객체를 반환한다.
+
+*/
+router.get('/calendar-list', function (req, res) {
+    var decoded = authentication.verifyJwt(req, res);
+
+    authentication.getAuthCode(decoded.userId).then(authClient => {
+        if (authClient) {
+            calendar_call.listCalendars(authClient, res);
         } else {
             res.set(500);
             res.end();

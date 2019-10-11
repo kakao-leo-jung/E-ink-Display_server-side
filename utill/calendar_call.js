@@ -18,7 +18,7 @@ const {
     @param {google.auth.OAuth2} auth An authorized OAuth2 client.
 
 */
-exports.listEvents = (auth, count, response) => {
+exports.listEvents = (auth, calendarId, minDate, maxDate, maxCount, response) => {
 
     console.log("entered listEvent, Auth : " + auth);
 
@@ -26,68 +26,25 @@ exports.listEvents = (auth, count, response) => {
         version: 'v3',
         auth
     });
-    calendar.events.list({
-        calendarId: 'primary',
-        timeMin: (new Date()).toISOString(),
-        maxResults: count,
-        singleEvents: true,
-        orderBy: 'startTime',
-    }, (err, res) => {
+
+    var options = new Object();
+    options.calendarId = calendarId;
+    minDate ? options.timeMin = minDate.toISOString() : null;
+    maxDate ? options.timeMax = maxDate.toISOString() : null;
+    maxCount ? options.maxResults = maxCount : null;
+    options.singleEvents = true;
+    options.orderBy = 'startTime';
+
+    calendar.events.list(options, (err, res) => {
         if (err) {
             response.set(400);
             response.end();
             return console.log('The API returned an error: ' + err);
         }
-
-        /* 달력 이벤트 객체를 리턴 */
         const events = res.data.items;
-        var retObj = new Object();
-        retObj.days = events;
-        console.log("Calendar 10days return : " + JSON.stringify(retObj));
-        response.json(retObj);
-
+        console.log(events);
+        response.json(eventsToCustomObj(events));
     });
-}
-
-/*
-
-    특정 범위의 날짜 구간의 이벤트를
-    유저의 primary 달력에서 가져온다.
-
-    해당 minDate, maxDate 는 시간까지 정의가 되어 있어야 한다.
-
-*/
-exports.listCertainDay = (auth, minDate, maxDate, response) => {
-
-    console.log("entered listCertainDay, Auth : " + auth);
-
-    const calendar = google.calendar({
-        version: 'v3',
-        auth
-    });
-    calendar.events.list({
-        calendarId: 'primary',
-        timeMin: minDate.toISOString(),
-        timeMax: maxDate.toISOString(),
-        singleEvents: true,
-        orderBy: 'startTime',
-    }, (err, res) => {
-        if (err) {
-            response.set(400);
-            response.end();
-            return console.log('The API returned an error: ' + err);
-        }
-
-        /* 달력 이벤트 객체를 리턴 */
-        /* TODO: 현재 end date 가 걸치는 전날의 일정도 같이 잡힌다. start date가 일치하는 것만 결러내야야함 */
-        const events = res.data.items;
-        var retObj = new Object();
-        retObj.days = events;
-        console.log("Calendar Certain days(" + minDate.toISOString() + " - " + maxDate.toISOString() + ") return : " + JSON.stringify(retObj));
-        response.json(retObj);
-
-    });
-
 }
 
 /*
@@ -104,14 +61,14 @@ exports.listCalendars = (auth, response) => {
             maxResults: 10
         },
         function (err, calendarList) {
-            if(err){
+            if (err) {
                 response.set(400);
                 response.end();
                 return console.log('The API returned an error: ' + err);
             }
             var retObj = new Object();
             retObj.calendarName = new Array();
-            for(const curItem of calendarList.data.items){
+            for (const curItem of calendarList.data.items) {
                 retObj.calendarName.push(curItem.summary);
             }
             console.log("Calendar List : " + JSON.stringify(retObj));
@@ -120,37 +77,37 @@ exports.listCalendars = (auth, response) => {
     )
 }
 
+
 /*
 
-    특정 월의 한달 이벤트를 조회한 후
-    달력 형태의 jsonObject로 응답한다.    
+    events reference : https://developers.google.com/calendar/v3/reference/events#resource
+
+    GoogleAPI 호출을 통해 받은 events 객체를
+    안드로이드에서 알맞게 사용할 수 있도록 커스터마이징 객체로 바꾸어 리턴한다.
+    @params day       : Date
+    @params title     : String
+    @params memo      : String
+    @params startTime : Date
+    @params endTime   : Date
+    @params location  : String
+    @params people    : Attendees[]
 
 */
-exports.listCertainMonth = (auth, minDate, maxDate, response) => {
+function eventsToCustomObj(events) {
 
-    const calendar = google.calendar({
-        version: 'v3',
-        auth
-    });
-
-    calendar.events.list({
-        calendarId: 'primary',
-        timeMin: minDate.toISOString(),
-        timeMax: maxDate.toISOString(),
-        singleEvents: true,
-        orderBy: 'startTime',
-    }, (err, res) => {
-        if (err) {
-            response.set(400);
-            response.end();
-            return console.log('The API returned an error: ' + err);
+    var retObjArr = new Array();
+    for (var event of events) {
+        var obj = {
+            day : "",
+            title: event.summary ? event.summary : "",
+            memo: event.description ? event.description : "",
+            startTime: event.start.date ? event.start.date : event.start.dateTime,
+            endTime: event.end.date ? event.end.date : event.end.dateTime,
+            location: event.location ? event.location : "",
+            people: event.attendees ? event.attendees : [],
         }
-        /* TODO: start date 기준으로 해당 월의 이내에 있는 -> 이전달 31일꺼 걸러내야함 */
-        /* TODO: json[] -> {day}/{title}/{starttime}/{endtime} +{memo}{people}{location}도 post */
-        /* TODO: 요구사항 객체에 맞게 커스터마이징 해서 response 할것 */
-        const events = res.data.items;
-        console.log(events);
-
-    });
-
-}
+        obj.day = new Date(obj.startTime).getDate();
+        retObjArr.push(obj);
+    }
+    return retObjArr;
+};
