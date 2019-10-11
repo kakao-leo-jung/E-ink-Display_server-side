@@ -34,6 +34,7 @@ exports.listEvents = (auth, calendarId, minDate, maxDate, maxCount, response) =>
     maxCount ? options.maxResults = maxCount : null;
     options.singleEvents = true;
     options.orderBy = 'startTime';
+    options.timeZone = 'Asia/Seoul';
 
     calendar.events.list(options, (err, res) => {
         if (err) {
