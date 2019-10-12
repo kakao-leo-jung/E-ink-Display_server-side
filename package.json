@@ -1,9 +1,9 @@
 {
-  "name": "MagicCalendar",
+  "name": "MagicCalendar-serverside",
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "nodejs ./bin/www"
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "express": "~4.0.0",
