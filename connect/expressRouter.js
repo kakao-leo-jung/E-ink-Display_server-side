@@ -6,10 +6,6 @@
 */
 module.exports = (app) => {
 
-    /* 메인 '/' 라우팅 */
-    var routes = require('../routes/index');
-    app.use('/', routes);
-
     /* 로그인 '/loginToken' 라우팅 */
     var login = require('../auth/login');
     app.use('/loginToken', login);

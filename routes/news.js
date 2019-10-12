@@ -25,7 +25,7 @@ var headline = require('headline-news-naver');
 
 */
 
-router.get('/', function(req, res){
+router.get('/', (req, res) => {
 
     getNews(res);
 

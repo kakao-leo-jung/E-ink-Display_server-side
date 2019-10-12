@@ -21,7 +21,7 @@ var authentication = require('../auth/authentication');
 const API_URI = config.OPENWEATHERMAP_API_URI;
 const API_KEY = config.OPENWEATHERMAP_API_KEY;
 
-router.get('/:latitude/:longitude', function(req, res){
+router.get('/:latitude/:longitude', (req, res) => {
 
     /* jwt 인증 - decoding 실패 시 res 403 반환 */
     authentication.verifyJwt(req, res);
@@ -46,7 +46,7 @@ router.get('/:latitude/:longitude', function(req, res){
         json: true
     };
 
-    request_promise.get(reqOption).then(function(responseData){
+    request_promise.get(reqOption).then(responseData => {
         /* weather 수신 성공 */
         console.log(responseData);
 
@@ -65,7 +65,7 @@ router.get('/:latitude/:longitude', function(req, res){
 
         res.json(resObj);
 
-    }).catch(function(err){
+    }).catch(err => {
         /* weather 수신 실패 */
         console.log("OpenWeatherMap GET Failed : " + err);
         res.set(500);

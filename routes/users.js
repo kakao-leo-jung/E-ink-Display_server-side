@@ -6,44 +6,40 @@ var router = express.Router();
 
 /* TODO: Author : 정근화 */
 
-/*
-
-    본 모듈은 /users 로 들어온다.
-    유저에 관한 데이터를 반환한다.
-
-*/
-
-/*
-
-    /users/
-    
-    post 로 들어온 유저의 JWT 값을 인증하고
-    userId 값으로 DB를 조회한 후에
-    유저의 정보를 json 형태로 반환한다.
-
-    header : jwt : 'jdklsjfies'
-
-*/
-router.get('/', function(req, res){
+/**
+ * @api {get} /user/ 유저의 정보를 요청합니다.
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiSuccess {String} userId      유저 고유 번호 값(구글)
+ * @apiSuccess {String} email       유저 이메일 값
+ * @apiSuccess {String} name        유저 풀네임
+ * @apiSuccess {String} picture     유저 구글 사진 URL
+ * @apiSuccess {String} given_name  유저 이름
+ * @apiSuccess {String} family_name 유저 이름(성)
+ * @apiSuccess {String} locale      유저 지역 정보
+ * 
+ *
+ * @apiSuccessExample 성공 시 응답 :
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "firstname": "John",
+ *       "lastname": "Doe"
+ *     }
+ *
+ * @apiError UserNotFound The id of the User was not found.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "UserNotFound"
+ *     }
+ */
+router.get('/', (req, res) => {
 
     var decoded = authentication.verifyJwt(req, res);
     
-    console.log("decoded : " + decoded);
-
-    /*
-
-        userId 값을 통해 db를 조회하고 필요한 정보를
-        가져와 Object 로 생성한다.
-        userId(string)          : 유저 토큰 아이디 숫자 값(token 의 sub 값)
-        email(string)           : 유저 이메일
-        name(string)            : 유저 풀 네임
-        picture(string)         : 유저 사진 url
-        given_name(string)      : 유저 이름
-        family_name(string)     : 유저 이름(성)
-        locale(string)          : 지역(한국은 ko)
-
-    */
-    User.findOne({ userId: decoded.userId }, function(err, resultUser){
+    User.findOne({ userId: decoded.userId }, (err, resultUser) => {
         if(!err){
 
             var ret = {
@@ -57,8 +53,6 @@ router.get('/', function(req, res){
                 locale : resultUser.locale
         
             };
-
-            /* 객체를 리턴한다 */
             res.json(ret);
 
         }else{

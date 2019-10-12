@@ -6,9 +6,11 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "apidoc": "^0.17.7",
     "body-parser": "~1.0.0",
     "cookie-parser": "~1.0.1",
     "debug": "~0.7.4",
+    "ejs": "^2.7.1",
     "express": "~4.0.0",
     "google-auth-library": "^5.4.1",
     "googleapis": "^43.0.0",

@@ -31,7 +31,7 @@ var router = express.Router();
 
 */
 /* FIXME: post 예시 구현 */
-router.post('/', function (req, res) {
+router.post('/', (req, res) => {
 
     /* 보낸 주체가 누구인지 구분하기 위해서는 무조건 JWT 디코딩부터 해야합니다. */
     var decoded = authentication.verifyJwt(req, res);
@@ -69,12 +69,12 @@ router.post('/', function (req, res) {
 });
 
 /* FIXME: get 예시 구현 */
-router.get('/', function (req, res) {
+router.get('/', (req, res) => {
 
     var decoded = authentication.verifyJwt(req, res);
     Todo.find({
         userId: decoded.userId
-    }, function (err, todoLists) {
+    }, (err, todoLists) => {
         if (err) {
             console.log("Todo DB Save Err : " + err);
             res.set(400);
@@ -97,7 +97,7 @@ router.get('/', function (req, res) {
 
 /* FIXME: put 예시 구현 */
 /* _id 값은 해당 todo 모델의 고유 값 */
-router.put('/:_id', function (req, res) {
+router.put('/:_id', (req, res) => {
 
     var decoded = authentication.verifyJwt(req, res);
 
@@ -124,7 +124,7 @@ router.put('/:_id', function (req, res) {
     Todo.findOneAndUpdate({
         _id: req.params._id,
         userId: decoded.userId
-    }, updateBody, function (err, document) {
+    }, updateBody, (err, document) => {
         if (err) {
             console.log("Todo DB Save Err : " + err);
             res.set(500);
@@ -141,7 +141,7 @@ router.put('/:_id', function (req, res) {
 });
 
 /* FIXME: delete 예시 구현 */
-router.delete('/:_id', function (req, res) {
+router.delete('/:_id', (req, res) => {
 
     var decoded = authentication.verifyJwt(req, res);
 
@@ -149,7 +149,7 @@ router.delete('/:_id', function (req, res) {
     Todo.findOneAndDelete({
         _id: req.params._id,
         userId: decoded.userId
-    }, function (err, document) {
+    }, (err, document) => {
         if (err) {
             console.log("Todo DB Save Err : " + err);
             res.set(500);

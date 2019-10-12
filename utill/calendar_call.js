@@ -65,25 +65,25 @@ exports.postEvents = (authInfo, calendarId, calendarBody, response) => {
 
     /* attendee self자신 추가 */
     calendarBody.people.push({
-        "email":authInfo.resultUser.email,
-        "responseStatus":"accepted"
+        "email": authInfo.resultUser.email,
+        "responseStatus": "accepted"
     });
 
     params.requestBody = {
-        start : {
-            dateTime:calendarBody.startTime
+        start: {
+            dateTime: calendarBody.startTime
         },
-        end : {
-            dateTime:calendarBody.endTime
+        end: {
+            dateTime: calendarBody.endTime
         },
-        summary : calendarBody.title,
-        description : calendarBody.memo,
-        location : calendarBody.location,
-        attendees : calendarBody.people
+        summary: calendarBody.title,
+        description: calendarBody.memo,
+        location: calendarBody.location,
+        attendees: calendarBody.people
     };
 
     calendar.events.insert(params, (err, res) => {
-        if(err){
+        if (err) {
             response.set(400);
             response.end();
             return console.log('The API returned an error: ' + err);
@@ -113,20 +113,20 @@ exports.putEvents = (authInfo, calendarId, eventId, calendarBody, response) => {
     params.calendarId = calendarId;
     params.eventId = eventId;
     params.requestBody = {
-        start : {
-            dateTime:calendarBody.startTime
+        start: {
+            dateTime: calendarBody.startTime
         },
-        end : {
-            dateTime:calendarBody.endTime
+        end: {
+            dateTime: calendarBody.endTime
         },
-        summary : calendarBody.title,
-        description : calendarBody.memo,
-        location : calendarBody.location,
-        attendees : calendarBody.people
+        summary: calendarBody.title,
+        description: calendarBody.memo,
+        location: calendarBody.location,
+        attendees: calendarBody.people
     };
 
     calendar.events.update(params, (err, res) => {
-        if(err){
+        if (err) {
             response.set(400);
             response.end();
             return console.log('The API returned an error: ' + err);
@@ -150,13 +150,13 @@ exports.deleteEvents = (authInfo, calendarId, eventId, response) => {
         version: 'v3',
         auth
     });
-    
+
     var params = new Object();
     params.calendarId = calendarId;
     params.eventId = eventId;
 
     calendar.events.delete(params, (err, res) => {
-        if(err){
+        if (err) {
             response.set(400);
             response.end();
             return console.log('The API returned an error: ' + err);
@@ -214,10 +214,10 @@ exports.listCalendars = (auth, response) => {
 
 */
 eventToCustomObj = (event) => {
-    
+
     var obj = {
-        _id : event.id,
-        day : "",
+        _id: event.id,
+        day: "",
         title: event.summary ? event.summary : "",
         memo: event.description ? event.description : "",
         startTime: event.start.date ? event.start.date : event.start.dateTime,
