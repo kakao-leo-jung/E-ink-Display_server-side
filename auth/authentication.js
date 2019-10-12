@@ -78,7 +78,12 @@ exports.getAuthCode = async (user_id) => {
             
             console.log("OAuth finish");
 
-            return oAuth2Client;
+            return {
+                oAuth2Client : oAuth2Client,
+                resultUser : resultUser
+            };
+
+            // return oAuth2Client;
 
         } else {
             /* 구글 토큰 미존재 */
@@ -88,7 +93,6 @@ exports.getAuthCode = async (user_id) => {
     } catch (err) {
         console.error(err);
     }
-
 }
 
 /*
@@ -98,6 +102,7 @@ exports.getAuthCode = async (user_id) => {
     보급한다. 이때 토큰을 DB 에 갱신하여 저장해준다.
 
     FIXME: Refresh 가 항시 작동하지 않아서 추후에 제대로 DB 에 갱신되는지 테스트 해봐야함.
+    -> 테스트 확인함, 정상작동
 
 */
 exports.refreshToken = async (authClient, resultUser) => {

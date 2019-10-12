@@ -20,23 +20,21 @@ const {
 */
 exports.listEvents = (auth, calendarId, minDate, maxDate, maxCount, response) => {
 
-    console.log("entered listEvent, Auth : " + auth);
-
     const calendar = google.calendar({
         version: 'v3',
         auth
     });
 
-    var options = new Object();
-    options.calendarId = calendarId;
-    minDate ? options.timeMin = minDate.toISOString() : null;
-    maxDate ? options.timeMax = maxDate.toISOString() : null;
-    maxCount ? options.maxResults = maxCount : null;
-    options.singleEvents = true;
-    options.orderBy = 'startTime';
-    options.timeZone = 'Asia/Seoul';
+    var params = new Object();
+    params.calendarId = calendarId;
+    minDate ? params.timeMin = minDate.toISOString() : null;
+    maxDate ? params.timeMax = maxDate.toISOString() : null;
+    maxCount ? params.maxResults = maxCount : null;
+    params.singleEvents = true;
+    params.orderBy = 'startTime';
+    params.timeZone = 'Asia/Seoul';
 
-    calendar.events.list(options, (err, res) => {
+    calendar.events.list(params, (err, res) => {
         if (err) {
             response.set(400);
             response.end();
@@ -47,6 +45,54 @@ exports.listEvents = (auth, calendarId, minDate, maxDate, maxCount, response) =>
         response.json(eventsToCustomObj(events));
     });
 }
+
+/*
+
+    요청받은 calendarBody 정보를 바탕으로
+    google Calendar 에 insert 한다.
+
+*/
+exports.postEvents = (authInfo, calendarId, calendarBody, response) => {
+
+    var auth = authInfo.oAuth2Client;
+    const calendar = google.calendar({
+        version: 'v3',
+        auth
+    });
+
+    var params = new Object();
+    params.calendarId = calendarId;
+    /* attendee self자신 추가 */
+    calendarBody.people.push({
+        "email":authInfo.resultUser.email,
+        "responseStatus":"accepted"
+    });
+    params.requestBody = {
+        start : {
+            dateTime:calendarBody.startTime
+        },
+        end : {
+            dateTime:calendarBody.endTime
+        },
+        summary : calendarBody.title,
+        description : calendarBody.memo,
+        location : calendarBody.location,
+        attendees : calendarBody.people
+    };
+
+    calendar.events.insert(params, (err, res) => {
+        if(err){
+            response.set(400);
+            response.end();
+            return console.log('The API returned an error: ' + err);
+        }
+
+        console.log(res.data);
+        response.json(res.data);
+
+    });
+
+};
 
 /*
 

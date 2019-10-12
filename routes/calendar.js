@@ -22,7 +22,7 @@ var router = express.Router();
 
 /*
 
-    /calendar/next
+    GET /calendar/next
 
     post 로 들어온 유저의 JWT 값을 인증하고
     userId 값으로 DB를 조회하여 googleToken을 조회한 후
@@ -35,7 +35,7 @@ var router = express.Router();
     불러올 리스트의 개수를 parameter로 넣어서 호출한다.
 
 */
-router.get('/next/:nextCount', function (req, res) {
+router.get('/next/:nextCount', (req, res) => {
 
     /* 요청에서 jwt 를 추출한 다음 veryfy 및 decoding 한다. */
     var decoded = authentication.verifyJwt(req, res);
@@ -53,8 +53,10 @@ router.get('/next/:nextCount', function (req, res) {
         원하는 함수를 호출한다. (listEvents 실행)
 
     */
-    authentication.getAuthCode(decoded.userId).then(authClient => {
+    authentication.getAuthCode(decoded.userId).then(authInfo => {
+        var authClient = authInfo.oAuth2Client;
         console.log("authClient get : " + authClient);
+
         if (authClient) {
             calendar_call.listEvents(authClient, 'primary', new Date(), null, maxCount, res);
         } else {
@@ -67,9 +69,9 @@ router.get('/next/:nextCount', function (req, res) {
 
 /*
 
-    /calendar/certainday
+    GET /calendar/certainday
 
-    post 로 들어온 유저의 JWT 값을 인증하고
+    요청 들어온 유저의 JWT 값을 인증하고
     userId 값으로 DB를 조회하여 googleToken을 조회한다.
 
      - yyyy (4자리 int)
@@ -82,17 +84,13 @@ router.get('/next/:nextCount', function (req, res) {
     해당 년, 월, 일의 제목과 내용을 호출하여 반환한다.
 
 */
-router.get('/certainday/:year/:month/:day', function (req, res) {
+router.get('/certainday/:year/:month/:day', (req, res) => {
 
     var decoded = authentication.verifyJwt(req, res);
-
-    console.log("decoded : " + decoded);
 
     var _year = req.params.year;
     var _month = req.params.month;
     var _day = req.params.day;
-
-    console.log("requested Certainday : " + _year + " / " + _month + " / " + _day);
 
     /* 날짜 유효성 검사 */
     if (_month > 12 || _month < 1 || _day > 31 || _day < 1) {
@@ -105,7 +103,8 @@ router.get('/certainday/:year/:month/:day', function (req, res) {
     var _minDate = new Date(_year, _month - 1, _day, 0, 0, 0);
     var _maxDate = new Date(_year, _month - 1, _day, 24, 0, 0);
 
-    authentication.getAuthCode(decoded.userId).then(authClient => {
+    authentication.getAuthCode(decoded.userId).then(authInfo => {
+        var authClient = authInfo.oAuth2Client;
         if (authClient) {
             calendar_call.listEvents(authClient, 'primary', _minDate, _maxDate, null, res);
         } else {
@@ -118,7 +117,32 @@ router.get('/certainday/:year/:month/:day', function (req, res) {
 
 /*
 
-    /calendar/certainmonth/
+    POST /calendar/certainday
+
+    해당 년/월/일에 해당하는 날짜에 body 값으로 달력을 받아
+    google calendar에 일정을 추가한다.
+
+*/
+router.post('/certainday', (req, res) => {
+
+    var decoded = authentication.verifyJwt(req, res);
+    var reqCalendar = req.body;
+
+    authentication.getAuthCode(decoded.userId).then(authInfo => {
+        if (authInfo) {
+            /* FIXME: 현재는 달력을 'primary' 에서만 처리하는데 안드로이드와 협의 후 다양한 달력list 사용하도록. */
+            calendar_call.postEvents(authInfo, 'primary', reqCalendar, res);
+        } else {
+            res.set(500);
+            res.end();
+        }
+    });
+
+});
+
+/*
+
+    GET /calendar/certainmonth/
 
     사용자의 달력의 해당 년,월에 해당하는 한달 짜리 달력 이벤트
     객체를 반환한다.
@@ -139,7 +163,8 @@ router.get('/certainmonth/:year/:month', (req, res) => {
     var _minDate = new Date(_year, _month - 1, 1, 0, 0, 0);
     var _maxDate = new Date(_year, _month, 1, 0, 0, 0);
 
-    authentication.getAuthCode(decoded.userId).then(authClient => {
+    authentication.getAuthCode(decoded.userId).then(authInfo => {
+        var authClient = authInfo.oAuth2Client;
         if (authClient) {
             calendar_call.listEvents(authClient, 'primary', _minDate, _maxDate, null, res);
         } else {
@@ -156,10 +181,11 @@ router.get('/certainmonth/:year/:month', (req, res) => {
     사용자의 캘린더 목록을 array로 가진 객체를 반환한다.
 
 */
-router.get('/calendar-list', function (req, res) {
+router.get('/calendar-list', (req, res) => {
     var decoded = authentication.verifyJwt(req, res);
 
-    authentication.getAuthCode(decoded.userId).then(authClient => {
+    authentication.getAuthCode(decoded.userId).then(authInfo => {
+        var authClient = authInfo.oAuth2Client;
         if (authClient) {
             calendar_call.listCalendars(authClient, res);
         } else {
