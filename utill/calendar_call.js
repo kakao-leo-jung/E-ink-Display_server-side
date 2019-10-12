@@ -62,11 +62,13 @@ exports.postEvents = (authInfo, calendarId, calendarBody, response) => {
 
     var params = new Object();
     params.calendarId = calendarId;
+
     /* attendee self자신 추가 */
     calendarBody.people.push({
         "email":authInfo.resultUser.email,
         "responseStatus":"accepted"
     });
+
     params.requestBody = {
         start : {
             dateTime:calendarBody.startTime
@@ -87,9 +89,79 @@ exports.postEvents = (authInfo, calendarId, calendarBody, response) => {
             return console.log('The API returned an error: ' + err);
         }
 
-        console.log(res.data);
-        response.json(res.data);
+        response.json(eventToCustomObj(res.data));
 
+    });
+
+};
+
+/*
+
+    요청받은 이벤트id 와 캘린더 정보를 바탕으로
+    google calendar 에 내용을 수정한다.
+
+*/
+exports.putEvents = (authInfo, calendarId, eventId, calendarBody, response) => {
+
+    var auth = authInfo.oAuth2Client;
+    const calendar = google.calendar({
+        version: 'v3',
+        auth
+    });
+
+    var params = new Object();
+    params.calendarId = calendarId;
+    params.eventId = eventId;
+    params.requestBody = {
+        start : {
+            dateTime:calendarBody.startTime
+        },
+        end : {
+            dateTime:calendarBody.endTime
+        },
+        summary : calendarBody.title,
+        description : calendarBody.memo,
+        location : calendarBody.location,
+        attendees : calendarBody.people
+    };
+
+    calendar.events.update(params, (err, res) => {
+        if(err){
+            response.set(400);
+            response.end();
+            return console.log('The API returned an error: ' + err);
+        }
+
+        response.json(eventToCustomObj(res.data));
+    });
+
+};
+
+/*
+
+    요청받은 이벤트 id 값을 가진 google calendar
+    이벤트를 삭제한다.
+
+*/
+exports.deleteEvents = (authInfo, calendarId, eventId, response) => {
+
+    var auth = authInfo.oAuth2Client;
+    const calendar = google.calendar({
+        version: 'v3',
+        auth
+    });
+    
+    var params = new Object();
+    params.calendarId = calendarId;
+    params.eventId = eventId;
+
+    calendar.events.delete(params, (err, res) => {
+        if(err){
+            response.set(400);
+            response.end();
+            return console.log('The API returned an error: ' + err);
+        }
+        response.end("Calendar Event [" + eventId + "] delete Success!");
     });
 
 };
@@ -131,6 +203,7 @@ exports.listCalendars = (auth, response) => {
 
     GoogleAPI 호출을 통해 받은 events 객체를
     안드로이드에서 알맞게 사용할 수 있도록 커스터마이징 객체로 바꾸어 리턴한다.
+    @params _id       : String
     @params day       : Date
     @params title     : String
     @params memo      : String
@@ -140,21 +213,28 @@ exports.listCalendars = (auth, response) => {
     @params people    : Attendees[]
 
 */
-function eventsToCustomObj(events) {
+eventToCustomObj = (event) => {
+    
+    var obj = {
+        _id : event.id,
+        day : "",
+        title: event.summary ? event.summary : "",
+        memo: event.description ? event.description : "",
+        startTime: event.start.date ? event.start.date : event.start.dateTime,
+        endTime: event.end.date ? event.end.date : event.end.dateTime,
+        location: event.location ? event.location : "",
+        people: event.attendees ? event.attendees : [],
+    }
+    obj.day = new Date(obj.startTime).getDate();
+
+    return obj;
+}
+
+eventsToCustomObj = (events) => {
 
     var retObjArr = new Array();
     for (var event of events) {
-        var obj = {
-            day : "",
-            title: event.summary ? event.summary : "",
-            memo: event.description ? event.description : "",
-            startTime: event.start.date ? event.start.date : event.start.dateTime,
-            endTime: event.end.date ? event.end.date : event.end.dateTime,
-            location: event.location ? event.location : "",
-            people: event.attendees ? event.attendees : [],
-        }
-        obj.day = new Date(obj.startTime).getDate();
-        retObjArr.push(obj);
+        retObjArr.push(eventToCustomObj(event));
     }
     return retObjArr;
 };

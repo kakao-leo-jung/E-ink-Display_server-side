@@ -117,13 +117,13 @@ router.get('/certainday/:year/:month/:day', (req, res) => {
 
 /*
 
-    POST /calendar/certainday
+    POST /calendar
 
     해당 년/월/일에 해당하는 날짜에 body 값으로 달력을 받아
     google calendar에 일정을 추가한다.
 
 */
-router.post('/certainday', (req, res) => {
+router.post('/', (req, res) => {
 
     var decoded = authentication.verifyJwt(req, res);
     var reqCalendar = req.body;
@@ -132,6 +132,53 @@ router.post('/certainday', (req, res) => {
         if (authInfo) {
             /* FIXME: 현재는 달력을 'primary' 에서만 처리하는데 안드로이드와 협의 후 다양한 달력list 사용하도록. */
             calendar_call.postEvents(authInfo, 'primary', reqCalendar, res);
+        } else {
+            res.set(500);
+            res.end();
+        }
+    });
+
+});
+
+/*
+
+    PUT /calendar/:_id
+
+    특정 _id 의 Calendar 의 정보를 수정한다.
+
+*/
+router.put('/:_id', (req, res) => {
+
+    var decoded = authentication.verifyJwt(req, res);
+    var reqCalendar = req.body;
+    var _id = req.params._id;
+
+    authentication.getAuthCode(decoded.userId).then(authInfo => {
+        if (authInfo) {
+            calendar_call.putEvents(authInfo, 'primary', _id, reqCalendar, res);
+        } else {
+            res.set(500);
+            res.end();
+        }
+    });
+
+});
+
+/*
+
+    DELETE /calendar/:_id
+
+    특정 _id 의 Calendar 이벤트를 삭제한다.
+
+*/
+router.delete('/:_id', (req, res) => {
+
+    var decoded = authentication.verifyJwt(req, res);
+    var _id = req.params._id;
+
+    authentication.getAuthCode(decoded.userId).then(authInfo => {
+        if (authInfo) {
+            calendar_call.deleteEvents(authInfo, 'primary', _id, res);
         } else {
             res.set(500);
             res.end();
