@@ -7,7 +7,7 @@ var router = express.Router();
 /* TODO: Author : 정근화 */
 
 /**
- * @api {get} /user/ 유저의 정보를 요청합니다.
+ * @api {get} /users/ 유저의 정보를 요청합니다.
  * @apiName GetUser
  * @apiGroup User
  *
@@ -23,8 +23,13 @@ var router = express.Router();
  * @apiSuccessExample 성공 시 응답 :
  *     HTTP/1.1 200 OK
  *     {
- *       "firstname": "John",
- *       "lastname": "Doe"
+ *          "userId": "100828347037604660700",
+            "email": "dfjung4254@gmail.com",
+            "name": "KH J",
+            "picture": "https://lh4.googleusercontent.com/-3WsHZ5SaYco/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3reBRCZFXpXnux85nyxUAdlQxv6rVw/s96-c/photo.jpg",
+            "given_name": "KH",
+            "family_name": "J",
+            "locale": "ko"
  *     }
  *
  * @apiError UserNotFound The id of the User was not found.
@@ -38,26 +43,28 @@ var router = express.Router();
 router.get('/', (req, res) => {
 
     var decoded = authentication.verifyJwt(req, res);
-    
-    User.findOne({ userId: decoded.userId }, (err, resultUser) => {
-        if(!err){
+
+    User.findOne({
+        userId: decoded.userId
+    }, (err, resultUser) => {
+        if (!err) {
 
             var ret = {
 
-                userId : resultUser.userId,
-                email : resultUser.email,
-                name : resultUser.name,
-                picture : resultUser.picture,
-                given_name : resultUser.given_name,
-                family_name : resultUser.family_name,
-                locale : resultUser.locale
-        
+                userId: resultUser.userId,
+                email: resultUser.email,
+                name: resultUser.name,
+                picture: resultUser.picture,
+                given_name: resultUser.given_name,
+                family_name: resultUser.family_name,
+                locale: resultUser.locale
+
             };
             res.json(ret);
 
-        }else{
+        } else {
             console.error(err);
-            res.status(500);
+            res.status(400);
             res.end();
         }
     });

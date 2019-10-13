@@ -4,6 +4,8 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var logHandler = require('./utill/logHandler');
+var errorHandler = require('./utill/errorHandler');
 
 var app = express();
 
@@ -18,6 +20,10 @@ app.set('views', path.join(__dirname, 'docs'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'docs')));
+
+/* Error Handling */
+app.use(logHandler);
+app.use(errorHandler);
 
 /* Express Routing */
 var expressRouter = require('./connect/expressRouter');

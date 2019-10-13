@@ -5,6 +5,7 @@ const {
     google
 } = require('googleapis');
 const util = require('util');
+const errorSet = require('../utill/errorSet');
 
 /* TODO: Author : 정근화 */
 
@@ -30,20 +31,22 @@ const CLIENT_REDIRECT_URIS = config.WEB_REDIRECT_URIS;
     userId 를 추출할 수 있다.
 
 */
-exports.verifyJwt = (req, res) => {
+exports.verifyJwt = (req, res, next) => {
 
     /* 헤더로 부터 JWT 를 수신한다. */
     var reqJwt = req.headers.jwt;
 
     if (!reqJwt) {
-        return res.status(403).json({
-            success: false,
-            message: 'not logged in'
-        })
+        next(errorSet.createError(errorSet.NO_JWT));
     }
 
-    var decoded = Jwt.verify(reqJwt, SECRET);
-    console.log("decoded userId : " + decoded.userId);
+    try{
+        var decoded = Jwt.verify(reqJwt, SECRET);
+    }catch(err){
+        
+        return console.log("verifyJwt : " + err);
+    }
+
 
     return decoded;
 
