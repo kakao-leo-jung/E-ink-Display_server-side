@@ -1,6 +1,7 @@
 var express = require('express');
 var Todo = require('../model/todolist');
 var authentication = require('../auth/authentication');
+var errorSet = require('../utill/errorSet');
 var router = express.Router();
 
 /** JSON Structure
@@ -31,254 +32,472 @@ var router = express.Router();
 
 */
 /* FIXME: post 예시 구현 */
-router.post('/', (req, res) => {
+/*
 
-    /* 보낸 주체가 누구인지 구분하기 위해서는 무조건 JWT 디코딩부터 해야합니다. */
-    var decoded = authentication.verifyJwt(req, res);
+    FIXME: 또한 API 의 문서화를 위해서 apidocs 를 사용하고 있습니다.
+    이에 맞게 api 주석을 작성해주시면 됩니다.
 
-    /*
+    url : http://apidocjs.com/
 
-        body 는 userId 빼고
-        title : String
-        selected : Boolean
-        값만 받음.
+*/
 
-        userId 값은 decoded 에서 userId 값 채워야함.
+/**
 
-    */
-    var newTodo = new Todo({
-        userId: decoded.userId,
-        title: req.body.title,
-        selected: req.body.selected
-    });
+    @api {post} /todo 유저의 Todo 정보를 저장합니다.
+    @apiName PostTodo
+    @apiGroup Todo
 
-    newTodo.save((err, document) => {
-        if (err) {
-            console.log("Todo DB Save Err : " + err);
-            res.set(400);
-            res.end();
+    @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
+    @apiHeaderExample {form} 헤더 예제
+    {
+        // retrofit2 : HashMap 에 key값은 "jwt", value값은 "eyJ..." 로 설정
+        "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
+    }
+
+    @apiParam {String} title Todo 제목
+    @apiParam {boolean} selected Todo 체크 여부
+    @apiParamExample {json} 파라미터(body) 예제
+    {
+        "title": "MagicCalender 만들기 테스트",
+        "selected": false
+    }
+
+    @apiSuccess {String}  _id             DB에 저장된 Todo의 고유값 - put, delete 요청할 때 사용
+    @apiSuccess {String}  title           Todo 의 제목
+    @apiSuccess {boolean} selected        Todo 체크되었는지 여부.
+    @apiSuccessExample 성공 시 응답 :
+    HTTP/1.1 200 OK
+    {
+        "_id": "5da46cff9ea01463ba5c2eca",
+        "title": "MagicCalendar 만들기 테스트",
+        "selected": false
+    }
+
+    @apiError NO_JWT JWT 가 헤더에 실려있지 않습니다.
+    @apiError INVALID_JWT JWT 가 유효하지 않습니다.
+    @apiError NOUSER_DB 해당 유저의 정보가 DB에서 찾을 수 없습니다.
+    @apiError INVALID_TODOBODY Request Body 가 유효하지 않습니다.
+    @apiError ERR_CRUDDB 내부 DB 작업에 실패하였습니다.
+
+    @apiErrorExample 실패 : NO_JWT
+    HTTP/1.1 401 Unauthorized
+    {
+        "name" : "NO_JWT",
+        "message": "Please put JWT in your request header!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : INAVLID_JWT
+    HTTP/1.1 401 Unauthorized
+    {
+        "name" : "INVALID_JWT",
+        "message": "Your JWT is invalid!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : NOUSER_DB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "NOUSER_DB",
+        "message": "Cannot find userId in database!",
+        "status": 500
+    }   
+    @apiErrorExample 실패 : INVALID_TODOBODY
+    HTTP/1.1 400 Bad Request
+    {
+        "name" : "INVALID_TODOBODY",
+        "message": "Invalid request body, please put [title] and [selected] in your request body!",
+        "status": 400
+    } 
+    @apiErrorExample 실패 : ERR_CRUDDB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "ERR_CRUDDB",
+        "message": "Cannot CRUD your Todo in database!",
+        "status": 400
+    }
+
+*/
+router.post('/', (req, res, next) => {
+
+    try {
+
+        /* 보낸 주체가 누구인지 구분하기 위해서는 무조건 JWT 디코딩부터 해야합니다. */
+        var decoded = authentication.verifyJwt(req, res);
+
+        var _title = req.body.title;
+        var _selected = req.body.selected;
+
+        if (!_title || !_selected) {
+            throw (errorSet.createError(errorSet.es.INAVLID_TODOBODY));
         }
-        var resTodo = {
-            _id: document._id,
-            title: document.title,
-            selected: document.selected
-        }
-        res.json(resTodo);
-    });
+
+        /*
+
+            body 는 userId 빼고
+            title : String
+            selected : Boolean
+            값만 받음.
+
+            userId 값은 decoded 에서 userId 값 채워야함.
+
+        */
+        var newTodo = new Todo({
+            userId: decoded.userId,
+            title: _title,
+            selected: _selected
+        });
+
+        newTodo.save()
+            .then(savedTodo => {
+                var resTodo = {
+                    _id: savedTodo._id,
+                    title: savedTodo.title,
+                    selected: savedTodo.selected
+                }
+                next(resTodo);
+            })
+            .catch(err => {
+                next(errorSet.createError(errorSet.es.ERR_CRUDDB));
+            });
+
+    } catch (err) {
+        /*
+
+            next 함수는 express 에서 다음 use로 등록한 다음 라우터로 보냅니다.
+            로그관리를 위해 에러를 보내든 정상적으로 응답을 하든 next 함수를 통해
+            logHandler로 보내야 합니다. 예외처리가 된 부분은 모두 throw 하여
+            여기 catch 부분의 err로 보냅니다.
+
+        */
+        next(err);
+    }
 
 });
 
-/* FIXME: get 예시 구현 */
-router.get('/', (req, res) => {
 
-    var decoded = authentication.verifyJwt(req, res);
-    Todo.find({
-        userId: decoded.userId
-    }, (err, todoLists) => {
-        if (err) {
-            console.log("Todo DB Save Err : " + err);
-            res.set(400);
-            res.end();
-        }
-        var retObj = new Object();
-        retObj.todoLists = new Array();
-        for (var todo of todoLists) {
-            var todoObj = {
-                "_id": todo._id,
-                "title": todo.title,
-                "selected": todo.selected
-            };
-            retObj.todoLists.push(todoObj);
-        }
-        res.json(retObj);
-    });
+
+/* FIXME: get 예시 구현 */
+/**
+
+    @api {get} /todo 유저의 Todo 정보를 가져옵니다.
+    @apiName GetTodo
+    @apiGroup Todo
+
+    @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
+    @apiHeaderExample {form} 헤더 예제
+    {
+        // retrofit2 : HashMap 에 key값은 "jwt", value값은 "eyJ..." 로 설정
+        "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
+    }
+
+    @apiParam {null} No Parameter 요청 파라미터 없음.
+    @apiParamExample {null} 파라미터(x) 예제
+    No Parameter
+
+    @apiSuccess {String}  _id             DB에 저장된 Todo의 고유값 - put, delete 요청할 때 사용
+    @apiSuccess {String}  title           Todo 의 제목
+    @apiSuccess {boolean} selected        Todo 체크되었는지 여부.
+    @apiSuccessExample 성공 시 응답 :
+    HTTP/1.1 200 OK
+    {
+        "todoLists":
+            [
+                {"_id": "5d9ed8a64d73a91bcc4526d7", "title": "MagicCalender 만들기2", "selected": true},
+                {"_id": "5d9ed8aa4d73a91bcc4526d8", "title": "MagicCalender 만들기3", "selected": true},
+                {"_id": "5d9efdeaec5df242401dd1a7", "title": "새로운 post modified!!", "selected": false},
+                {"_id": "5d9efe6b21e6cb42d3071cde", "title": "새로운 post 테스트2", "selected": false},
+                {"_id": "5d9f00a421e6cb42d3071cdf", "title": "Android post test", "selected": false},
+                {"_id": "5da309dd93968368d2266635", "title": "New Post Test good!", "selected": false}
+            ]
+    }
+
+    @apiError NO_JWT JWT 가 헤더에 실려있지 않습니다.
+    @apiError INVALID_JWT JWT 가 유효하지 않습니다.
+    @apiError NOUSER_DB 해당 유저의 정보가 DB에서 찾을 수 없습니다.
+    @apiError ERR_CRUDDB 내부 DB 작업에 실패하였습니다.
+
+        @apiErrorExample 실패 : NO_JWT
+    HTTP/1.1 401 Unauthorized
+    {
+        "name" : "NO_JWT",
+        "message": "Please put JWT in your request header!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : INAVLID_JWT
+    HTTP/1.1 401 Unauthorized
+    {
+        "name" : "INVALID_JWT",
+        "message": "Your JWT is invalid!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : NOUSER_DB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "NOUSER_DB",
+        "message": "Cannot find userId in database!",
+        "status": 500
+    } 
+    @apiErrorExample 실패 : ERR_CRUDDB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "ERR_CRUDDB",
+        "message": "Cannot CRUD your Todo in database!",
+        "status": 400
+    }
+
+*/
+router.get('/', (req, res, next) => {
+
+    try {
+        var decoded = authentication.verifyJwt(req, res);
+
+        Todo.find({
+            userId: decoded.userId
+        }).then(todoLists => {
+            var retObj = new Object();
+            retObj.todoLists = new Array();
+            for (var todo of todoLists) {
+                var todoObj = {
+                    "_id": todo._id,
+                    "title": todo.title,
+                    "selected": todo.selected
+                };
+                retObj.todoLists.push(todoObj);
+            }
+            next(retObj);
+        }).catch(err => {
+            next(errorSet.createError(errorSet.es.ERR_CRUDDB));
+        });
+
+    } catch (err) {
+        next(err);
+    }
 
 });
 
 /* FIXME: put 예시 구현 */
 /* _id 값은 해당 todo 모델의 고유 값 */
-router.put('/:_id', (req, res) => {
+/**
 
-    var decoded = authentication.verifyJwt(req, res);
+    @api {put} /todo 유저의 Todo 정보를 수정합니다.
+    @apiName PutTodo
+    @apiGroup Todo
 
-    /* userId, 값은 수정 불가능 req.body 에 있으면 안됨 */
-    if (req.body.hasOwnProperty('userId')) {
-        res.set(400);
-        res.end("invalid body property is included! : userId");
-        return;
+    @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
+    @apiHeaderExample {form} 헤더 예제
+    {
+        // retrofit2 : HashMap 에 key값은 "jwt", value값은 "eyJ..." 로 설정
+        "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
     }
 
-    /* 
+    @apiParam {String} title Todo 제목
+    @apiParam {boolean} selected Todo 체크 여부
+    @apiParamExample {json} 파라미터(body) 예제
+    {
+        "title": "MagicCalender 만들기 수정하기",
+        "selected": true
+    }
+    @apiParam {String} :_id 고칠 todo 정보의 고유 아이디 값
+    @apiParamExample {path} 파라미터(url) 예제
+    URL : http://169.56.98.117/todo/5d9ed8a64d73a91bcc4526d7
 
-        _id 특정 글의 objectId 값과 해당 글의 userId 값이 요청한 측의 userId 값과 일치해야함.
-        그렇지 않을 경우 다른 계정의 _id 값을 알기만 하면 남의 글도 지울 수가 있음.
-        내가 올린 글만 수정할 수 있어야 함
-
-    */
-    /* _id 값은 update 안함 */
-    var updateBody = {
-        title : req.body.title,
-        selected : req.body.selected
+    @apiSuccess {String}  _id             DB에 저장된 Todo의 고유값 - put, delete 요청할 때 사용
+    @apiSuccess {String}  title           Todo 의 제목
+    @apiSuccess {boolean} selected        Todo 체크되었는지 여부.
+    @apiSuccessExample 성공 시 응답 :
+    HTTP/1.1 200 OK
+    {
+        "_id": "5d9ed8a64d73a91bcc4526d7",
+        "title": "MagicCalendar 만들기 수정하기",
+        "selected": true
     }
 
-    Todo.findOneAndUpdate({
-        _id: req.params._id,
-        userId: decoded.userId
-    }, updateBody, (err, document) => {
-        if (err) {
-            console.log("Todo DB Save Err : " + err);
-            res.set(500);
-            res.end();
+    @apiError NO_JWT JWT 가 헤더에 실려있지 않습니다.
+    @apiError INVALID_JWT JWT 가 유효하지 않습니다.
+    @apiError NOUSER_DB 해당 유저의 정보가 DB에서 찾을 수 없습니다.
+    @apiError INVALID_TODOBODY Request Body 가 유효하지 않습니다.
+    @apiError ERR_CRUDDB 내부 DB 작업에 실패하였습니다.
+    @apiError INVALID_TODOBODYKEY Body 값에 userId 값은 들어있으면 안됩니다.
+
+    @apiErrorExample 실패 : NO_JWT
+    HTTP/1.1 401 Unauthorized
+    {
+        "name" : "NO_JWT",
+        "message": "Please put JWT in your request header!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : INAVLID_JWT
+    HTTP/1.1 401 Unauthorized
+    {
+        "name" : "INVALID_JWT",
+        "message": "Your JWT is invalid!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : NOUSER_DB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "NOUSER_DB",
+        "message": "Cannot find userId in database!",
+        "status": 500
+    }   
+    @apiErrorExample 실패 : INVALID_TODOBODY
+    HTTP/1.1 400 Bad Request
+    {
+        "name" : "INVALID_TODOBODY",
+        "message": "Invalid request body, please put [title] and [selected] in your request body!",
+        "status": 400
+    } 
+    @apiErrorExample 실패 : ERR_CRUDDB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "ERR_CRUDDB",
+        "message": "Cannot CRUD your Todo in database!",
+        "status": 400
+    }
+    @apiErrorExample 실패 : INVALID_TODOBODYKEY
+    HTTP/1.1 400 Bad Request
+    {
+        "name" : "INVALID_TODOBODYKEY",
+        "message": "Invalid body property is included! : userId",
+        "status": 400
+    }    
+
+*/
+router.put('/:_id', (req, res, next) => {
+
+    try {
+        var decoded = authentication.verifyJwt(req, res);
+
+        /* userId, 값은 수정 불가능 req.body 에 있으면 안됨 */
+        if (req.body.hasOwnProperty('userId')) {
+            throw (errorSet.createError(errorSet.es.INVALID_TODOBODYKEY));
         }
-        var resTodo = {
-            _id: document._id,
-            title: updateBody.title,
-            selected: updateBody.selected
+
+        /* body 예외 처리 */
+        var _title = req.body.title;
+        var _selected = req.body.selected;
+        if (!_title || !_selected) {
+            throw (errorSet.createError(errorSet.es.INAVLID_TODOBODY));
         }
-        res.json(resTodo);
-    });
+
+        /* 
+
+            _id 특정 글의 objectId 값과 해당 글의 userId 값이 요청한 측의 userId 값과 일치해야함.
+            그렇지 않을 경우 다른 계정의 _id 값을 알기만 하면 남의 글도 지울 수가 있음.
+            내가 올린 글만 수정할 수 있어야 함
+
+        */
+        /* _id 값은 update 안함 */
+        var updateBody = {
+            title: _title,
+            selected: _selected
+        }
+
+        Todo.findOneAndUpdate({
+                _id: req.params._id,
+                userId: decoded.userId
+            }, updateBody)
+            .then(document => {
+                var resTodo = {
+                    _id: document._id,
+                    title: updateBody.title,
+                    selected: updateBody.selected
+                }
+                next(resTodo);
+            }).catch(err => {
+                next(errorSet.createError(errorSet.es.ERR_CRUDDB));
+            });
+
+    } catch (err) {
+        next(err);
+    }
 
 });
 
 /* FIXME: delete 예시 구현 */
-router.delete('/:_id', (req, res) => {
+/**
 
-    var decoded = authentication.verifyJwt(req, res);
+    @api {delete} /todo 유저의 Todo 정보를 삭제합니다.
+    @apiName DeleteTodo
+    @apiGroup Todo
 
-    /* PUT 과 마찬가지, userId 값이 동일한 사람인지 확인 */
-    Todo.findOneAndDelete({
-        _id: req.params._id,
-        userId: decoded.userId
-    }, (err, document) => {
-        if (err) {
-            console.log("Todo DB Save Err : " + err);
-            res.set(500);
-            res.end();
-        }
-        res.set(200);
-        res.end("todo delete success!");
-    });
+    @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
+    @apiHeaderExample {form} 헤더 예제
+    {
+        // retrofit2 : HashMap 에 key값은 "jwt", value값은 "eyJ..." 로 설정
+        "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
+    }
+
+    @apiParam {String} :_id 지울 todo 정보의 고유 아이디 값
+    @apiParamExample {path} 파라미터(url) 예제
+    URL : http://169.56.98.117/todo/5d9ed8a64d73a91bcc4526d7
+
+    @apiSuccess {String} message       삭제 완료 메세지
+    @apiSuccess {Number} status        성공 상태 200
+    @apiSuccessExample 성공 시 응답 :
+    HTTP/1.1 200 OK
+    {
+        "message": "Todo delete success!",
+        "status": 200
+    }
+
+    @apiError NO_JWT JWT 가 헤더에 실려있지 않습니다.
+    @apiError INVALID_JWT JWT 가 유효하지 않습니다.
+    @apiError NOUSER_DB 해당 유저의 정보가 DB에서 찾을 수 없습니다.
+    @apiError ERR_CRUDDB 내부 DB 작업에 실패하였습니다.
+
+    @apiErrorExample 실패 : NO_JWT
+    HTTP/1.1 401 Unauthorized
+    {
+        "name" : "NO_JWT",
+        "message": "Please put JWT in your request header!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : INAVLID_JWT
+    HTTP/1.1 401 Unauthorized
+    {
+        "name" : "INVALID_JWT",
+        "message": "Your JWT is invalid!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : NOUSER_DB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "NOUSER_DB",
+        "message": "Cannot find userId in database!",
+        "status": 500
+    }    
+    @apiErrorExample 실패 : ERR_CRUDDB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "ERR_CRUDDB",
+        "message": "Cannot CRUD your Todo in database!",
+        "status": 400
+    }   
+
+*/
+router.delete('/:_id', (req, res, next) => {
+
+    try {
+        var decoded = authentication.verifyJwt(req, res);
+
+        /* PUT 과 마찬가지, userId 값이 동일한 사람인지 확인 */
+        Todo.findOneAndDelete({
+            _id: req.params._id,
+            userId: decoded.userId
+        }).then(document => {
+            var resObj = {
+                message : "Todo delete success!",
+                status : 200
+            }
+            next(resObj);
+        }).catch(err => {
+            next(errorSet.createError(errorSet.es.ERR_CRUDDB));
+        });
+
+    } catch (err) {
+        next(err);
+    }
 
 });
-
-
-/** Get List of Todo */
-// router.get('/', function (req, res) {
-//   // MongoDB 조회
-//   Todo.find(function (err, data) {
-//     console.log(data);
-//     res.send(data);
-//   });
-// });
-
-// /** Get Todo
-//  * id : todoId
-//  */
-// router.get('/:id', function (req, res) {
-//   // MongoDB ID로 조회
-//   Todo.find(req.params.id, function (err, data) {
-//     console.log(data);
-//     res.json({
-//       result: data
-//     });
-//   });
-// });
-
-
-// /*
-//  todo 생성
-//  userId : string,
-//  *   email : string
-//  *   userName : String,
-//  *   title : String,
-//  *   selected : Boolean
-// */
-// router.post('/', function (req, res) {
-//   const newTodo = new Todo(req.body);
-//   newTodo.save(function (err) {
-//     if (err) {
-//       console.error(err);
-//       res.json({
-//         result: 0
-//       });
-//       return;
-//     }
-
-//     res.json({
-//       result: 1
-//     });
-
-//   });
-
-// });
-// /*
-//   데이터 저장에 성공하면 result:1을, 실패하면 result:0을 반환한다.
-
-// */
-
-// /*
-//   todo title로 검색
-//   userName과 title만 출력.
-
-// */
-// router.get('/:title', function (req, res) {
-//   Todo.find({
-//     title: req.params.title
-//   }, {
-//     _id: 0,
-//     userId: 0,
-//     userName: 1,
-//     title: 1,
-//     selected: 0
-//   }, function (err, data) {
-//     if (err) return res.status(500).json({
-//       error: err
-//     });
-//     if (data.length == 0) return res.status(404).json({
-//       error: 'todo not found'
-//     })
-//     res.json(data);
-//   })
-// })
-
-
-// /*
-//   todo 수정
-// */
-// router.put('/:id', function (req, res) {
-//   Todo.findById(req.params.id, function (err, todo) {
-//     if (err) return res.status(500).json({
-//       error: 'database failure '
-//     });
-//     if (!data) return res.status(404).json({
-//       error: 'todo not found'
-//     });
-
-//     if (req.body.title) todo.title = req.body.title;
-//     todo.save(function (err) {
-//       if (err) res.status(500).json({
-//         error: 'failed to update'
-//       });
-//       res.json({
-//         message: 'todo updated'
-//       });
-//     })
-
-//   })
-
-// });
-
-// router.delete('/:id', function (req, res) {
-
-//   Todo.remove({
-//     _id: req.params.id
-//   }, function (err, output) {
-//     if (err) return res.status(500).json({
-//       error: 'database failure'
-//     });
-
-//     res.status(204).end();
-//   })
-// });
 
 module.exports = router;

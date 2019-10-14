@@ -1,9 +1,18 @@
+var logHandler = require('../utill/logHandler');
+var errorHandler = require('../utill/errorHandler');
+
+/* TODO: Author : 정근화 */
+
 /*
 
     여기서 라우팅 한다.
     app.use('/원하는받을URL경로', 변수);
 
 */
+/* Error Handling */
+// app.use(logHandler);
+// app.use(errorHandler);
+
 module.exports = (app) => {
 
     /* 로그인 '/loginToken' 라우팅 */
@@ -12,7 +21,7 @@ module.exports = (app) => {
 
     /* 유저 정보 '/users' 라우팅 */
     var users = require('../routes/users');
-    app.use('/users', users);
+    app.use('/users', users, logHandler, errorHandler);
 
     /* 달력 정보 '/calendar' 라우팅 */
     var calendar = require('../routes/calendar');

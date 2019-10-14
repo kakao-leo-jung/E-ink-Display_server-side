@@ -21,10 +21,6 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'docs')));
 
-/* Error Handling */
-app.use(logHandler);
-app.use(errorHandler);
-
 /* Express Routing */
 var expressRouter = require('./connect/expressRouter');
 expressRouter(app);
@@ -50,34 +46,37 @@ var mqttConnect = require('./connect/mqttConnect');
 mqttConnect();
 
 /// catch 404 and forwarding to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
+app.use(require('./utill/logHandler'));
+app.use(require('./utill/successHandler'));
+app.use(require('./utill/errorHandler'));
+// app.use(function(req, res, next) {
+//   var err = new Error('Not Found');
+//   err.status = 404;
+//   next(err);
+// });
 
-/// error handlers
+// /// error handlers
 
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err,
-    });
-  });
-}
+// // development error handler
+// // will print stacktrace
+// if (app.get('env') === 'development') {
+//   app.use(function(err, req, res, next) {
+//     res.status(err.status || 500);
+//     res.render('error', {
+//       message: err.message,
+//       error: err,
+//     });
+//   });
+// }
 
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {},
-  });
-});
+// // production error handler
+// // no stacktraces leaked to user
+// app.use(function(err, req, res, next) {
+//   res.status(err.status || 500);
+//   res.render('error', {
+//     message: err.message,
+//     error: {},
+//   });
+// });
 
 module.exports = app;

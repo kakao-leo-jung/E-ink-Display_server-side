@@ -31,25 +31,22 @@ const CLIENT_REDIRECT_URIS = config.WEB_REDIRECT_URIS;
     userId 를 추출할 수 있다.
 
 */
-exports.verifyJwt = (req, res, next) => {
+exports.verifyJwt = (req, res) => {
 
     /* 헤더로 부터 JWT 를 수신한다. */
     var reqJwt = req.headers.jwt;
 
     if (!reqJwt) {
-        next(errorSet.createError(errorSet.NO_JWT));
+        throw(errorSet.createError(errorSet.es.NO_JWT));
     }
 
     try{
         var decoded = Jwt.verify(reqJwt, SECRET);
+        return decoded;
     }catch(err){
-        
-        return console.log("verifyJwt : " + err);
+        throw(errorSet.createError(errorSet.es.INVALID_JWT));
     }
-
-
-    return decoded;
-
+    
 }
 
 /*
