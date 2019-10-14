@@ -1,6 +1,7 @@
 const {
     google
 } = require('googleapis');
+var errorSet = require('./errorSet');
 
 /* TODO: Author : 정근화 */
 /*
@@ -18,7 +19,7 @@ const {
     @param {google.auth.OAuth2} auth An authorized OAuth2 client.
 
 */
-exports.listEvents = (auth, calendarId, minDate, maxDate, maxCount, response) => {
+exports.listEvents = async (auth, calendarId, minDate, maxDate, maxCount) => {
 
     const calendar = google.calendar({
         version: 'v3',
@@ -34,16 +35,15 @@ exports.listEvents = (auth, calendarId, minDate, maxDate, maxCount, response) =>
     params.orderBy = 'startTime';
     params.timeZone = 'Asia/Seoul';
 
-    calendar.events.list(params, (err, res) => {
-        if (err) {
-            response.set(400);
-            response.end();
-            return console.log('The API returned an error: ' + err);
-        }
-        const events = res.data.items;
-        console.log(events);
-        response.json(eventsToCustomObj(events));
-    });
+    var res = await calendar.events.list(params)
+        .catch(err => {
+            throw (errorSet.createError(errorSet.es.FAILED_GOOGLE));
+        });
+
+    const events = res.data.items;
+
+    return eventsToCustomObj(events);
+
 }
 
 /*
@@ -52,7 +52,7 @@ exports.listEvents = (auth, calendarId, minDate, maxDate, maxCount, response) =>
     google Calendar 에 insert 한다.
 
 */
-exports.postEvents = (authInfo, calendarId, calendarBody, response) => {
+exports.postEvents = async (authInfo, calendarId, calendarBody) => {
 
     var auth = authInfo.oAuth2Client;
     const calendar = google.calendar({
@@ -82,16 +82,12 @@ exports.postEvents = (authInfo, calendarId, calendarBody, response) => {
         attendees: calendarBody.people
     };
 
-    calendar.events.insert(params, (err, res) => {
-        if (err) {
-            response.set(400);
-            response.end();
-            return console.log('The API returned an error: ' + err);
-        }
+    var res = await calendar.events.insert(params)
+        .catch(err => {
+            throw (errorSet.createError(errorSet.es.FAILED_GOOGLE));
+        });
 
-        response.json(eventToCustomObj(res.data));
-
-    });
+    return eventToCustomObj(res.data);
 
 };
 
@@ -101,7 +97,7 @@ exports.postEvents = (authInfo, calendarId, calendarBody, response) => {
     google calendar 에 내용을 수정한다.
 
 */
-exports.putEvents = (authInfo, calendarId, eventId, calendarBody, response) => {
+exports.putEvents = async (authInfo, calendarId, eventId, calendarBody) => {
 
     var auth = authInfo.oAuth2Client;
     const calendar = google.calendar({
@@ -125,15 +121,12 @@ exports.putEvents = (authInfo, calendarId, eventId, calendarBody, response) => {
         attendees: calendarBody.people
     };
 
-    calendar.events.update(params, (err, res) => {
-        if (err) {
-            response.set(400);
-            response.end();
-            return console.log('The API returned an error: ' + err);
-        }
+    var res = await calendar.events.update(params)
+        .catch(err => {
+            throw (errorSet.createError(errorSet.es.FAILED_GOOGLE));
+        });
 
-        response.json(eventToCustomObj(res.data));
-    });
+    return eventToCustomObj(res.data);
 
 };
 
@@ -143,7 +136,7 @@ exports.putEvents = (authInfo, calendarId, eventId, calendarBody, response) => {
     이벤트를 삭제한다.
 
 */
-exports.deleteEvents = (authInfo, calendarId, eventId, response) => {
+exports.deleteEvents = async (authInfo, calendarId, eventId) => {
 
     var auth = authInfo.oAuth2Client;
     const calendar = google.calendar({
@@ -155,14 +148,17 @@ exports.deleteEvents = (authInfo, calendarId, eventId, response) => {
     params.calendarId = calendarId;
     params.eventId = eventId;
 
-    calendar.events.delete(params, (err, res) => {
-        if (err) {
-            response.set(400);
-            response.end();
-            return console.log('The API returned an error: ' + err);
-        }
-        response.end("Calendar Event [" + eventId + "] delete Success!");
-    });
+    await calendar.events.delete(params)
+        .catch(err => {
+            throw (err);
+        });
+
+    var res = {
+        message: "Calendar Event [" + eventId + "] delete Success!",
+        status: 200
+    }
+
+    return res;
 
 };
 
@@ -172,28 +168,24 @@ exports.deleteEvents = (authInfo, calendarId, eventId, response) => {
     key값은 retObj.calendarName
 
 */
-exports.listCalendars = (auth, response) => {
+exports.listCalendars = async (auth) => {
     const calendar = google.calendar('v3');
 
-    calendar.calendarList.list({
-            auth: auth,
-            maxResults: 10
-        },
-        function (err, calendarList) {
-            if (err) {
-                response.set(400);
-                response.end();
-                return console.log('The API returned an error: ' + err);
-            }
-            var retObj = new Object();
-            retObj.calendarName = new Array();
-            for (const curItem of calendarList.data.items) {
-                retObj.calendarName.push(curItem.summary);
-            }
-            console.log("Calendar List : " + JSON.stringify(retObj));
-            response.json(retObj);
-        }
-    )
+    var calendarList = await calendar.calendarList.list({
+        auth: auth,
+        maxResults: 10
+    }).catch(err => {
+        throw (errorSet.createError(errorSet.es.FAILED_GOOGLE));
+    });
+
+    var retObj = new Object();
+    retObj.calendarName = new Array();
+    for (const curItem of calendarList.data.items) {
+        retObj.calendarName.push(curItem.summary);
+    }
+    
+    return retObj;
+
 }
 
 

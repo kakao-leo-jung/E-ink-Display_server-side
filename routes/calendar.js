@@ -1,6 +1,7 @@
 var express = require('express');
 var calendar_call = require('../utill/calendar_call');
 var authentication = require('../auth/authentication');
+var errorSet = require('../utill/errorSet');
 var router = express.Router();
 
 /* TODO: Author : 정근화 */
@@ -35,35 +36,32 @@ var router = express.Router();
     불러올 리스트의 개수를 parameter로 넣어서 호출한다.
 
 */
-router.get('/next/:nextCount', (req, res) => {
+router.get('/next/:nextCount', async (req, res, next) => {
 
-    /* 요청에서 jwt 를 추출한 다음 veryfy 및 decoding 한다. */
-    var decoded = authentication.verifyJwt(req, res);
+    try {
 
-    /* 달력의 일정리스트 호출 개수의 디폴트값은 10이다. */
-    var maxCount = req.params.nextCount;
-    if (!maxCount) {
-        maxCount = 10;
-    }
+        /* 요청에서 jwt 를 추출한 다음 veryfy 및 decoding 한다. */
+        var decoded = authentication.verifyJwt(req);
 
-    /*
+        /* 달력의 일정리스트 호출 개수의 디폴트값은 10이다. */
+        var maxCount = req.params.nextCount;
 
-        userId 값을 통해 db의 AuthCode 값을 조회한다.
-        authCode 조회 성공 후 인증된 auth클라이언트를 이용해
-        원하는 함수를 호출한다. (listEvents 실행)
+        /*
 
-    */
-    authentication.getAuthCode(decoded.userId).then(authInfo => {
+            userId 값을 통해 db의 AuthCode 값을 조회한다.
+            authCode 조회 성공 후 인증된 auth클라이언트를 이용해
+            원하는 함수를 호출한다. (listEvents 실행)
+
+        */
+        var authInfo = await authentication.getAuthCode(decoded.userId);
         var authClient = authInfo.oAuth2Client;
-        console.log("authClient get : " + authClient);
+        var resObj = await calendar_call.listEvents(authClient, 'primary', new Date(), null, maxCount);
 
-        if (authClient) {
-            calendar_call.listEvents(authClient, 'primary', new Date(), null, maxCount, res);
-        } else {
-            res.set(500);
-            res.end();
-        }
-    });
+        next(resObj);
+
+    } catch (err) {
+        next(err);
+    }
 
 });
 
@@ -84,34 +82,34 @@ router.get('/next/:nextCount', (req, res) => {
     해당 년, 월, 일의 제목과 내용을 호출하여 반환한다.
 
 */
-router.get('/certainday/:year/:month/:day', (req, res) => {
+router.get('/certainday/:year/:month/:day', async (req, res, next) => {
 
-    var decoded = authentication.verifyJwt(req, res);
+    try {
 
-    var _year = req.params.year;
-    var _month = req.params.month;
-    var _day = req.params.day;
+        var decoded = authentication.verifyJwt(req);
 
-    /* 날짜 유효성 검사 */
-    if (_month > 12 || _month < 1 || _day > 31 || _day < 1) {
-        console.log("requested Day is invalid : response 400");
-        res.set(400);
-        res.end();
-    }
+        var _year = req.params.year;
+        var _month = req.params.month;
+        var _day = req.params.day;
 
-    /* 시간 설정 */
-    var _minDate = new Date(_year, _month - 1, _day, 0, 0, 0);
-    var _maxDate = new Date(_year, _month - 1, _day, 24, 0, 0);
-
-    authentication.getAuthCode(decoded.userId).then(authInfo => {
-        var authClient = authInfo.oAuth2Client;
-        if (authClient) {
-            calendar_call.listEvents(authClient, 'primary', _minDate, _maxDate, null, res);
-        } else {
-            res.set(500);
-            res.end();
+        /* 날짜 유효성 검사 */
+        if (_month > 12 || _month < 1 || _day > 31 || _day < 1) {
+            throw (errorSet.createError(errorSet.es.INVALID_DATE));
         }
-    });
+
+        /* 시간 설정 */
+        var _minDate = new Date(_year, _month - 1, _day, 0, 0, 0);
+        var _maxDate = new Date(_year, _month - 1, _day, 24, 0, 0);
+
+        var authInfo = await authentication.getAuthCode(decoded.userId);
+        var authClient = authInfo.oAuth2Client;
+        var resObj = await calendar_call.listEvents(authClient, 'primary', _minDate, _maxDate, null);
+
+        next(resObj);
+
+    } catch (err) {
+        next(err);
+    }
 
 });
 
@@ -123,20 +121,26 @@ router.get('/certainday/:year/:month/:day', (req, res) => {
     google calendar에 일정을 추가한다.
 
 */
-router.post('/', (req, res) => {
+router.post('/', async (req, res, next) => {
 
-    var decoded = authentication.verifyJwt(req, res);
-    var reqCalendar = req.body;
+    try {
+        var decoded = authentication.verifyJwt(req);
+        var reqCalendar = req.body;
 
-    authentication.getAuthCode(decoded.userId).then(authInfo => {
-        if (authInfo) {
-            /* FIXME: 현재는 달력을 'primary' 에서만 처리하는데 안드로이드와 협의 후 다양한 달력list 사용하도록. */
-            calendar_call.postEvents(authInfo, 'primary', reqCalendar, res);
-        } else {
-            res.set(500);
-            res.end();
+        /* FIXME: body 에 대한 예외 처리 더 다양하게! */
+        if (!reqCalendar) {
+            throw (errorSet.createError(errorSet.es.NO_CALENDARBODY));
         }
-    });
+
+        var authInfo = await authentication.getAuthCode(decoded.userId);
+        /* FIXME: 현재는 달력을 'primary' 에서만 처리하는데 안드로이드와 협의 후 다양한 달력list 사용하도록. */
+        var resObj = await calendar_call.postEvents(authInfo, 'primary', reqCalendar);
+
+        next(resObj);
+
+    } catch (err) {
+        next(err);
+    }
 
 });
 
@@ -147,20 +151,26 @@ router.post('/', (req, res) => {
     특정 _id 의 Calendar 의 정보를 수정한다.
 
 */
-router.put('/:_id', (req, res) => {
+router.put('/:_id', async (req, res, next) => {
 
-    var decoded = authentication.verifyJwt(req, res);
-    var reqCalendar = req.body;
-    var _id = req.params._id;
+    try {
+        var decoded = authentication.verifyJwt(req);
+        var reqCalendar = req.body;
+        var _id = req.params._id;
 
-    authentication.getAuthCode(decoded.userId).then(authInfo => {
-        if (authInfo) {
-            calendar_call.putEvents(authInfo, 'primary', _id, reqCalendar, res);
-        } else {
-            res.set(500);
-            res.end();
+        /* FIXME: body 에 대한 예외 처리 더 다양하게! */
+        if (!reqCalendar) {
+            throw (errorSet.createError(errorSet.es.NO_CALENDARBODY));
         }
-    });
+
+        var authInfo = await authentication.getAuthCode(decoded.userId);
+        var resObj = await calendar_call.putEvents(authInfo, 'primary', _id, reqCalendar);
+
+        next(resObj);
+
+    } catch (err) {
+        next(err);
+    }
 
 });
 
@@ -171,19 +181,20 @@ router.put('/:_id', (req, res) => {
     특정 _id 의 Calendar 이벤트를 삭제한다.
 
 */
-router.delete('/:_id', (req, res) => {
+router.delete('/:_id', async (req, res, next) => {
 
-    var decoded = authentication.verifyJwt(req, res);
-    var _id = req.params._id;
+    try{
+        var decoded = authentication.verifyJwt(req);
+        var _id = req.params._id;
 
-    authentication.getAuthCode(decoded.userId).then(authInfo => {
-        if (authInfo) {
-            calendar_call.deleteEvents(authInfo, 'primary', _id, res);
-        } else {
-            res.set(500);
-            res.end();
-        }
-    });
+        var authInfo = await authentication.getAuthCode(decoded.userId);
+        var resObj = await calendar_call.deleteEvents(authInfo, 'primary', _id);
+
+        next(resObj);
+
+    }catch(err){
+        next(err);
+    }
 
 });
 
@@ -195,30 +206,30 @@ router.delete('/:_id', (req, res) => {
     객체를 반환한다.
 
 */
-router.get('/certainmonth/:year/:month', (req, res) => {
+router.get('/certainmonth/:year/:month', async (req, res, next) => {
 
-    var decoded = authentication.verifyJwt(req, res);
-    var _year = req.params.year;
-    var _month = req.params.month;
+    try{
+        var decoded = authentication.verifyJwt(req);
+        var _year = req.params.year;
+        var _month = req.params.month;
 
-    if (_month > 12 || _month < 1) {
-        console.log("requested Day is invalid : response 400");
-        res.set(400);
-        res.end();
+        if (_month > 12 || _month < 1) {
+            throw(errorSet.createError(errorSet.es.INVALID_DATE));
+        }
+
+        var _minDate = new Date(_year, _month - 1, 1, 0, 0, 0);
+        var _maxDate = new Date(_year, _month, 1, 0, 0, 0);
+
+        var authInfo = await authentication.getAuthCode(decoded.userId);
+        var authClient = authInfo.oAuth2Client;
+        var resObj = await calendar_call.listEvents(authClient, 'primary', _minDate, _maxDate, null);
+
+        next(resObj);
+
+    }catch(err){
+        next(err);
     }
 
-    var _minDate = new Date(_year, _month - 1, 1, 0, 0, 0);
-    var _maxDate = new Date(_year, _month, 1, 0, 0, 0);
-
-    authentication.getAuthCode(decoded.userId).then(authInfo => {
-        var authClient = authInfo.oAuth2Client;
-        if (authClient) {
-            calendar_call.listEvents(authClient, 'primary', _minDate, _maxDate, null, res);
-        } else {
-            res.set(500);
-            res.end();
-        }
-    });
 });
 
 /*
@@ -228,18 +239,20 @@ router.get('/certainmonth/:year/:month', (req, res) => {
     사용자의 캘린더 목록을 array로 가진 객체를 반환한다.
 
 */
-router.get('/calendar-list', (req, res) => {
-    var decoded = authentication.verifyJwt(req, res);
+router.get('/calendar-list', async (req, res, next) => {
 
-    authentication.getAuthCode(decoded.userId).then(authInfo => {
-        var authClient = authInfo.oAuth2Client;
-        if (authClient) {
-            calendar_call.listCalendars(authClient, res);
-        } else {
-            res.set(500);
-            res.end();
-        }
-    });
+    try{
+        var decoded = authentication.verifyJwt(req);
+
+        var authInfo = await authentication.getAuthCode(decoded.userId);
+        var authClient = authInfo.oAuth2Client;        
+        var resObj = await calendar_call.listCalendars(authClient);
+
+        next(resObj);
+
+    }catch(err){
+        next(err);
+    }
 
 });
 

@@ -17,6 +17,5 @@ module.exports = (obj, req, res, next) => {
     } else {
         /* 성공 일때 객체 응답 */
         res.status(200).json(obj);
-
     }
 };

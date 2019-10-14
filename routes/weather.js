@@ -6,27 +6,21 @@ var authentication = require('../auth/authentication');
 var errorSet = require('../utill/errorSet');
 
 /* TODO: Author : 정근화 */
-
-/*
-
-    본 모듈은 /weather 로 들어온다.
-
-    OpenWeatherMap API 를 호출하여 날씨 정보를 대신 호출하고 반환한다.
-
-    안드로이드 어플리케이션에서 위도와 경도 값, 그리고 jwt를 통해 인증 절차를 거쳐야 한다.
-    jwt 인증을 거치는 이유는 OpenWeatherMap free티어(분당 60회)를 사용하고 있는데
-    오픈소스로 공개할 경우 jwt 인증 없이 외부에서 무분별하게 호출이 가능하기 때문.
-
-*/
+/* /weather */
 
 const API_URI = config.OPENWEATHERMAP_API_URI;
 const API_KEY = config.OPENWEATHERMAP_API_KEY;
 
 /**
 
-    @api {get} /weather/:latitude/:longitude 날씨 정보를 제공합니다.
+    @api {get} /weather/:latitude/:longitude GetWeatherInfo
     @apiName GetWeather
     @apiGroup Weather
+    @apiDescription
+    OpenWeatherMap API 를 호출하여 날씨 정보를 대신 호출하고 반환합니다.
+    안드로이드 어플리케이션에서 위도와 경도 값, 그리고 jwt를 통해 인증 절차를 거쳐야 합니다.
+    jwt 인증을 거치는 이유는 OpenWeatherMap free티어(분당 60회)를 사용하고 있는데
+    오픈소스로 공개할 경우 jwt 인증 없이 외부에서 무분별하게 호출이 가능하기 때문입니다.
 
     @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
     @apiHeaderExample {form} 헤더 예제
@@ -103,10 +97,10 @@ const API_KEY = config.OPENWEATHERMAP_API_KEY;
     }
 
 */
-router.get('/:latitude/:longitude', (req, res, next) => {
+router.get('/:latitude/:longitude', async (req, res, next) => {
 
     try {
-        authentication.verifyJwt(req, res);
+        authentication.verifyJwt(req);
 
         var latitude = req.params.latitude;
         var longitude = req.params.longitude;
@@ -130,27 +124,27 @@ router.get('/:latitude/:longitude', (req, res, next) => {
             json: true
         };
 
-        request_promise.get(reqOption).then(responseData => {
-            /* weather 수신 성공 */
-            var resObj = {
-                "city": responseData.name,
-                "weather": responseData.weather[0].main,
-                "weather_description": responseData.weather[0].description,
-                "temperature": responseData.main.temp,
-                "temperature_max": responseData.main.temp_max,
-                "temperature_min": responseData.main.temp_min,
-                "pressure": responseData.main.pressure,
-                "humidity": responseData.main.humidity,
-                "wind_speed": responseData.wind.speed,
-                "clouds": responseData.clouds.all
-            };
+        var responseData = await request_promise.get(reqOption)
+            .catch(err => {
+                /* weather 수신 실패 */
+                throw (errorSet.createError(errorSet.es.FAILED_OWM));
+            });
 
-            next(resObj);
+        /* weather 수신 성공 */
+        var resObj = {
+            "city": responseData.name,
+            "weather": responseData.weather[0].main,
+            "weather_description": responseData.weather[0].description,
+            "temperature": responseData.main.temp,
+            "temperature_max": responseData.main.temp_max,
+            "temperature_min": responseData.main.temp_min,
+            "pressure": responseData.main.pressure,
+            "humidity": responseData.main.humidity,
+            "wind_speed": responseData.wind.speed,
+            "clouds": responseData.clouds.all
+        };
 
-        }).catch(err => {
-            /* weather 수신 실패 */
-            next(errorSet.createError(errorSet.es.FAILED_OWM));
-        });
+        next(resObj);
 
     } catch (err) {
         next(err);

@@ -34,7 +34,7 @@ var router = express.Router();
 /* FIXME: post 예시 구현 */
 /*
 
-    FIXME: 또한 API 의 문서화를 위해서 apidocs 를 사용하고 있습니다.
+    FIXME: 또한 API 의 문서화를 위해서 apidoc 을 사용하고 있습니다.
     이에 맞게 api 주석을 작성해주시면 됩니다.
 
     url : http://apidocjs.com/
@@ -43,9 +43,11 @@ var router = express.Router();
 
 /**
 
-    @api {post} /todo 유저의 Todo 정보를 저장합니다.
+    @api {post} /todo 유저의 InsertTodo
     @apiName PostTodo
     @apiGroup Todo
+    @apiDescription
+    새로운 todo 목록을 저장합니다.
 
     @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
     @apiHeaderExample {form} 헤더 예제
@@ -76,7 +78,6 @@ var router = express.Router();
     @apiError NO_JWT JWT 가 헤더에 실려있지 않습니다.
     @apiError INVALID_JWT JWT 가 유효하지 않습니다.
     @apiError NOUSER_DB 해당 유저의 정보가 DB에서 찾을 수 없습니다.
-    @apiError INVALID_TODOBODY Request Body 가 유효하지 않습니다.
     @apiError ERR_CRUDDB 내부 DB 작업에 실패하였습니다.
 
     @apiErrorExample 실패 : NO_JWT
@@ -99,13 +100,6 @@ var router = express.Router();
         "name" : "NOUSER_DB",
         "message": "Cannot find userId in database!",
         "status": 500
-    }   
-    @apiErrorExample 실패 : INVALID_TODOBODY
-    HTTP/1.1 400 Bad Request
-    {
-        "name" : "INVALID_TODOBODY",
-        "message": "Invalid request body, please put [title] and [selected] in your request body!",
-        "status": 400
     } 
     @apiErrorExample 실패 : ERR_CRUDDB
     HTTP/1.1 500 Internal Server Error
@@ -116,19 +110,15 @@ var router = express.Router();
     }
 
 */
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res, next) => {
 
     try {
 
         /* 보낸 주체가 누구인지 구분하기 위해서는 무조건 JWT 디코딩부터 해야합니다. */
-        var decoded = authentication.verifyJwt(req, res);
+        var decoded = authentication.verifyJwt(req);
 
         var _title = req.body.title;
         var _selected = req.body.selected;
-
-        if (!_title || !_selected) {
-            throw (errorSet.createError(errorSet.es.INAVLID_TODOBODY));
-        }
 
         /*
 
@@ -146,18 +136,18 @@ router.post('/', (req, res, next) => {
             selected: _selected
         });
 
-        newTodo.save()
-            .then(savedTodo => {
-                var resTodo = {
-                    _id: savedTodo._id,
-                    title: savedTodo.title,
-                    selected: savedTodo.selected
-                }
-                next(resTodo);
-            })
+        var savedTodo = await newTodo.save()
             .catch(err => {
-                next(errorSet.createError(errorSet.es.ERR_CRUDDB));
+                throw (errorSet.createError(errorSet.es.ERR_CRUDDB));
             });
+
+        var resTodo = {
+            _id: savedTodo._id,
+            title: savedTodo.title,
+            selected: savedTodo.selected
+        }
+
+        next(resTodo);
 
     } catch (err) {
         /*
@@ -178,9 +168,12 @@ router.post('/', (req, res, next) => {
 /* FIXME: get 예시 구현 */
 /**
 
-    @api {get} /todo 유저의 Todo 정보를 가져옵니다.
+    @api {get} /todo 유저의 GetTodoList
     @apiName GetTodo
     @apiGroup Todo
+    @apiDescription
+    현재 유저가 등록한 Todo 리스트를 반환합니다.
+    반환받을 때 각 todo 의 _id 값으로 put, delete 요청을 할 수 있습니다.
 
     @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
     @apiHeaderExample {form} 헤더 예제
@@ -193,6 +186,7 @@ router.post('/', (req, res, next) => {
     @apiParamExample {null} 파라미터(x) 예제
     No Parameter
 
+    @apiSuccess {Todo[]}  todoLists       JSONArray<Todo> 의 모양으로 Todo 의 리스트를 가짐
     @apiSuccess {String}  _id             DB에 저장된 Todo의 고유값 - put, delete 요청할 때 사용
     @apiSuccess {String}  title           Todo 의 제목
     @apiSuccess {boolean} selected        Todo 체크되었는지 여부.
@@ -201,7 +195,11 @@ router.post('/', (req, res, next) => {
     {
         "todoLists":
             [
-                {"_id": "5d9ed8a64d73a91bcc4526d7", "title": "MagicCalender 만들기2", "selected": true},
+                {
+                    "_id": "5d9ed8a64d73a91bcc4526d7",
+                    "title": "MagicCalender 만들기2",
+                    "selected": true
+                },
                 {"_id": "5d9ed8aa4d73a91bcc4526d8", "title": "MagicCalender 만들기3", "selected": true},
                 {"_id": "5d9efdeaec5df242401dd1a7", "title": "새로운 post modified!!", "selected": false},
                 {"_id": "5d9efe6b21e6cb42d3071cde", "title": "새로운 post 테스트2", "selected": false},
@@ -245,28 +243,29 @@ router.post('/', (req, res, next) => {
     }
 
 */
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 
     try {
-        var decoded = authentication.verifyJwt(req, res);
+        var decoded = authentication.verifyJwt(req);
 
-        Todo.find({
+        var todoLists = await Todo.find({
             userId: decoded.userId
-        }).then(todoLists => {
-            var retObj = new Object();
-            retObj.todoLists = new Array();
-            for (var todo of todoLists) {
-                var todoObj = {
-                    "_id": todo._id,
-                    "title": todo.title,
-                    "selected": todo.selected
-                };
-                retObj.todoLists.push(todoObj);
-            }
-            next(retObj);
         }).catch(err => {
-            next(errorSet.createError(errorSet.es.ERR_CRUDDB));
-        });
+            throw (errorSet.createError(errorSet.es.ERR_CRUDDB));
+        })
+
+        var retObj = new Object();
+        retObj.todoLists = new Array();
+        for (var todo of todoLists) {
+            var todoObj = {
+                "_id": todo._id,
+                "title": todo.title,
+                "selected": todo.selected
+            };
+            retObj.todoLists.push(todoObj);
+        }
+
+        next(retObj);
 
     } catch (err) {
         next(err);
@@ -278,9 +277,14 @@ router.get('/', (req, res, next) => {
 /* _id 값은 해당 todo 모델의 고유 값 */
 /**
 
-    @api {put} /todo 유저의 Todo 정보를 수정합니다.
+    @api {put} /todo 유저의 UpdateTodo
     @apiName PutTodo
     @apiGroup Todo
+    @apiDescription
+    jwt 토큰과 todo 의 _id 값을 통해 현재 유저의 해당 todo 를 요청받은 body 의
+    내용으로 업데이트합니다.
+    url parameter 에 넣는 _id 값은 GET 을 통해 todolist 를 호출 했을 때
+    각 todo 객에가 지니고 있는 "_id" 의 value 값 입니다.
 
     @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
     @apiHeaderExample {form} 헤더 예제
@@ -314,7 +318,6 @@ router.get('/', (req, res, next) => {
     @apiError NO_JWT JWT 가 헤더에 실려있지 않습니다.
     @apiError INVALID_JWT JWT 가 유효하지 않습니다.
     @apiError NOUSER_DB 해당 유저의 정보가 DB에서 찾을 수 없습니다.
-    @apiError INVALID_TODOBODY Request Body 가 유효하지 않습니다.
     @apiError ERR_CRUDDB 내부 DB 작업에 실패하였습니다.
     @apiError INVALID_TODOBODYKEY Body 값에 userId 값은 들어있으면 안됩니다.
 
@@ -338,14 +341,7 @@ router.get('/', (req, res, next) => {
         "name" : "NOUSER_DB",
         "message": "Cannot find userId in database!",
         "status": 500
-    }   
-    @apiErrorExample 실패 : INVALID_TODOBODY
-    HTTP/1.1 400 Bad Request
-    {
-        "name" : "INVALID_TODOBODY",
-        "message": "Invalid request body, please put [title] and [selected] in your request body!",
-        "status": 400
-    } 
+    }
     @apiErrorExample 실패 : ERR_CRUDDB
     HTTP/1.1 500 Internal Server Error
     {
@@ -362,10 +358,10 @@ router.get('/', (req, res, next) => {
     }    
 
 */
-router.put('/:_id', (req, res, next) => {
+router.put('/:_id', async (req, res, next) => {
 
     try {
-        var decoded = authentication.verifyJwt(req, res);
+        var decoded = authentication.verifyJwt(req);
 
         /* userId, 값은 수정 불가능 req.body 에 있으면 안됨 */
         if (req.body.hasOwnProperty('userId')) {
@@ -375,9 +371,6 @@ router.put('/:_id', (req, res, next) => {
         /* body 예외 처리 */
         var _title = req.body.title;
         var _selected = req.body.selected;
-        if (!_title || !_selected) {
-            throw (errorSet.createError(errorSet.es.INAVLID_TODOBODY));
-        }
 
         /* 
 
@@ -392,20 +385,20 @@ router.put('/:_id', (req, res, next) => {
             selected: _selected
         }
 
-        Todo.findOneAndUpdate({
-                _id: req.params._id,
-                userId: decoded.userId
-            }, updateBody)
-            .then(document => {
-                var resTodo = {
-                    _id: document._id,
-                    title: updateBody.title,
-                    selected: updateBody.selected
-                }
-                next(resTodo);
-            }).catch(err => {
-                next(errorSet.createError(errorSet.es.ERR_CRUDDB));
-            });
+        var document = await Todo.findByIdAndUpdate({
+            _id: req.params._id,
+            userId: decoded.userId
+        }, updateBody).catch(err => {
+            throw (errorSet.createError(errorSet.es.ERR_CRUDDB));
+        });
+
+        var resTodo = {
+            _id: document._id,
+            title: updateBody.title,
+            selected: updateBody.selected
+        }
+
+        next(resTodo);
 
     } catch (err) {
         next(err);
@@ -416,9 +409,13 @@ router.put('/:_id', (req, res, next) => {
 /* FIXME: delete 예시 구현 */
 /**
 
-    @api {delete} /todo 유저의 Todo 정보를 삭제합니다.
+    @api {delete} /todo DeleteTodo
     @apiName DeleteTodo
     @apiGroup Todo
+    @apiDescription
+    jwt 토큰과 todo 의 _id 값을 통해 현재 유저의 해당 todo 를 삭제합니다.
+    url parameter 에 넣는 _id 값은 GET 을 통해 todolist 를 호출 했을 때
+    각 todo 객에가 지니고 있는 "_id" 의 value 값 입니다.
 
     @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
     @apiHeaderExample {form} 헤더 예제
@@ -475,24 +472,25 @@ router.put('/:_id', (req, res, next) => {
     }   
 
 */
-router.delete('/:_id', (req, res, next) => {
+router.delete('/:_id', async (req, res, next) => {
 
     try {
-        var decoded = authentication.verifyJwt(req, res);
+        var decoded = authentication.verifyJwt(req);
 
         /* PUT 과 마찬가지, userId 값이 동일한 사람인지 확인 */
-        Todo.findOneAndDelete({
+        var document = await Todo.findOneAndDelete({
             _id: req.params._id,
             userId: decoded.userId
-        }).then(document => {
-            var resObj = {
-                message : "Todo delete success!",
-                status : 200
-            }
-            next(resObj);
         }).catch(err => {
-            next(errorSet.createError(errorSet.es.ERR_CRUDDB));
-        });
+            throw(errorSet.createError(errorSet.es.ERR_CRUDDB));
+        })
+
+        var resObj = {
+            message: "Todo delete success!",
+            status: 200
+        }
+        
+        next(resObj);
 
     } catch (err) {
         next(err);

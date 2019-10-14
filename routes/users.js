@@ -5,12 +5,16 @@ var errorSet = require('../utill/errorSet');
 var router = express.Router();
 
 /* TODO: Author : 정근화 */
+/* /users */
 
 /**
 
-    @api {get} /users 유저의 정보를 제공합니다.
+    @api {get} /users GetUserInfo
     @apiName GetUser
     @apiGroup User
+    @apiDescription
+    헤더에 JWT 를 실어 /user 로 GET 요청을 해주세요.
+    서버는 해당 JWT를 통해 현재 구글 로그인된 계정의 개인정보를 반환합니다.
 
     @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
     @apiHeaderExample {form} 헤더 예제
@@ -66,29 +70,27 @@ var router = express.Router();
     }
 
 */
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 
     try{
-        var decoded = authentication.verifyJwt(req, res, next);
+        var decoded = authentication.verifyJwt(req);
 
-        User.findOne({
+        var resultUser = await User.findOne({
             userId: decoded.userId
-        }, (err, resultUser) => {
-            if (err) {
-                throw(errorSet.createError(errorSet.es.NOUSER_DB));
-            } else {
-                var ret = {
-                    userId: resultUser.userId,
-                    email: resultUser.email,
-                    name: resultUser.name,
-                    picture: resultUser.picture,
-                    given_name: resultUser.given_name,
-                    family_name: resultUser.family_name,
-                    locale: resultUser.locale
-                };
-                next(ret);
-            }
+        }).catch(err => {
+            throw(errorSet.createError(errorSet.es.NOUSER_DB));
         });
+
+        var retObj = {
+            userId: resultUser.userId,
+            email: resultUser.email,
+            name: resultUser.name,
+            picture: resultUser.picture,
+            given_name: resultUser.given_name,
+            family_name: resultUser.family_name,
+            locale: resultUser.locale
+        };
+        next(retObj);
 
     }catch(err){
         next(err);
