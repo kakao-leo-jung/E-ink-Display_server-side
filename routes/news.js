@@ -4,17 +4,7 @@ var headline = require('headline-news-naver');
 var errorSet = require('../utill/errorSet');
 
 /* TODO: Author : 정근화 */
-
-/*
-
-    본 모듈은 /news 로 들어온다.
-
-    headline-news-naver 모듈을 활용하여
-    네이버 뉴스의 헤드라인뉴스 5개를 추출 및 반환한다.
-
-    MODULE INFO : https://github.com/dfjung4254/headline-news-naver
-
-*/
+/* /news */
 
 /*
 
@@ -29,26 +19,21 @@ var errorSet = require('../utill/errorSet');
 
 /**
 
-    @api {post} /todo 유저의 InsertTodo
-    @apiName PostTodo
-    @apiGroup Todo
+    @api {get} /news GetNews
+    @apiName GetNews
+    @apiGroup News
     @apiDescription
-    새로운 todo 목록을 저장합니다.
+    headline-news-naver 모듈을 활용하여
+    네이버 뉴스의 헤드라인뉴스 5개를 추출 및 반환한다.
+    MODULE INFO : https://github.com/dfjung4254/headline-news-naver
 
-    @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
-    @apiHeaderExample {form} 헤더 예제
-    {
-        // retrofit2 : HashMap 에 key값은 "jwt", value값은 "eyJ..." 로 설정
-        "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
-    }
+    @apiHeader {null} NoHeader 필요한 헤더값 없음(jwt X)
+    @apiHeaderExample {null} 헤더(x) 예제
+    No JWT and other Header type
 
-    @apiParam {String} title Todo 제목
-    @apiParam {boolean} selected Todo 체크 여부
-    @apiParamExample {json} 파라미터(body) 예제
-    {
-        "title": "MagicCalender 만들기 테스트",
-        "selected": false
-    }
+    @apiParam {null} NoParameter 요청 파라미터 없음.
+    @apiParamExample {null} 파라미터(x) 예제
+    No Parameter
 
     @apiSuccess {News[]}  news_array      JSONArray<News> 의 형태로 News 의 리스트를 가짐. 
     @apiSuccess {String}  title           뉴스 제목

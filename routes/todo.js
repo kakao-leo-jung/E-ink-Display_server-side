@@ -43,7 +43,7 @@ var router = express.Router();
 
 /**
 
-    @api {post} /todo 유저의 InsertTodo
+    @api {post} /todo InsertTodo
     @apiName PostTodo
     @apiGroup Todo
     @apiDescription
@@ -168,7 +168,7 @@ router.post('/', async (req, res, next) => {
 /* FIXME: get 예시 구현 */
 /**
 
-    @api {get} /todo 유저의 GetTodoList
+    @api {get} /todo GetTodoList
     @apiName GetTodo
     @apiGroup Todo
     @apiDescription
@@ -277,7 +277,7 @@ router.get('/', async (req, res, next) => {
 /* _id 값은 해당 todo 모델의 고유 값 */
 /**
 
-    @api {put} /todo 유저의 UpdateTodo
+    @api {put} /todo/:_id UpdateTodo
     @apiName PutTodo
     @apiGroup Todo
     @apiDescription
@@ -409,7 +409,7 @@ router.put('/:_id', async (req, res, next) => {
 /* FIXME: delete 예시 구현 */
 /**
 
-    @api {delete} /todo DeleteTodo
+    @api {delete} /todo/:id DeleteTodo
     @apiName DeleteTodo
     @apiGroup Todo
     @apiDescription
@@ -489,7 +489,7 @@ router.delete('/:_id', async (req, res, next) => {
             message: "Todo delete success!",
             status: 200
         }
-        
+
         next(resObj);
 
     } catch (err) {
