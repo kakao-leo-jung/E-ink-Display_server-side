@@ -5,21 +5,7 @@ var errorSet = require('../utill/errorSet');
 var router = express.Router();
 
 /* TODO: Author : 정근화 */
-
-/*
-
-    본 모듈은 /calendar 로 들어온다.
-    google calendar api 호출을 사용하여
-    개인의 달략에 관한 요청값을 반환한다.
-
-    참고 : https://developers.google.com/calendar/quickstart/nodejs
-
-    * 호출 과정
-    1. 먼저 요청의 헤더로 부터 jwt를 수신한다.
-    2. jwt 를 verify 하고 jwt 로 부터 user_id 검출한다.
-    3. user_id 로 DB 를 조회하여 access_token 을 조회한다.
-
-*/
+/* /calendar */
 
 /**
 

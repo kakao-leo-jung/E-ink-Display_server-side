@@ -1,6 +1,3 @@
-var logHandler = require('../utill/logHandler');
-var errorHandler = require('../utill/errorHandler');
-
 /* TODO: Author : 정근화 */
 
 /*
@@ -9,10 +6,6 @@ var errorHandler = require('../utill/errorHandler');
     app.use('/원하는받을URL경로', 변수);
 
 */
-/* Error Handling */
-// app.use(logHandler);
-// app.use(errorHandler);
-
 module.exports = (app) => {
 
     /* 로그인 '/loginToken' 라우팅 */
@@ -21,7 +14,7 @@ module.exports = (app) => {
 
     /* 유저 정보 '/users' 라우팅 */
     var users = require('../routes/users');
-    app.use('/users', users, logHandler, errorHandler);
+    app.use('/users', users);
 
     /* 달력 정보 '/calendar' 라우팅 */
     var calendar = require('../routes/calendar');
@@ -38,5 +31,9 @@ module.exports = (app) => {
     /* Weather 정보 '/weather' 라우팅 */
     var weather = require('../routes/weather');
     app.use('/weather', weather);
+
+    /* Alarm 정보 '/alarm' 라우팅 */
+    var alarm = require('../routes/alarm');
+    app.use('/alarm', alarm);
 
 }
