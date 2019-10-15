@@ -172,8 +172,8 @@ router.post('/', async (req, res, next) => {
     @apiName GetTodo
     @apiGroup Todo
     @apiDescription
-    현재 유저가 등록한 Todo 리스트를 반환합니다.
-    반환받을 때 각 todo 의 _id 값으로 put, delete 요청을 할 수 있습니다.
+    현재 유저가 등록한 Todo 리스트를 반환합니다.</br>
+    반환받을 때 각 todo 의 _id 값으로 put, delete 요청을 할 수 있습니다.</br>
 
     @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
     @apiHeaderExample {form} 헤더 예제
@@ -281,10 +281,9 @@ router.get('/', async (req, res, next) => {
     @apiName PutTodo
     @apiGroup Todo
     @apiDescription
-    jwt 토큰과 todo 의 _id 값을 통해 현재 유저의 해당 todo 를 요청받은 body 의
-    내용으로 업데이트합니다.
-    url parameter 에 넣는 _id 값은 GET 을 통해 todolist 를 호출 했을 때
-    각 todo 객에가 지니고 있는 "_id" 의 value 값 입니다.
+    jwt 토큰과 todo 의 _id 값을 통해 현재 유저의 해당 todo 를 요청받은 body 의내용으로 업데이트합니다.</br>
+    url parameter 에 넣는 _id 값은 GET 을 통해 todolist 를 호출 했을 때</br>
+    각 todo 객에가 지니고 있는 "_id" 의 value 값 입니다.</br>
 
     @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
     @apiHeaderExample {form} 헤더 예제
@@ -293,14 +292,14 @@ router.get('/', async (req, res, next) => {
         "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
     }
 
-    @apiParam {String} title Todo 제목
-    @apiParam {boolean} selected Todo 체크 여부
+    @apiParam {String} title 요청 바디의 Todo 제목
+    @apiParam {boolean} selected 요청 바디의 Todo 체크 여부
     @apiParamExample {json} 파라미터(body) 예제
     {
         "title": "MagicCalender 만들기 수정하기",
         "selected": true
     }
-    @apiParam {String} :_id 고칠 todo 정보의 고유 아이디 값
+    @apiParam {String} :_id URL에 고칠 todo 정보의 고유 아이디 값을 적습니다.
     @apiParamExample {path} 파라미터(url) 예제
     URL : http://169.56.98.117/todo/5d9ed8a64d73a91bcc4526d7
 
@@ -413,9 +412,9 @@ router.put('/:_id', async (req, res, next) => {
     @apiName DeleteTodo
     @apiGroup Todo
     @apiDescription
-    jwt 토큰과 todo 의 _id 값을 통해 현재 유저의 해당 todo 를 삭제합니다.
-    url parameter 에 넣는 _id 값은 GET 을 통해 todolist 를 호출 했을 때
-    각 todo 객에가 지니고 있는 "_id" 의 value 값 입니다.
+    jwt 토큰과 todo 의 _id 값을 통해 현재 유저의 해당 todo 를 삭제합니다.</br>
+    url parameter 에 넣는 _id 값은 GET 을 통해 todolist 를 호출 했을 때</br>
+    각 todo 객에가 지니고 있는 "_id" 의 value 값 입니다.</br>
 
     @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
     @apiHeaderExample {form} 헤더 예제
@@ -424,7 +423,7 @@ router.put('/:_id', async (req, res, next) => {
         "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
     }
 
-    @apiParam {String} :_id 지울 todo 정보의 고유 아이디 값
+    @apiParam {String} :_id URL에 지울 todo 정보의 고유 아이디 값을 넣습니다.
     @apiParamExample {path} 파라미터(url) 예제
     URL : http://169.56.98.117/todo/5d9ed8a64d73a91bcc4526d7
 

@@ -23,9 +23,9 @@ var errorSet = require('../utill/errorSet');
     @apiName GetNews
     @apiGroup News
     @apiDescription
-    headline-news-naver 모듈을 활용하여
-    네이버 뉴스의 헤드라인뉴스 5개를 추출 및 반환한다.
-    MODULE INFO : https://github.com/dfjung4254/headline-news-naver
+    headline-news-naver 모듈을 활용하여</br>
+    네이버 뉴스의 헤드라인뉴스 5개를 추출 및 반환한다.</br>
+    MODULE INFO : https://github.com/dfjung4254/headline-news-naver</br>
 
     @apiHeader {null} NoHeader 필요한 헤더값 없음(jwt X)
     @apiHeaderExample {null} 헤더(x) 예제

@@ -13,8 +13,8 @@ var router = express.Router();
     @apiName GetUser
     @apiGroup User
     @apiDescription
-    헤더에 JWT 를 실어 /user 로 GET 요청을 해주세요.
-    서버는 해당 JWT를 통해 현재 구글 로그인된 계정의 개인정보를 반환합니다.
+    헤더에 JWT 를 실어 /user 로 GET 요청을 해주세요.</br>
+    서버는 해당 JWT를 통해 현재 구글 로그인된 계정의 개인정보를 반환합니다.</br>
 
     @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
     @apiHeaderExample {form} 헤더 예제

@@ -17,10 +17,10 @@ const API_KEY = config.OPENWEATHERMAP_API_KEY;
     @apiName GetWeather
     @apiGroup Weather
     @apiDescription
-    OpenWeatherMap API 를 호출하여 날씨 정보를 대신 호출하고 반환합니다.
-    안드로이드 어플리케이션에서 위도와 경도 값, 그리고 jwt를 통해 인증 절차를 거쳐야 합니다.
-    jwt 인증을 거치는 이유는 OpenWeatherMap free티어(분당 60회)를 사용하고 있는데
-    오픈소스로 공개할 경우 jwt 인증 없이 외부에서 무분별하게 호출이 가능하기 때문입니다.
+    OpenWeatherMap API 를 호출하여 날씨 정보를 대신 호출하고 반환합니다.</br>
+    안드로이드 어플리케이션에서 위도와 경도 값, 그리고 jwt를 통해 인증 절차를 거쳐야 합니다.</br>
+    jwt 인증을 거치는 이유는 OpenWeatherMap free티어(분당 60회)를 사용하고 있는데</br>
+    오픈소스로 공개할 경우 jwt 인증 없이 외부에서 무분별하게 호출이 가능하기 때문입니다.</br>
 
     @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
     @apiHeaderExample {form} 헤더 예제

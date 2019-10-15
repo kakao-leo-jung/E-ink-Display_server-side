@@ -64,10 +64,13 @@ exports.postEvents = async (authInfo, calendarId, calendarBody) => {
     params.calendarId = calendarId;
 
     /* attendee self자신 추가 */
-    calendarBody.people.push({
-        "email": authInfo.resultUser.email,
-        "responseStatus": "accepted"
-    });
+    if (calendarBody.people.length > 0) {
+        calendarBody.people.push({
+            "email": authInfo.resultUser.email,
+            "responseStatus": "accepted"
+        });
+    }
+
 
     params.requestBody = {
         start: {
@@ -183,7 +186,7 @@ exports.listCalendars = async (auth) => {
     for (const curItem of calendarList.data.items) {
         retObj.calendarName.push(curItem.summary);
     }
-    
+
     return retObj;
 
 }
