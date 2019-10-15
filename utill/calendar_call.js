@@ -37,7 +37,7 @@ exports.listEvents = async (auth, calendarId, minDate, maxDate, maxCount) => {
 
     var res = await calendar.events.list(params)
         .catch(err => {
-            throw (errorSet.createError(errorSet.es.FAILED_GOOGLE));
+            throw (errorSet.createError(errorSet.es.FAILED_GOOGLE, err.stack));
         });
 
     const events = res.data.items;
@@ -87,7 +87,7 @@ exports.postEvents = async (authInfo, calendarId, calendarBody) => {
 
     var res = await calendar.events.insert(params)
         .catch(err => {
-            throw (errorSet.createError(errorSet.es.FAILED_GOOGLE));
+            throw (errorSet.createError(errorSet.es.FAILED_GOOGLE, err.stack));
         });
 
     return eventToCustomObj(res.data);
@@ -126,7 +126,7 @@ exports.putEvents = async (authInfo, calendarId, eventId, calendarBody) => {
 
     var res = await calendar.events.update(params)
         .catch(err => {
-            throw (errorSet.createError(errorSet.es.FAILED_GOOGLE));
+            throw (errorSet.createError(errorSet.es.FAILED_GOOGLE, err.stack));
         });
 
     return eventToCustomObj(res.data);
@@ -178,7 +178,7 @@ exports.listCalendars = async (auth) => {
         auth: auth,
         maxResults: 10
     }).catch(err => {
-        throw (errorSet.createError(errorSet.es.FAILED_GOOGLE));
+        throw (errorSet.createError(errorSet.es.FAILED_GOOGLE, err.stack));
     });
 
     var retObj = new Object();

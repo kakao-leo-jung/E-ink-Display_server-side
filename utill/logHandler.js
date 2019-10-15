@@ -15,6 +15,7 @@ module.exports = (obj, req, res, next) => {
         /* 실패 일 때 로그 반환 */
         console.log('\n\x1b[31m%s', '\n[ERROR!][' + new Date() + ']');
         console.log('%s\x1b[0m', ' : (' + obj.name + ')' + obj.message + '\n');
+        console.log(obj.stack);
         next(obj);
     } else {
         /* 성공 일때 로그 반환 */

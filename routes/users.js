@@ -78,7 +78,7 @@ router.get('/', async (req, res, next) => {
         var resultUser = await User.findOne({
             userId: decoded.userId
         }).catch(err => {
-            throw(errorSet.createError(errorSet.es.NOUSER_DB));
+            throw(errorSet.createError(errorSet.es.NOUSER_DB, err.stack));
         });
 
         var retObj = {

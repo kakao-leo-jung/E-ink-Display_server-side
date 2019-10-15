@@ -32,10 +32,11 @@ exports.es = {
 }
 
 /* es 포맷에 맞게 에러를 생성함 */
-exports.createError = (errorSet) => {
+exports.createError = (errorSet, stack) => {
     var error = new Error();
     error.name = errorSet[0];
     error.message = errorSet[1];
     error.status = errorSet[2];
+    error.stack = stack;
     return error;
 }

@@ -138,7 +138,7 @@ router.post('/', async (req, res, next) => {
 
         var savedTodo = await newTodo.save()
             .catch(err => {
-                throw (errorSet.createError(errorSet.es.ERR_CRUDDB));
+                throw (errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack));
             });
 
         var resTodo = {
@@ -251,7 +251,7 @@ router.get('/', async (req, res, next) => {
         var todoLists = await Todo.find({
             userId: decoded.userId
         }).catch(err => {
-            throw (errorSet.createError(errorSet.es.ERR_CRUDDB));
+            throw (errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack));
         })
 
         var retObj = new Object();
@@ -364,7 +364,7 @@ router.put('/:_id', async (req, res, next) => {
 
         /* userId, 값은 수정 불가능 req.body 에 있으면 안됨 */
         if (req.body.hasOwnProperty('userId')) {
-            throw (errorSet.createError(errorSet.es.INVALID_TODOBODYKEY));
+            throw (errorSet.createError(errorSet.es.INVALID_TODOBODYKEY, this.stack));
         }
 
         /* body 예외 처리 */
@@ -384,11 +384,11 @@ router.put('/:_id', async (req, res, next) => {
             selected: _selected
         }
 
-        var document = await Todo.findByIdAndUpdate({
+        var document = await Todo.findOneAndUpdate({
             _id: req.params._id,
             userId: decoded.userId
         }, updateBody).catch(err => {
-            throw (errorSet.createError(errorSet.es.ERR_CRUDDB));
+            throw (errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack));
         });
 
         var resTodo = {
@@ -481,7 +481,7 @@ router.delete('/:_id', async (req, res, next) => {
             _id: req.params._id,
             userId: decoded.userId
         }).catch(err => {
-            throw(errorSet.createError(errorSet.es.ERR_CRUDDB));
+            throw(errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack));
         })
 
         var resObj = {

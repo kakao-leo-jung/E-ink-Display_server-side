@@ -106,7 +106,7 @@ router.get('/:latitude/:longitude', async (req, res, next) => {
         var longitude = req.params.longitude;
 
         if (!latitude || !longitude) {
-            throw (errorSet.createError(errorSet.es.NO_LONANDLAT));
+            throw (errorSet.createError(errorSet.es.NO_LONANDLAT, this.stack));
         }
 
         /* weathermap 호출 */
@@ -127,7 +127,7 @@ router.get('/:latitude/:longitude', async (req, res, next) => {
         var responseData = await request_promise.get(reqOption)
             .catch(err => {
                 /* weather 수신 실패 */
-                throw (errorSet.createError(errorSet.es.FAILED_OWM));
+                throw (errorSet.createError(errorSet.es.FAILED_OWM, err.stack));
             });
 
         /* weather 수신 성공 */

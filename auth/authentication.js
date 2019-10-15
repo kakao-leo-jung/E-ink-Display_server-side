@@ -37,14 +37,14 @@ exports.verifyJwt = (req) => {
     var reqJwt = req.headers.jwt;
 
     if (!reqJwt) {
-        throw (errorSet.createError(errorSet.es.NO_JWT));
+        throw (errorSet.createError(errorSet.es.NO_JWT, this.stack));
     }
 
     try {
         var decoded = Jwt.verify(reqJwt, SECRET);
         return decoded;
     } catch (err) {
-        throw (errorSet.createError(errorSet.es.INVALID_JWT));
+        throw (errorSet.createError(errorSet.es.INVALID_JWT, err.stack));
     }
 
 }
@@ -60,7 +60,7 @@ exports.getAuthCode = async (user_id) => {
     var resultUser = await User.findOne({
         userId: user_id
     }).catch(err => {
-        throw (errorSet.createError(errorSet.es.NOUSER_DB));
+        throw (errorSet.createError(errorSet.es.NOUSER_DB, err.stack));
     });
 
     const oAuth2Client = new google.auth.OAuth2(
@@ -70,7 +70,7 @@ exports.getAuthCode = async (user_id) => {
 
     await this.refreshToken(oAuth2Client, resultUser)
         .catch(err => {
-            throw (errorSet.createError(errorSet.es.ERR_REFRESH));
+            throw (errorSet.createError(errorSet.es.ERR_REFRESH, err.stack));
         });
     
     return {

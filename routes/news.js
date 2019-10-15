@@ -86,7 +86,7 @@ async function getNews() {
     /* TODO: 헤드라인 크롤러 에러발생 시 catch 해야함. */
     var newsObj = await headline.getNaverNews()
         .catch(err => {
-            throw (errorSet.createError(errorSet.es.FAILED_NEWS));
+            throw (errorSet.createError(errorSet.es.FAILED_NEWS, err.stack));
         });
 
     return newsObj;
