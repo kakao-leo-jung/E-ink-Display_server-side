@@ -1,6 +1,708 @@
 [
   {
     "type": "delete",
+    "url": "/alarm/:_id",
+    "title": "DeleteAlarm",
+    "name": "DeleteAlarm",
+    "group": "Alarm",
+    "description": "<p>유저의 알람정보를 삭제합니다. </br></p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": ":_id",
+            "description": "<p>알람의 id 값, /alarm/:_id 로 해당 알람의 put, delete 를 호출합니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(url) 예제",
+          "content": "URL Http://169.56.98.117/alarm/5da6bee89d02807cd9288a5a",
+          "type": "path"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>삭제 성공 메세지</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "status",
+            "description": "<p>삭제 성공 상태 200.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n{\n    \"message\": \"Alarm delete success!\",\n    \"status\": 200\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NO_JWT",
+            "description": "<p>JWT 가 헤더에 실려있지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_JWT",
+            "description": "<p>JWT 가 유효하지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NOUSER_DB",
+            "description": "<p>해당 유저의 정보가 DB에서 찾을 수 없습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ERR_CRUDDB",
+            "description": "<p>내부 DB 작업에 실패하였습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "실패 : NO_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"NO_JWT\",\n    \"message\": \"Please put JWT in your request header!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INAVLID_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"INVALID_JWT\",\n    \"message\": \"Your JWT is invalid!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : NOUSER_DB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"NOUSER_DB\",\n    \"message\": \"Cannot find userId in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : ERR_CRUDDB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"ERR_CRUDDB\",\n    \"message\": \"Cannot CRUD your Todo in database!\",\n    \"status\": 400\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/alarm.js",
+    "groupTitle": "Alarm"
+  },
+  {
+    "type": "get",
+    "url": "/alarm",
+    "title": "GetAlarm",
+    "name": "GetAlarm",
+    "group": "Alarm",
+    "description": "<p>유저의 알람 리스트를 배열로 받아옵니다.</br> Call &lt;List<Alarm>&gt; 형식으로 자바에서 retrofit 인터페이스를 구축할 수 있습니다.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "null",
+            "optional": false,
+            "field": "No",
+            "description": "<p>Parameter 요청 파라미터 없음.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(x) 예제",
+          "content": "No Parameter",
+          "type": "null"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>해당 알람의 고유 id값, put, delete 호출 때 사용.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "title",
+            "description": "<p>알람 제목</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "hour",
+            "description": "<p>알람 시, 범위는 0~23.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "minute",
+            "description": "<p>알람 분, 범위는 0~59.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "ampm",
+            "description": "<p>오전/오후 여부를 &quot;AM&quot;, &quot;PM&quot; 으로 나타냅니다.</br> ampm 은 hour, minute 에 의해 자동으로 세팅됩니다.</br></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "boolean[]",
+            "optional": false,
+            "field": "day_selected",
+            "description": "<p>각 요일에 알람이 on 상태인지 여부를 나타냅니다</br> 배열의 사이즈는 7이며 [0-6] 인덱스는 [월-일] 을 표시합니다.</br></p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n[\n    {\n        \"_id\": \"5da6bee89d02807cd9288a5a\",\n        \"title\": \"알람테스트0\",\n        \"hour\": 23,\n        \"minute\": 0,\n        \"ampm\": \"PM\",\n        \"day_selected\":[true, false, false, false, true, true, false]\n    },\n    {\n        \"_id\": \"5da6bf319d02807cd9288a5d\",\n        \"title\": \"알람테스트1\",\n        \"hour\": 23,\n        \"minute\": 59,\n        \"ampm\": \"PM\",\n        \"day_selected\":[false, false, false, false, true, true, false]\n    },\n    {\n        \"_id\": \"5da6bf429d02807cd9288a5e\",\n        \"title\": \"알람테스트2\",\n        \"hour\": 0,\n        \"minute\": 1,\n        \"ampm\": \"AM\",\n        \"day_selected\":[false, false, false, false, true, true, false]\n    }\n]",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NO_JWT",
+            "description": "<p>JWT 가 헤더에 실려있지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_JWT",
+            "description": "<p>JWT 가 유효하지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NOUSER_DB",
+            "description": "<p>해당 유저의 정보가 DB에서 찾을 수 없습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ERR_CRUDDB",
+            "description": "<p>내부 DB 작업에 실패하였습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "실패 : NO_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"NO_JWT\",\n    \"message\": \"Please put JWT in your request header!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INAVLID_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"INVALID_JWT\",\n    \"message\": \"Your JWT is invalid!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : NOUSER_DB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"NOUSER_DB\",\n    \"message\": \"Cannot find userId in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : ERR_CRUDDB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"ERR_CRUDDB\",\n    \"message\": \"Cannot CRUD your Todo in database!\",\n    \"status\": 400\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/alarm.js",
+    "groupTitle": "Alarm"
+  },
+  {
+    "type": "post",
+    "url": "/alarm",
+    "title": "InsertAlarm",
+    "name": "InsertAlarm",
+    "group": "Alarm",
+    "description": "<p>유저의 알람을 추가합니다. </br> 알람이 등록되면 등록된 요일(day_selected[] = true) 의 hour, minute 에 푸시를 받을 수 있습니다.</br></p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "title",
+            "description": "<p>알람 제목</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "hour",
+            "description": "<p>알람 시, 범위는 0~23</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "minute",
+            "description": "<p>알람 분, 범위는 0~59</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "boolean[]",
+            "optional": false,
+            "field": "day_selected",
+            "description": "<p>각 요일에 알람여부를 뜻합니다. 배열의 사이즈는 반드시 7이여야 하고</br> [0 - 6] 까지의 인덱스는 각각 [월 - 일]을 나타냅니다</br></p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(body) 예제",
+          "content": "{\n    \"title\": \"알람테스트3\",\n    \"hour\":11,\n    \"minute\":45,\n    \"day_selected\":[true, true, false, false, true, true, false]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>해당 알람의 고유 id값, put, delete 호출 때 사용.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "title",
+            "description": "<p>알람 제목</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "hour",
+            "description": "<p>알람 시, 범위는 0~23.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "minute",
+            "description": "<p>알람 분, 범위는 0~59.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "ampm",
+            "description": "<p>오전/오후 여부를 &quot;AM&quot;, &quot;PM&quot; 으로 나타냅니다.</br> ampm 은 hour, minute 에 의해 자동으로 세팅됩니다.</br></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "boolean[]",
+            "optional": false,
+            "field": "day_selected",
+            "description": "<p>각 요일에 알람이 on 상태인지 여부를 나타냅니다</br> 배열의 사이즈는 7이며 [0-6] 인덱스는 [월-일] 을 표시합니다.</br></p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5da6c1fea3c4697d4765b6b7\",\n    \"title\": \"알람테스트3\",\n    \"hour\": 11,\n    \"minute\": 45,\n    \"ampm\": \"AM\",\n    \"day_selected\":[true, true, false, false, true, true, false]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NO_JWT",
+            "description": "<p>JWT 가 헤더에 실려있지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_JWT",
+            "description": "<p>JWT 가 유효하지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NOUSER_DB",
+            "description": "<p>해당 유저의 정보가 DB에서 찾을 수 없습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ERR_CRUDDB",
+            "description": "<p>내부 DB 작업에 실패하였습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_TIME",
+            "description": "<p>시간 값이 유효하지 않습니다 hour(0-23), minute(0-59)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "LENGTH_ARRAY",
+            "description": "<p>day_selected 배열의 사이즈가 7이 아닙니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "실패 : NO_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"NO_JWT\",\n    \"message\": \"Please put JWT in your request header!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INAVLID_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"INVALID_JWT\",\n    \"message\": \"Your JWT is invalid!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : NOUSER_DB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"NOUSER_DB\",\n    \"message\": \"Cannot find userId in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : ERR_CRUDDB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"ERR_CRUDDB\",\n    \"message\": \"Cannot CRUD your Todo in database!\",\n    \"status\": 400\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INVALID_TIME",
+          "content": "HTTP/1.1 400 Bad Request\n{\n    \"name\" : \"INVALID_TIME\",\n    \"message\": \"You input invalide hour or minute, please check range of your request hour(0-23) and minute(0-59)!\",\n    \"status\": 400\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : LENGTH_ARRAY",
+          "content": "HTTP/1.1 400 Bad Request\n{\n    \"name\" : \"LENGTH_ARRAY\",\n    \"message\": \"Your request day_selected[] array size is not 7.\",\n    \"status\": 400\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/alarm.js",
+    "groupTitle": "Alarm"
+  },
+  {
+    "type": "put",
+    "url": "/alarm/:_id",
+    "title": "UpdateAlarm",
+    "name": "UpdateAlarm",
+    "group": "Alarm",
+    "description": "<p>유저의 알람정보를 수정합니다. </br> 알람이 수정되면 수정된 요일(day_selected[] = true) 의 hour, minute 에 푸시를 받을 수 있습니다.</br></p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": ":_id",
+            "description": "<p>알람의 id 값, /alarm/:_id 로 해당 알람의 put, delete 를 호출합니다.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "title",
+            "description": "<p>알람 제목</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "hour",
+            "description": "<p>알람 시, 범위는 0~23</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "minute",
+            "description": "<p>알람 분, 범위는 0~59</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "boolean[]",
+            "optional": false,
+            "field": "day_selected",
+            "description": "<p>각 요일에 알람여부를 뜻합니다. 배열의 사이즈는 반드시 7이여야 하고</br> [0 - 6] 까지의 인덱스는 각각 [월 - 일]을 나타냅니다</br></p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(body) 예제",
+          "content": "{\n    \"title\": \"알람테스트3 - modified\",\n    \"hour\":10,\n    \"minute\":20,\n    \"day_selected\":[true, true, false, true, false, false, true]\n}",
+          "type": "json"
+        },
+        {
+          "title": "파라미터(url) 예제",
+          "content": "URL Http://169.56.98.117/alarm/5da6bee89d02807cd9288a5a",
+          "type": "path"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>해당 알람의 고유 id값, put, delete 호출 때 사용.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "title",
+            "description": "<p>알람 제목</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "hour",
+            "description": "<p>알람 시, 범위는 0~23.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "minute",
+            "description": "<p>알람 분, 범위는 0~59.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "ampm",
+            "description": "<p>오전/오후 여부를 &quot;AM&quot;, &quot;PM&quot; 으로 나타냅니다.</br> ampm 은 hour, minute 에 의해 자동으로 세팅됩니다.</br></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "boolean[]",
+            "optional": false,
+            "field": "day_selected",
+            "description": "<p>각 요일에 알람이 on 상태인지 여부를 나타냅니다</br> 배열의 사이즈는 7이며 [0-6] 인덱스는 [월-일] 을 표시합니다.</br></p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5da6bee89d02807cd9288a5a\",\n    \"title\": \"알람테스트3 - modified\",\n    \"hour\": 10,\n    \"minute\": 20,\n    \"ampm\": \"AM\",\n    \"day_selected\":[true, true, false, true, false, false, true]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NO_JWT",
+            "description": "<p>JWT 가 헤더에 실려있지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_JWT",
+            "description": "<p>JWT 가 유효하지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NOUSER_DB",
+            "description": "<p>해당 유저의 정보가 DB에서 찾을 수 없습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ERR_CRUDDB",
+            "description": "<p>내부 DB 작업에 실패하였습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_TIME",
+            "description": "<p>시간 값이 유효하지 않습니다 hour(0-23), minute(0-59)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "LENGTH_ARRAY",
+            "description": "<p>day_selected 배열의 사이즈가 7이 아닙니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "실패 : NO_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"NO_JWT\",\n    \"message\": \"Please put JWT in your request header!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INAVLID_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"INVALID_JWT\",\n    \"message\": \"Your JWT is invalid!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : NOUSER_DB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"NOUSER_DB\",\n    \"message\": \"Cannot find userId in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : ERR_CRUDDB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"ERR_CRUDDB\",\n    \"message\": \"Cannot CRUD your Todo in database!\",\n    \"status\": 400\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INVALID_TIME",
+          "content": "HTTP/1.1 400 Bad Request\n{\n    \"name\" : \"INVALID_TIME\",\n    \"message\": \"You input invalide hour or minute, please check range of your request hour(0-23) and minute(0-59)!\",\n    \"status\": 400\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : LENGTH_ARRAY",
+          "content": "HTTP/1.1 400 Bad Request\n{\n    \"name\" : \"LENGTH_ARRAY\",\n    \"message\": \"Your request day_selected[] array size is not 7.\",\n    \"status\": 400\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/alarm.js",
+    "groupTitle": "Alarm"
+  },
+  {
+    "type": "delete",
     "url": "/calendar/:_id",
     "title": "DeleteCalendar",
     "name": "DeleteCalendar",
@@ -818,14 +1520,14 @@
           },
           {
             "group": "Parameter",
-            "type": "ISOString",
+            "type": "Date",
             "optional": false,
             "field": "startTime",
             "description": "<p>달력 일정의 시작시간</br> ISOString 형태로 전달이 됩니다.</br> RFC3339 표준 시간 형식을 사용하며</br> JAVA 에서는 new Date().toISOString()</br> &quot;2019-08-14T09:25:50.136Z&quot; 의 형식으로 request 하면될겁니다</br> (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br> new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br> ISOString() 화 하여 바디에 startTime 에 넣어주시면 될겁니다.</br></p>"
           },
           {
             "group": "Parameter",
-            "type": "ISOString",
+            "type": "Date",
             "optional": false,
             "field": "endTime",
             "description": "<p>달력 일정의 종료시간</br> ISOString 형태로 전달이 됩니다.</br> RFC3339 표준 시간 형식을 사용하며</br> JAVA 에서는 new Date().toISOString()</br> &quot;2019-08-14T09:25:50.136Z&quot; 의 형식으로 request 하면될겁니다</br> (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br> new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br> ISOString() 화 하여 바디에 endTime 에 넣어주시면 될겁니다.</br></p>"
@@ -1071,14 +1773,14 @@
           },
           {
             "group": "Parameter",
-            "type": "ISOString",
+            "type": "Date",
             "optional": false,
             "field": "startTime",
             "description": "<p>달력 일정의 시작시간</br> ISOString 형태로 전달이 됩니다.</br> RFC3339 표준 시간 형식을 사용하며</br> JAVA 에서는 new Date().toISOString()</br> &quot;2019-08-14T09:25:50.136Z&quot; 의 형식으로 request 하면될겁니다</br> (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br> new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br> ISOString() 화 하여 바디에 startTime 에 넣어주시면 될겁니다.</br></p>"
           },
           {
             "group": "Parameter",
-            "type": "ISOString",
+            "type": "Date",
             "optional": false,
             "field": "endTime",
             "description": "<p>달력 일정의 종료시간</br> ISOString 형태로 전달이 됩니다.</br> RFC3339 표준 시간 형식을 사용하며</br> JAVA 에서는 new Date().toISOString()</br> &quot;2019-08-14T09:25:50.136Z&quot; 의 형식으로 request 하면될겁니다</br> (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br> new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br> ISOString() 화 하여 바디에 endTime 에 넣어주시면 될겁니다.</br></p>"

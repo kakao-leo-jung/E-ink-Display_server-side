@@ -28,6 +28,10 @@ exports.es = {
     INVALID_DATE: ['INVALID_DATE', 'You input invalid date, check url parameter again!', 400],
     NO_CALENDARBODY: ['INVALID_CALENDARBODY', 'You did not input calendar body, check request body again!', 400],
 
+    /* /alarm */
+    INVALID_TIME: ['INVALID_TIME', 'You input invalide hour or minute, please check range of your request hour(0-23) and minute(0-59)!', 400],
+    LENGTH_ARRAY: ['LENGTH_ARRAY', 'Your request day_selected[] array size is not 7.', 400],
+    
 
 }
 

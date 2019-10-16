@@ -526,7 +526,7 @@ router.get('/certainmonth/:year/:month', async (req, res, next) => {
 
     @apiParam {String}    title         달력 일정의 타이틀
     @apiParam {String}    memo          달력 일정의 메모
-    @apiParam {ISOString} startTime     달력 일정의 시작시간</br>
+    @apiParam {Date}      startTime     달력 일정의 시작시간</br>
                                         ISOString 형태로 전달이 됩니다.</br>
                                         RFC3339 표준 시간 형식을 사용하며</br>
                                         JAVA 에서는 new Date().toISOString()</br>
@@ -534,7 +534,7 @@ router.get('/certainmonth/:year/:month', async (req, res, next) => {
                                         (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br>
                                         new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br>
                                         ISOString() 화 하여 바디에 startTime 에 넣어주시면 될겁니다.</br>
-    @apiParam {ISOString} endTime       달력 일정의 종료시간</br>
+    @apiParam {Date}      endTime       달력 일정의 종료시간</br>
                                         ISOString 형태로 전달이 됩니다.</br>
                                         RFC3339 표준 시간 형식을 사용하며</br>
                                         JAVA 에서는 new Date().toISOString()</br>
@@ -718,7 +718,7 @@ router.post('/', async (req, res, next) => {
 
     @apiParam {String}    title         달력 일정의 타이틀
     @apiParam {String}    memo          달력 일정의 메모
-    @apiParam {ISOString} startTime     달력 일정의 시작시간</br>
+    @apiParam {Date}      startTime     달력 일정의 시작시간</br>
                                         ISOString 형태로 전달이 됩니다.</br>
                                         RFC3339 표준 시간 형식을 사용하며</br>
                                         JAVA 에서는 new Date().toISOString()</br>
@@ -726,7 +726,7 @@ router.post('/', async (req, res, next) => {
                                         (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br>
                                         new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br>
                                         ISOString() 화 하여 바디에 startTime 에 넣어주시면 될겁니다.</br>
-    @apiParam {ISOString} endTime       달력 일정의 종료시간</br>
+    @apiParam {Date}      endTime       달력 일정의 종료시간</br>
                                         ISOString 형태로 전달이 됩니다.</br>
                                         RFC3339 표준 시간 형식을 사용하며</br>
                                         JAVA 에서는 new Date().toISOString()</br>
