@@ -42,3 +42,5 @@ users -> 유저정보 보관
 todos -> todo 정보 보관
 alarms -> alarm 정보 보관
 
+#### APIDOC 변경 및 생성
+$ apidoc -i routes/ -o docs/
