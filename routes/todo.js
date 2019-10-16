@@ -354,7 +354,7 @@ router.get('/', async (req, res, next) => {
         "name" : "INVALID_TODOBODYKEY",
         "message": "Invalid body property is included! : userId",
         "status": 400
-    }    
+    }
 
 */
 router.put('/:_id', async (req, res, next) => {

@@ -124,6 +124,12 @@ $ screen -r server
 (server 스크린 상태에서)
 $ node ./bin/www
 
+(node:30411) DeprecationWarning: current URL string parser is deprecated, and will be removed in a future version. To use the new parser, pass option { useNewUrlParser: true } to MongoClient.connect.
+(node:30411) DeprecationWarning: current Server Discovery and Monitoring engine is deprecated, and will be removed in a future version. To use the new Server Discover and Monitoring engine, pass option { useUnifiedTopology: true } to the MongoClient constructor.
+Express server listening on port 80
+Connected to MongoDB server : user_auth
+MQTT broker server connected : true
+
 [콘솔화면에서 로그 실시간으로 확인 가능 - 텍스트로 저장은x 디버깅용]
 ```
 
@@ -136,6 +142,9 @@ $ node ./bin/www
 
 $ node ./bin/www >> log.txt
 
+(node:30411) DeprecationWarning: current URL string parser is deprecated, and will be removed in a future version. To use the new parser, pass option { useNewUrlParser: true } to MongoClient.connect.
+(node:30411) DeprecationWarning: current Server Discovery and Monitoring engine is deprecated, and will be removed in a future version. To use the new Server Discover and Monitoring engine, pass option { useUnifiedTopology: true } to the MongoClient constructor.
+
 [이 상태에서 log.txt 파일에 로그를 이어쓰기중임. 평상시 server스크린은 이상태를 유지]
 ```
 
@@ -143,7 +152,7 @@ $ node ./bin/www >> log.txt
 
 - ##### server 스크린에서 탈출
 
-  - server 스크린 상태(node 서버 running)에서 ctrl + (shift) + a + d
+  - server 스크린 상태(node 서버 running)에서 **ctrl + (shift) + a + d**
 
 
 
@@ -158,5 +167,10 @@ $ node ./bin/www >> log.txt
 
 ```
 $ apidoc -i routes/ -o docs/
+
+{"message":"Please create an apidoc.json configuration file.","level":"warn"}
+{"message":"Done.","level":"info"}
+
+[doc/ 디렉토리에 api 문서를 위한 html 파일 등이 업데이트 됩니다.]
 ```
 
