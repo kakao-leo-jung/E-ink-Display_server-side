@@ -319,7 +319,7 @@ router.get('/certainday/:year/:month/:day', async (req, res, next) => {
 
         /* 날짜 유효성 검사 */
         if (_month > 12 || _month < 1 || _day > 31 || _day < 1) {
-            throw (errorSet.createError(errorSet.es.INVALID_DATE, this.stack));
+            throw (errorSet.createError(errorSet.es.INVALID_DATE, new Error().stack));
         }
 
         /* 시간 설정 */
@@ -489,7 +489,7 @@ router.get('/certainmonth/:year/:month', async (req, res, next) => {
         var _month = req.params.month;
 
         if (_month > 12 || _month < 1) {
-            throw (errorSet.createError(errorSet.es.INVALID_DATE, this.stack));
+            throw (errorSet.createError(errorSet.es.INVALID_DATE, new Error().stack));
         }
 
         var _minDate = new Date(_year, _month - 1, 1, 0, 0, 0);
@@ -681,7 +681,7 @@ router.post('/', async (req, res, next) => {
 
         /* FIXME: body 에 대한 예외 처리 더 다양하게! */
         if (!reqCalendar) {
-            throw (errorSet.createError(errorSet.es.NO_CALENDARBODY, this.stack));
+            throw (errorSet.createError(errorSet.es.NO_CALENDARBODY, new Error().stack));
         }
 
         var authInfo = await authentication.getAuthCode(decoded.userId);
@@ -882,7 +882,7 @@ router.put('/:_id', async (req, res, next) => {
 
         /* FIXME: body 에 대한 예외 처리 더 다양하게! */
         if (!reqCalendar) {
-            throw (errorSet.createError(errorSet.es.NO_CALENDARBODY, this.stack));
+            throw (errorSet.createError(errorSet.es.NO_CALENDARBODY, new Error().stack));
         }
 
         var authInfo = await authentication.getAuthCode(decoded.userId);

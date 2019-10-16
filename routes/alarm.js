@@ -245,11 +245,11 @@ router.post('/', async (req, res, next) => {
         });
 
         if(newAlarm.hour > 23 || newAlarm.hour < 0 || newAlarm.minute > 59 || newAlarm.minute < 0){
-            throw(errorSet.createError(errorSet.es.INVALID_TIME));
+            throw(errorSet.createError(errorSet.es.INVALID_TIME, new Error().stack));
         }
 
         if(newAlarm.day_selected.length != 7){
-            throw(errorSet.createError(errorSet.es.LENGTH_ARRAY));
+            throw(errorSet.createError(errorSet.es.LENGTH_ARRAY, new Error().stack));
         }
 
         var savedAlarm = await newAlarm.save()
@@ -390,11 +390,11 @@ router.put('/:_id', async (req, res, next) => {
         }
 
         if(changedAlarm.hour > 23 || changedAlarm.hour < 0 || changedAlarm.minute > 59 || changedAlarm.minute < 0){
-            throw(errorSet.createError(errorSet.es.INVALID_TIME));
+            throw(errorSet.createError(errorSet.es.INVALID_TIME, new Error().stack));
         }
 
         if(changedAlarm.day_selected.length != 7){
-            throw(errorSet.createError(errorSet.es.LENGTH_ARRAY));
+            throw(errorSet.createError(errorSet.es.LENGTH_ARRAY, new Error().stack));
         }
 
         /* 현재 로그인된 jwt 의 유저와 alarm 등록한 userId 가 일치해야 함. */
