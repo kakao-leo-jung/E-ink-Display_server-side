@@ -38,3 +38,7 @@ $ > show collections
 $ > db.users.find().pretty()
 
 #### user_auth > user 콜렉션 구조
+users -> 유저정보 보관
+todos -> todo 정보 보관
+alarms -> alarm 정보 보관
+
