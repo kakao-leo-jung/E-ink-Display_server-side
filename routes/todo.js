@@ -354,7 +354,7 @@ router.get('/', async (req, res, next) => {
         "name" : "INVALID_TODOBODYKEY",
         "message": "Invalid body property is included! : userId",
         "status": 400
-    }    
+    }
 
 */
 router.put('/:_id', async (req, res, next) => {
@@ -364,7 +364,7 @@ router.put('/:_id', async (req, res, next) => {
 
         /* userId, 값은 수정 불가능 req.body 에 있으면 안됨 */
         if (req.body.hasOwnProperty('userId')) {
-            throw (errorSet.createError(errorSet.es.INVALID_TODOBODYKEY, this.stack));
+            throw (errorSet.createError(errorSet.es.INVALID_TODOBODYKEY, new Error().stack));
         }
 
         /* body 예외 처리 */

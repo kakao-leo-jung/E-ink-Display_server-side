@@ -37,7 +37,7 @@ exports.verifyJwt = (req) => {
     var reqJwt = req.headers.jwt;
 
     if (!reqJwt) {
-        throw (errorSet.createError(errorSet.es.NO_JWT, this.stack));
+        throw (errorSet.createError(errorSet.es.NO_JWT, new Error().stack));
     }
 
     try {

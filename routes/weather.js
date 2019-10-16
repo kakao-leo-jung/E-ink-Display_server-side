@@ -106,7 +106,7 @@ router.get('/:latitude/:longitude', async (req, res, next) => {
         var longitude = req.params.longitude;
 
         if (!latitude || !longitude) {
-            throw (errorSet.createError(errorSet.es.NO_LONANDLAT, this.stack));
+            throw (errorSet.createError(errorSet.es.NO_LONANDLAT, new Error().stack));
         }
 
         /* weathermap 호출 */
