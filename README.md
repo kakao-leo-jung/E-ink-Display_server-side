@@ -3,6 +3,9 @@
 - URL						: http://169.56.98.117
 - Application           : https://lab.hanium.or.kr/e-display-calendar/android
 - TEST Application  : https://github.com/dfjung4254/E-ink-Display_android-application
+- 테스트용 JWT 발급
+  - (로컬테스트) : http://localhost/debug/webjwt
+  - (운영테스트) : http://169.56.98.117/debug/webjwt
 
 
 
@@ -67,6 +70,15 @@ $ git push -u origin master
    - 깃랩 브라우저 좌측의 MergeRequest 에서 new MergeRequest
    - 개인레포지토리(포크)의 master 에서 프로젝트레포지토리(원본e-ink)의 master
    - assign 은 저(정근화)로 주세요!
+
+
+
+4. **JWT 발급받기**
+   - 로컬서버가 실행된 상태(node ./bin/www)
+   - 브라우저에서 http://localhost/debug/webjwt 입력
+   - JWT 발급 - 구글로그인 후 뜨는 페이지의 코드 값이 custom JWT 값
+   - 해당 jwt는 로그인 한 구글 계정을 의미합니다.
+   - 만약 처음 브라우저에서 구글로그인하시면 로컬DB의 users 에 본인 계정정보 추가됨.
 
 
 
