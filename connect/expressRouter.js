@@ -12,6 +12,10 @@ module.exports = (app) => {
     var login = require('../auth/login');
     app.use('/loginToken', login);
 
+    /* JWT 디버깅웹 '/debug/webjwt' 라우팅 */
+    var webjwt = require('../routes/webjwt');
+    app.use('/debug/webjwt', webjwt);
+
     /* 유저 정보 '/users' 라우팅 */
     var users = require('../routes/users');
     app.use('/users', users);

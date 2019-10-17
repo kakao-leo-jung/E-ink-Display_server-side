@@ -1,6 +1,10 @@
 var express = require('express');
-const { OAuth2Client } = require('google-auth-library');
-const { google } = require('googleapis');
+const {
+    OAuth2Client
+} = require('google-auth-library');
+const {
+    google
+} = require('googleapis');
 var User = require('../model/user');
 const Jwt = require('jsonwebtoken');
 const config = require('../config');
@@ -29,8 +33,14 @@ const oAuth2Client = new google.auth.OAuth2(
     CLIENT_REDIRECT_URIS
 );
 
+const oAuth2ClientWebDebugging = new google.auth.OAuth2(
+
+);
+
 /* JWT 발급을 위한 secret 키 */
 const SECRET = config.JWT_SECRET;
+
+
 
 /*
 
@@ -45,13 +55,11 @@ const SECRET = config.JWT_SECRET;
         - DB에 존재안함 : 새 user를 등록 한다.
 
 */
-router.post('/', function (req, res) {
-
+router.get('/', (req, res) => {
     /* 인증 코드를 담는다. */
-    const authCode = req.body.authCode;
+    const authCode = req.query.code;
     console.log("Receive AuthCode from client : " + authCode);
     returnJWT(authCode, res);
-
 });
 
 /*
@@ -66,11 +74,12 @@ async function returnJWT(authCode, res) {
 
     /* authCode 로 부터 토큰을 추출해 낸다. */
     console.log("Enter oAuth2Client.getToken : resultUser.google_authCode : " + authCode);
-    const { tokens } = await oAuth2Client.getToken(authCode);
+    const {
+        tokens
+    } = await oAuth2Client.getToken(authCode);
     console.log("getToken Method Result [access_tokens] : " + tokens.access_token);
     console.log("getToken Method Result [refresh_tokens] : " + tokens.refresh_token);
     console.log("getToken Method Result [id_tokens] : " + tokens.id_token);
-    oAuth2Client.setCredentials(tokens);
 
     /* 구글 ID 토큰 유효성 검사 및 payload 추출 */
     const payload = await verify(tokens).catch(console.error);
@@ -79,13 +88,11 @@ async function returnJWT(authCode, res) {
     const searchedUser = await searchDB(tokens, payload).catch(console.error);
 
     /* JWT 를 생성한다. */
-    const newJwt = Jwt.sign(
-        {
+    const newJwt = Jwt.sign({
             _id: searchedUser._id,
             userId: searchedUser.userId
         },
-        SECRET,
-        {
+        SECRET, {
             expiresIn: '24h',
             issuer: 'com.jcp.magicapplication',
             subject: 'userAuth'
@@ -114,7 +121,9 @@ async function searchDB(tokens, payload) {
     try {
 
         /* userId 가 일치하는 유저가 DB에 존재하는지 조회한다. */
-        var resultUser = await User.findOne({ userId: payload.sub });
+        var resultUser = await User.findOne({
+            userId: payload.sub
+        });
 
         /* DB 에 기존 유저 없음 */
         if (!resultUser) {
@@ -186,7 +195,7 @@ async function verify(tokens) {
 
     const ticket = await client.verifyIdToken({
         idToken: tokens.id_token,
-        audience: CLIENT_ID, 
+        audience: CLIENT_ID,
     });
 
     /* 아래 코드는 verify 가 성공하였을 때 해야 할 역할 */

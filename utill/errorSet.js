@@ -31,7 +31,6 @@ exports.es = {
     /* /alarm */
     INVALID_TIME: ['INVALID_TIME', 'You input invalide hour or minute, please check range of your request hour(0-23) and minute(0-59)!', 400],
     LENGTH_ARRAY: ['LENGTH_ARRAY', 'Your request day_selected[] array size is not 7.', 400],
-    
 
 }
 

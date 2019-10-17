@@ -41,6 +41,7 @@ exports.verifyJwt = (req) => {
     }
 
     try {
+
         var decoded = Jwt.verify(reqJwt, SECRET);
         return decoded;
     } catch (err) {
