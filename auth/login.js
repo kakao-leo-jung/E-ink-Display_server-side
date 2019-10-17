@@ -33,14 +33,8 @@ const oAuth2Client = new google.auth.OAuth2(
     CLIENT_REDIRECT_URIS
 );
 
-const oAuth2ClientWebDebugging = new google.auth.OAuth2(
-
-);
-
 /* JWT 발급을 위한 secret 키 */
 const SECRET = config.JWT_SECRET;
-
-
 
 /*
 
