@@ -59,11 +59,10 @@
                 if(window.location.hostname == 'localhost'){
                     /* 로컬 개발 환경 */
                     document.write('<h2 style="color:blue">이 페이지는 로컬 개발환경입니다. GoogleLogin요청이 http://localhost/loginToken 으로 리다이렉트되어 작업이 수행됩니다.</h2>')
-                    documnet.write('<span style="font-family:sans-serif; font-size:x-large;font-color:blue">이 페이지는 로컬 개발환경입니다. GoogleLogin요청이 http://localhost/loginToken 으로 리다이렉트되어 작업이 수행됩니다.</span>');
                 }else{
                     /* 실제 서버 환경 */
-                    document.write('<h2>이 페이지는 실제 서버환경입니다. GoogleLogin요청이 http://169.56.98.117/loginToken 으로 리다이렉트되어 작업이 수행됩니다.</h2>')
-                    documnet.write('<span style="font-family:sans-serif; font-size:x-large;font-color:blue">이 페이지는 실제 서버환경입니다. GoogleLogin요청이 http://169.56.98.117/loginToken 으로 리다이렉트되어 작업이 수행됩니다.</span>');
+                    document.write('<h2 style="color:red">이 페이지는 실제 서버환경입니다. GoogleLogin요청이 http://169.56.98.117/loginToken 으로 리다이렉트되어 작업이 수행됩니다.</h2>')
+                    document.write('<h3 style="color:red">현재 도메인이 없어 실제서버(169.56.98.117)로는 GoogleAuthCode 가 리다이렉트 되지 않습니다</h3>')
                 }
             </script>
             </br></br></br>
