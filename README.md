@@ -160,11 +160,20 @@ $ node ./bin/www >> log.txt
 [이 상태에서 log.txt 파일에 로그를 이어쓰기중임. 평상시 server스크린은 이상태를 유지]
 ```
 
+- ##### 서버에서 실시간 log 확인
+```
+$ screen -r log
+
+(로그가 꺼져 있을 시)
+$ tail -f log.txt
+
+(log screen 이 따로 있습니다.)
+```
 
 
 - ##### server 스크린에서 탈출
 
-  - server 스크린 상태(node 서버 running)에서 **ctrl + (shift) + a + d**
+  - server/log 스크린 진입 상태(node 서버 running)에서 **ctrl + (shift) + a + d**
 
 
 
