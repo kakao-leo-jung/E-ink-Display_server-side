@@ -71,6 +71,9 @@ async function returnJWT(authCode, res) {
     const {
         tokens
     } = await oAuth2Client.getToken(authCode);
+
+    console.log("Tokens : " + JSON.stringify(tokens, null, 2));
+
     console.log("getToken Method Result [access_tokens] : " + tokens.access_token);
     console.log("getToken Method Result [refresh_tokens] : " + tokens.refresh_token);
     console.log("getToken Method Result [id_tokens] : " + tokens.id_token);
