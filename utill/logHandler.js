@@ -24,7 +24,7 @@ module.exports = (obj, req, res, next) => {
     } else {
         /* 성공 일때 로그 반환 */
         console.log('\n\x1b[36m%s', '\n[OK!][' + new Date() + ']');
-        console.log('%s\x1b[0m', ' : ' + JSON.stringify(obj) + '\n');
+        console.log('%s\x1b[0m', ' : ' + JSON.stringify(obj, null, 2) + '\n');
         next(obj);
     }
 };

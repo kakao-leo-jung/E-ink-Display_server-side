@@ -181,13 +181,18 @@ exports.listCalendars = async (auth) => {
         throw (errorSet.createError(errorSet.es.FAILED_GOOGLE, err.stack));
     });
 
-    var retObj = new Object();
-    retObj.calendarName = new Array();
+    retObjArray = new Array();
     for (const curItem of calendarList.data.items) {
-        retObj.calendarName.push(curItem.summary);
+
+        var retObj = {
+            _id : curItem.id,
+            summary : curItem.summary,
+            primary : curItem.primary
+        }
+        retObjArray.push(retObj);
     }
 
-    return retObj;
+    return retObjArray;
 
 }
 

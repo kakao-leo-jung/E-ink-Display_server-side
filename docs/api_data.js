@@ -135,7 +135,7 @@ define({ "api": [
     "title": "GetAlarm",
     "name": "GetAlarm",
     "group": "Alarm",
-    "description": "<p>유저의 알람 리스트를 배열로 받아옵니다.</br> Call &lt;List<Alarm>&gt; 형식으로 자바에서 retrofit 인터페이스를 구축할 수 있습니다.</p>",
+    "description": "<p>유저의 알람 리스트를 배열로 받아옵니다.</br> Call &lt;List<Alarm>&gt; 형식으로 자바에서 retrofit 인터페이스를 구축할 수 있습니다. 서버에서 시간을 체크 한 뒤 isAlarmOn 이 켜있는 상태에서 해당 시간에 푸시를 줍니다.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -220,13 +220,20 @@ define({ "api": [
             "optional": false,
             "field": "day_selected",
             "description": "<p>각 요일에 알람이 on 상태인지 여부를 나타냅니다</br> 배열의 사이즈는 7이며 [0-6] 인덱스는 [월-일] 을 표시합니다.</br></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "boolean",
+            "optional": false,
+            "field": "isAlarmOn",
+            "description": "<p>현재 알람이 켜져있는지 여부를 나타냅니다.</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "성공 시 응답 :",
-          "content": "HTTP/1.1 200 OK\n[\n    {\n        \"_id\": \"5da6bee89d02807cd9288a5a\",\n        \"title\": \"알람테스트0\",\n        \"hour\": 23,\n        \"minute\": 0,\n        \"ampm\": \"PM\",\n        \"day_selected\":[true, false, false, false, true, true, false]\n    },\n    {\n        \"_id\": \"5da6bf319d02807cd9288a5d\",\n        \"title\": \"알람테스트1\",\n        \"hour\": 23,\n        \"minute\": 59,\n        \"ampm\": \"PM\",\n        \"day_selected\":[false, false, false, false, true, true, false]\n    },\n    {\n        \"_id\": \"5da6bf429d02807cd9288a5e\",\n        \"title\": \"알람테스트2\",\n        \"hour\": 0,\n        \"minute\": 1,\n        \"ampm\": \"AM\",\n        \"day_selected\":[false, false, false, false, true, true, false]\n    }\n]",
+          "content": "HTTP/1.1 200 OK\n[\n    {\n        \"_id\": \"5da6bee89d02807cd9288a5a\",\n        \"title\": \"알람테스트0\",\n        \"hour\": 23,\n        \"minute\": 0,\n        \"ampm\": \"PM\",\n        \"day_selected\":[true, false, false, false, true, true, false],\n        \"isAlarmOn\": true\n    },\n    {\n        \"_id\": \"5da6bf319d02807cd9288a5d\",\n        \"title\": \"알람테스트1\",\n        \"hour\": 23,\n        \"minute\": 59,\n        \"ampm\": \"PM\",\n        \"day_selected\":[false, false, false, false, true, true, false],\n        \"isAlarmOn\": false\n    },\n    {\n        \"_id\": \"5da6bf429d02807cd9288a5e\",\n        \"title\": \"알람테스트2\",\n        \"hour\": 0,\n        \"minute\": 1,\n        \"ampm\": \"AM\",\n        \"day_selected\":[false, false, false, false, true, true, false],\n        \"isAlarmOn\": true\n    }\n]",
           "type": "json"
         }
       ]
@@ -350,7 +357,7 @@ define({ "api": [
       "examples": [
         {
           "title": "파라미터(body) 예제",
-          "content": "{\n    \"title\": \"알람테스트3\",\n    \"hour\":11,\n    \"minute\":45,\n    \"day_selected\":[true, true, false, false, true, true, false]\n}",
+          "content": "{\n    \"title\": \"알람테스트3\",\n    \"hour\":11,\n    \"minute\":45,\n    \"day_selected\":[true, true, false, false, true, true, false],\n    \"isAlarmOn\": true\n}",
           "type": "json"
         }
       ]
@@ -358,6 +365,13 @@ define({ "api": [
     "success": {
       "fields": {
         "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "boolean",
+            "optional": false,
+            "field": "isAlarmOn",
+            "description": "<p>현재 알람이 켜져있는지 여부를 나타냅니다.</p>"
+          },
           {
             "group": "Success 200",
             "type": "String",
@@ -405,7 +419,7 @@ define({ "api": [
       "examples": [
         {
           "title": "성공 시 응답 :",
-          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5da6c1fea3c4697d4765b6b7\",\n    \"title\": \"알람테스트3\",\n    \"hour\": 11,\n    \"minute\": 45,\n    \"ampm\": \"AM\",\n    \"day_selected\":[true, true, false, false, true, true, false]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5da6c1fea3c4697d4765b6b7\",\n    \"title\": \"알람테스트3\",\n    \"hour\": 11,\n    \"minute\": 45,\n    \"ampm\": \"AM\",\n    \"day_selected\":[true, true, false, false, true, true, false],\n    \"isAlarmOn\": true\n}",
           "type": "json"
         }
       ]
@@ -558,7 +572,7 @@ define({ "api": [
       "examples": [
         {
           "title": "파라미터(body) 예제",
-          "content": "{\n    \"title\": \"알람테스트3 - modified\",\n    \"hour\":10,\n    \"minute\":20,\n    \"day_selected\":[true, true, false, true, false, false, true]\n}",
+          "content": "{\n    \"title\": \"알람테스트3 - modified\",\n    \"hour\":10,\n    \"minute\":20,\n    \"day_selected\":[true, true, false, true, false, false, true],\n    \"isAlarmOn\": true\n}",
           "type": "json"
         },
         {
@@ -571,6 +585,13 @@ define({ "api": [
     "success": {
       "fields": {
         "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "boolean",
+            "optional": false,
+            "field": "isAlarmOn",
+            "description": "<p>현재 알람이 켜져있는지 여부를 나타냅니다.</p>"
+          },
           {
             "group": "Success 200",
             "type": "String",
@@ -618,7 +639,7 @@ define({ "api": [
       "examples": [
         {
           "title": "성공 시 응답 :",
-          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5da6bee89d02807cd9288a5a\",\n    \"title\": \"알람테스트3 - modified\",\n    \"hour\": 10,\n    \"minute\": 20,\n    \"ampm\": \"AM\",\n    \"day_selected\":[true, true, false, true, false, false, true]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5da6bee89d02807cd9288a5a\",\n    \"title\": \"알람테스트3 - modified\",\n    \"hour\": 10,\n    \"minute\": 20,\n    \"ampm\": \"AM\",\n    \"day_selected\":[true, true, false, true, false, false, true],\n    \"isAlarmOn\": true\n}",
           "type": "json"
         }
       ]
@@ -702,12 +723,12 @@ define({ "api": [
     "groupTitle": "Alarm"
   },
   {
-    "type": "delete",
-    "url": "/calendar/:_id",
-    "title": "DeleteCalendar",
-    "name": "DeleteCalendar",
-    "group": "Calendar",
-    "description": "<p>기존의 캘린더 일정을 삭제합니다.</br></p> <pre><code>_id 값은 GET 을 통해 넘어온 calendar 의 _id 값이며,&lt;/br&gt; URL 을 통해 삭제하고자 하는 특정 calendar 일정을 지정할 수 있습니다.&lt;/br&gt;</code></pre>",
+    "type": "put",
+    "url": "/alarm/onoff/:_id",
+    "title": "UpdateAlarmOnoff",
+    "name": "UpdateAlarmOnoff",
+    "group": "Alarm",
+    "description": "<p>유저의 알람정보의 ON/OFF 정보만 수정합니다. </br> 알람이 ON 상태여야만 요일(day_selected[] = true) 의 hour, minute 에 푸시를 받을 수 있습니다.</br></p>",
     "header": {
       "fields": {
         "Header": [
@@ -736,6 +757,197 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": ":_id",
+            "description": "<p>알람의 id 값, /alarm/:_id 로 해당 알람의 put, delete 를 호출합니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(body) 예제",
+          "content": "{\n    \"isAlarmOn\": true\n}",
+          "type": "json"
+        },
+        {
+          "title": "파라미터(url) 예제",
+          "content": "URL Http://169.56.98.117/alarm/5da6bee89d02807cd9288a5a",
+          "type": "path"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "boolean",
+            "optional": false,
+            "field": "isAlarmOn",
+            "description": "<p>현재 알람이 켜져있는지 여부를 나타냅니다.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>해당 알람의 고유 id값, put, delete 호출 때 사용.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "title",
+            "description": "<p>알람 제목</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "hour",
+            "description": "<p>알람 시, 범위는 0~23.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "minute",
+            "description": "<p>알람 분, 범위는 0~59.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "ampm",
+            "description": "<p>오전/오후 여부를 &quot;AM&quot;, &quot;PM&quot; 으로 나타냅니다.</br> ampm 은 hour, minute 에 의해 자동으로 세팅됩니다.</br></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "boolean[]",
+            "optional": false,
+            "field": "day_selected",
+            "description": "<p>각 요일에 알람이 on 상태인지 여부를 나타냅니다</br> 배열의 사이즈는 7이며 [0-6] 인덱스는 [월-일] 을 표시합니다.</br></p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5da6bee89d02807cd9288a5a\",\n    \"title\": \"알람테스트3 - modified\",\n    \"hour\": 10,\n    \"minute\": 20,\n    \"ampm\": \"AM\",\n    \"day_selected\":[true, true, false, true, false, false, true],\n    \"isAlarmOn\": true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NO_JWT",
+            "description": "<p>JWT 가 헤더에 실려있지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_JWT",
+            "description": "<p>JWT 가 유효하지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NOUSER_DB",
+            "description": "<p>해당 유저의 정보가 DB에서 찾을 수 없습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ERR_CRUDDB",
+            "description": "<p>내부 DB 작업에 실패하였습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_TIME",
+            "description": "<p>시간 값이 유효하지 않습니다 hour(0-23), minute(0-59)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "LENGTH_ARRAY",
+            "description": "<p>day_selected 배열의 사이즈가 7이 아닙니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "실패 : NO_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"NO_JWT\",\n    \"message\": \"Please put JWT in your request header!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INAVLID_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"INVALID_JWT\",\n    \"message\": \"Your JWT is invalid!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : NOUSER_DB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"NOUSER_DB\",\n    \"message\": \"Cannot find userId in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : ERR_CRUDDB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"ERR_CRUDDB\",\n    \"message\": \"Cannot CRUD your Todo in database!\",\n    \"status\": 400\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/alarm.js",
+    "groupTitle": "Alarm"
+  },
+  {
+    "type": "delete",
+    "url": "/calendar/:_id?calendarId=:calendarId",
+    "title": "DeleteCalendar",
+    "name": "DeleteCalendar",
+    "group": "Calendar",
+    "description": "<p>기존의 캘린더 일정을 삭제합니다.</br></p> <pre><code>_id 값은 GET 을 통해 넘어온 calendar 의 _id 값이며,&lt;/br&gt; URL 을 통해 삭제하고자 하는 특정 calendar 일정을 지정할 수 있습니다.&lt;/br&gt;</code></pre>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "query string": [
+          {
+            "group": "query string",
+            "type": "String",
+            "optional": false,
+            "field": ":calendarId",
+            "description": "<p>불러올 캘린더의 id 를 적습니다. (기본 : primary)</p>"
+          }
+        ],
+        "params": [
+          {
+            "group": "params",
+            "type": "String",
+            "optional": false,
+            "field": ":_id",
             "description": "<p>URL 의 path 에 올려야 하는 해당 일정의 고유번호입니다.</p>"
           }
         ]
@@ -743,7 +955,7 @@ define({ "api": [
       "examples": [
         {
           "title": "파라미터(url) 예제",
-          "content": "URL : http://169.56.98.117/calendar/b25dtstnmhjk4rploc5gl2vvks",
+          "content": "URL : http://169.56.98.117/calendar/b25dtstnmhjk4rploc5gl2vvks?l8162nkuj54205lks5fmkotqtk@group.calendar.google.com",
           "type": "path"
         }
       ]
@@ -833,7 +1045,144 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/calendar/certainday/:year/:month/:day",
+    "url": "/calendar/calendar-list",
+    "title": "GetCalendarLists",
+    "name": "GetCalendarLists",
+    "group": "Calendar",
+    "description": "<p>해당 계정이 보유한 캘린더 리스트의 종류를 가져옵니다.</br></p> <pre><code>_id 값을 통해 어떠한 캘린더의 정보를 CRUD 할 것인지 다른 api 호출을 쿼리스트링으로 지정할 수 있습니다.&lt;/br&gt;</code></pre>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "null",
+            "optional": false,
+            "field": "No",
+            "description": "<p>Parameter 요청 파라미터 없음.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(x) 예제",
+          "content": "No Parameter",
+          "type": "null"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>각 캘린더 종류의 고유 id 값을 나타냅니다</br> 캘린더 이벤트의 CRUD api 를 호출할 때 ?calendarId=_id 로 </br> 어떤 캘린더의 이벤트를 조작할 것인지 선택할 수 있습니다.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "summary",
+            "description": "<p>해당 캘린더의 제목</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "primary",
+            "description": "<p>계정의 기본 캘린더를 의미합니다.</br> 다른 api 를 호출할때 쿼리스트링을 지정하지 않으면 </br> primary=true 로 지정된 캘린더 id 가 자동으로 지정됩니다. </br></p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n[\n    {\n        \"_id\": \"l8162nkuj54205lks5fmkotqtk@group.calendar.google.com\",\n        \"summary\": \"Us\"\n    },\n    {\n        \"_id\": \"dfjung4254@gmail.com\",\n        \"summary\": \"dfjung4254@gmail.com\",\n        \"primary\": true\n    },\n    {\n        \"_id\": \"addressbook#contacts@group.v.calendar.google.com\",\n        \"summary\": \"Contacts\"\n    },\n    {\n        \"_id\": \"ko.south_korea#holiday@group.v.calendar.google.com\",\n        \"summary\": \"대한민국의 휴일\"\n    }\n]",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NO_JWT",
+            "description": "<p>JWT 가 헤더에 실려있지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_JWT",
+            "description": "<p>JWT 가 유효하지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NOUSER_DB",
+            "description": "<p>해당 유저의 정보가 DB에서 찾을 수 없습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "FAILED_GOOGLE",
+            "description": "<p>Google API 를 호출하는데 실패하였습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "실패 : NO_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"NO_JWT\",\n    \"message\": \"Please put JWT in your request header!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INAVLID_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"INVALID_JWT\",\n    \"message\": \"Your JWT is invalid!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : NOUSER_DB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"NOUSER_DB\",\n    \"message\": \"Cannot find userId in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : FAILED_GOOGLE",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"FAILED_GOOGLE\",\n    \"message\": \"Failed to GET google calendar api!\",\n    \"status\": 500\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/calendar.js",
+    "groupTitle": "Calendar"
+  },
+  {
+    "type": "get",
+    "url": "/calendar/certainday/:year/:month/:day?calendarId=:calendarId",
     "title": "GetCertainDay",
     "name": "GetCertainDay",
     "group": "Calendar",
@@ -860,34 +1209,43 @@ define({ "api": [
     },
     "parameter": {
       "fields": {
-        "Parameter": [
+        "params": [
           {
-            "group": "Parameter",
+            "group": "params",
             "type": "Number",
             "optional": false,
             "field": ":year",
             "description": "<p>URL에 가져올 일정의 날짜의 년도를 적습니다. (yyyy)</p>"
           },
           {
-            "group": "Parameter",
+            "group": "params",
             "type": "Number",
             "optional": false,
             "field": ":month",
             "description": "<p>URL에 가져올 일정의 날짜의 월을 적습니다. (m 또는 mm)</p>"
           },
           {
-            "group": "Parameter",
+            "group": "params",
             "type": "Number",
             "optional": false,
             "field": ":day",
             "description": "<p>URL에 가져올 일정의 날짜의 일을 적습니다. (d 또는 dd)</p>"
+          }
+        ],
+        "query string": [
+          {
+            "group": "query string",
+            "type": "String",
+            "optional": false,
+            "field": ":calendarId",
+            "description": "<p>불러올 캘린더의 id 를 적습니다. (기본 : primary)</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "파라미터(url) 예제",
-          "content": "http://169.56.98.117/calendar/certainday/2019/8/29",
+          "content": "http://169.56.98.117/calendar/certainday/2019/8/29?calendarId=l8162nkuj54205lks5fmkotqtk@group.calendar.google.com",
           "type": "path"
         }
       ]
@@ -1058,7 +1416,7 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/calendar/certainmonth/:year/:month",
+    "url": "/calendar/certainmonth/:year/:month?calendarId=:calendarId",
     "title": "GetCertainMonth",
     "name": "GetCertainMonth",
     "group": "Calendar",
@@ -1085,27 +1443,36 @@ define({ "api": [
     },
     "parameter": {
       "fields": {
-        "Parameter": [
+        "params": [
           {
-            "group": "Parameter",
+            "group": "params",
             "type": "Number",
             "optional": false,
             "field": ":year",
             "description": "<p>URL에 가져올 일정의 날짜의 년도를 적습니다. (yyyy)</p>"
           },
           {
-            "group": "Parameter",
+            "group": "params",
             "type": "Number",
             "optional": false,
             "field": ":month",
             "description": "<p>URL에 가져올 일정의 날짜의 월을 적습니다. (m 또는 mm)</p>"
+          }
+        ],
+        "query string": [
+          {
+            "group": "query string",
+            "type": "String",
+            "optional": false,
+            "field": ":calendarId",
+            "description": "<p>불러올 캘린더의 id 를 적습니다. (기본 : primary)</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "파라미터(url) 예제",
-          "content": "http://169.56.98.117/calendar/certainmonth/2019/8",
+          "content": "http://169.56.98.117/calendar/certainmonth/2019/8?calendarId=l8162nkuj54205lks5fmkotqtk@group.calendar.google.com",
           "type": "path"
         }
       ]
@@ -1276,8 +1643,8 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/calendar/next/:nextCount",
-    "title": "GetNextLists",
+    "url": "/calendar/next/:nextCount?calendarId=:calendarId",
+    "title": "GetNextEvents",
     "name": "GetNextLists",
     "group": "Calendar",
     "description": "<p>현재 시간으로부터 다음 :nextCount 개의 일정을 가져옵니다.</br> 달력리스트는 JSONObject 형태로 리턴되는 것이 아니라</br> JSONArray 형태로 리턴되는것에 유의하셔야 합니다.</br> post 로 들어온 유저의 JWT 값을 인증하고</br> userId 값으로 DB를 조회하여 googleToken을 조회한 후</br> 구글 Calendar api 를 호출한다.</br> 다음 primary calendar의 다음 10일 일정을 받아서</br> 반환한다.</br></br></p> <ul> <li>10일 이 아닐 경우 body 에 nextCount : 12 이런식으로</br> 불러올 리스트의 개수를 parameter로 넣어서 호출한다.</br></li> </ul>",
@@ -1303,20 +1670,29 @@ define({ "api": [
     },
     "parameter": {
       "fields": {
-        "Parameter": [
+        "params": [
           {
-            "group": "Parameter",
+            "group": "params",
             "type": "Number",
             "optional": false,
             "field": ":nextCount",
             "description": "<p>URL에 가져올 일정의 최대 개수를 적습니다.(Max 2500)</p>"
+          }
+        ],
+        "query string": [
+          {
+            "group": "query string",
+            "type": "String",
+            "optional": false,
+            "field": ":calendarId",
+            "description": "<p>불러올 캘린더의 id 를 적습니다. (기본 : primary)</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "파라미터(url) 예제",
-          "content": "http://169.56.98.117/calendar/next/5",
+          "content": "http://169.56.98.117/calendar/next/5?calendarId=l8162nkuj54205lks5fmkotqtk@group.calendar.google.com",
           "type": "path"
         }
       ]
@@ -1476,7 +1852,7 @@ define({ "api": [
   },
   {
     "type": "post",
-    "url": "/calendar",
+    "url": "/calendar?calendarId=:calendarId",
     "title": "InsertCalendar",
     "name": "InsertCalendar",
     "group": "Calendar",
@@ -1503,51 +1879,60 @@ define({ "api": [
     },
     "parameter": {
       "fields": {
-        "Parameter": [
+        "query string": [
           {
-            "group": "Parameter",
+            "group": "query string",
+            "type": "String",
+            "optional": false,
+            "field": ":calendarId",
+            "description": "<p>불러올 캘린더의 id 를 적습니다. (기본 : primary)</p>"
+          }
+        ],
+        "body": [
+          {
+            "group": "body",
             "type": "String",
             "optional": false,
             "field": "title",
             "description": "<p>달력 일정의 타이틀</p>"
           },
           {
-            "group": "Parameter",
+            "group": "body",
             "type": "String",
             "optional": false,
             "field": "memo",
             "description": "<p>달력 일정의 메모</p>"
           },
           {
-            "group": "Parameter",
+            "group": "body",
             "type": "Date",
             "optional": false,
             "field": "startTime",
             "description": "<p>달력 일정의 시작시간</br> ISOString 형태로 전달이 됩니다.</br> RFC3339 표준 시간 형식을 사용하며</br> JAVA 에서는 new Date().toISOString()</br> &quot;2019-08-14T09:25:50.136Z&quot; 의 형식으로 request 하면될겁니다</br> (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br> new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br> ISOString() 화 하여 바디에 startTime 에 넣어주시면 될겁니다.</br></p>"
           },
           {
-            "group": "Parameter",
+            "group": "body",
             "type": "Date",
             "optional": false,
             "field": "endTime",
             "description": "<p>달력 일정의 종료시간</br> ISOString 형태로 전달이 됩니다.</br> RFC3339 표준 시간 형식을 사용하며</br> JAVA 에서는 new Date().toISOString()</br> &quot;2019-08-14T09:25:50.136Z&quot; 의 형식으로 request 하면될겁니다</br> (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br> new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br> ISOString() 화 하여 바디에 endTime 에 넣어주시면 될겁니다.</br></p>"
           },
           {
-            "group": "Parameter",
+            "group": "body",
             "type": "String",
             "optional": false,
             "field": "location",
             "description": "<p>달력 일정의 장소</p>"
           },
           {
-            "group": "Parameter",
+            "group": "body",
             "type": "People[]",
             "optional": false,
             "field": "people",
             "description": "<p>다른 참여자가 있을 경우 people배열에 이메일을 포함해주시면 됩니다.</p>"
           },
           {
-            "group": "Parameter",
+            "group": "body",
             "type": "String",
             "optional": false,
             "field": "people-email",
@@ -1560,6 +1945,11 @@ define({ "api": [
           "title": "파라미터(body) 예제",
           "content": "    {\n    \t\"title\": \"POST 달력 등록 테스트\",\n\t    \"memo\": \"내용이 추가된다\",\n    \t\"startTime\": \"2019-10-8T04:00:00+09:00\",\n\t    \"endTime\": \"2019-10-8T05:00:00+09:00\",\n\t    \"location\": \"장소는 우리집 ㅋ\",\n        \"people\":\n        [\n            // 자기 자신은 people 에 넣지 않습니다(자동으로 추가됨)\n            {\n                // 초대할 참가자 이메일 1\n                \"email\":\"zohizohi@naver.com\"\n            },\n            {\n                // 초대할 참가자 이메일 2\n                \"email\":\"thals_7@naver.com\" \n            }\n        ]\n    }",
           "type": "json"
+        },
+        {
+          "title": "파라미터(url) 예제",
+          "content": "http://169.56.98.117/calendar?calendarId=l8162nkuj54205lks5fmkotqtk@group.calendar.google.com",
+          "type": "path"
         }
       ]
     },
@@ -1729,7 +2119,7 @@ define({ "api": [
   },
   {
     "type": "put",
-    "url": "/calendar/:_id",
+    "url": "/calendar/:_id?calendarId=:calendarId",
     "title": "UpdateCalendar",
     "name": "UpdateCalendar",
     "group": "Calendar",
@@ -1756,62 +2146,73 @@ define({ "api": [
     },
     "parameter": {
       "fields": {
-        "Parameter": [
+        "query string": [
           {
-            "group": "Parameter",
+            "group": "query string",
+            "type": "String",
+            "optional": false,
+            "field": ":calendarId",
+            "description": "<p>불러올 캘린더의 id 를 적습니다. (기본 : primary)</p>"
+          }
+        ],
+        "params": [
+          {
+            "group": "params",
+            "type": "String",
+            "optional": false,
+            "field": ":_id",
+            "description": "<p>URL 의 path 에 올려야 하는 해당 일정의 고유번호입니다.</p>"
+          }
+        ],
+        "body": [
+          {
+            "group": "body",
             "type": "String",
             "optional": false,
             "field": "title",
             "description": "<p>달력 일정의 타이틀</p>"
           },
           {
-            "group": "Parameter",
+            "group": "body",
             "type": "String",
             "optional": false,
             "field": "memo",
             "description": "<p>달력 일정의 메모</p>"
           },
           {
-            "group": "Parameter",
+            "group": "body",
             "type": "Date",
             "optional": false,
             "field": "startTime",
             "description": "<p>달력 일정의 시작시간</br> ISOString 형태로 전달이 됩니다.</br> RFC3339 표준 시간 형식을 사용하며</br> JAVA 에서는 new Date().toISOString()</br> &quot;2019-08-14T09:25:50.136Z&quot; 의 형식으로 request 하면될겁니다</br> (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br> new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br> ISOString() 화 하여 바디에 startTime 에 넣어주시면 될겁니다.</br></p>"
           },
           {
-            "group": "Parameter",
+            "group": "body",
             "type": "Date",
             "optional": false,
             "field": "endTime",
             "description": "<p>달력 일정의 종료시간</br> ISOString 형태로 전달이 됩니다.</br> RFC3339 표준 시간 형식을 사용하며</br> JAVA 에서는 new Date().toISOString()</br> &quot;2019-08-14T09:25:50.136Z&quot; 의 형식으로 request 하면될겁니다</br> (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br> new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br> ISOString() 화 하여 바디에 endTime 에 넣어주시면 될겁니다.</br></p>"
           },
           {
-            "group": "Parameter",
+            "group": "body",
             "type": "String",
             "optional": false,
             "field": "location",
             "description": "<p>달력 일정의 장소</p>"
           },
           {
-            "group": "Parameter",
+            "group": "body",
             "type": "People[]",
             "optional": false,
             "field": "people",
             "description": "<p>다른 참여자가 있을 경우 people배열에 이메일을 포함해주시면 됩니다.</p>"
           },
           {
-            "group": "Parameter",
+            "group": "body",
             "type": "String",
             "optional": false,
             "field": "people-email",
             "description": "<p>각 people 객체에 email 값만 추가해주면 해당 참여자에게도 일정이 표시됩니다.</br> 단 이때, 타인의 이메일만 넣기만 하면 되고 자기 자신은 추가하지 않습니다.</br> 다른 사람의 email만 배열에 추가하여 요청하면 자동으로 자기자신도 people에 추가됨.</br></p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": ":_id",
-            "description": "<p>URL 의 path 에 올려야 하는 해당 일정의 고유번호입니다.</p>"
           }
         ]
       },
@@ -1823,7 +2224,7 @@ define({ "api": [
         },
         {
           "title": "파라미터(url) 예제",
-          "content": "URL : http://169.56.98.117/calendar/b25dtstnmhjk4rploc5gl2vvks",
+          "content": "URL : http://169.56.98.117/calendar/b25dtstnmhjk4rploc5gl2vvks?calendarId=l8162nkuj54205lks5fmkotqtk@group.calendar.google.com",
           "type": "path"
         }
       ]

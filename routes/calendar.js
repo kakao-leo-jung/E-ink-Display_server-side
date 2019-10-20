@@ -9,7 +9,7 @@ var router = express.Router();
 
 /**
 
-    @api {get} /calendar/next/:nextCount GetNextLists
+    @api {get} /calendar/next/:nextCount?calendarId=:calendarId GetNextEvents
     @apiName GetNextLists
     @apiGroup Calendar
     @apiDescription
@@ -21,7 +21,6 @@ var router = express.Router();
     구글 Calendar api 를 호출한다.</br>
     다음 primary calendar의 다음 10일 일정을 받아서</br>
     반환한다.</br></br>
-
     ** 10일 이 아닐 경우 body 에 nextCount : 12 이런식으로</br>
     불러올 리스트의 개수를 parameter로 넣어서 호출한다.</br>
 
@@ -32,9 +31,10 @@ var router = express.Router();
         "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
     }
 
-    @apiParam {Number} :nextCount URL에 가져올 일정의 최대 개수를 적습니다.(Max 2500)
+    @apiParam (params) {Number}        :nextCount   URL에 가져올 일정의 최대 개수를 적습니다.(Max 2500)
+    @apiParam (query string) {String}  :calendarId  불러올 캘린더의 id 를 적습니다. (기본 : primary)
     @apiParamExample {path} 파라미터(url) 예제
-    http://169.56.98.117/calendar/next/5
+    http://169.56.98.117/calendar/next/5?calendarId=l8162nkuj54205lks5fmkotqtk@group.calendar.google.com
 
     @apiSuccess {String}  _id                       현재 캘린더 정보의 고유 id 값, _id를 통해 PUT, DELETE 할 수 있습니다.
     @apiSuccess {Number}  day                       몇 일인지 나타냅니다. startTime 기준으로 일정의 시작일을 나타냅니다.
@@ -148,6 +148,9 @@ router.get('/next/:nextCount', async (req, res, next) => {
         /* 달력의 일정리스트 호출 개수의 디폴트값은 10이다. */
         var maxCount = req.params.nextCount;
 
+        var calendarId = req.query.calendarId;
+        if(!calendarId) calendarId = 'primary';
+
         /*
 
             userId 값을 통해 db의 AuthCode 값을 조회한다.
@@ -157,7 +160,7 @@ router.get('/next/:nextCount', async (req, res, next) => {
         */
         var authInfo = await authentication.getAuthCode(decoded.userId);
         var authClient = authInfo.oAuth2Client;
-        var resObj = await calendar_call.listEvents(authClient, 'primary', new Date(), null, maxCount);
+        var resObj = await calendar_call.listEvents(authClient, calendarId, new Date(), null, maxCount);
 
         next(resObj);
 
@@ -169,7 +172,7 @@ router.get('/next/:nextCount', async (req, res, next) => {
 
 /**
 
-    @api {get} /calendar/certainday/:year/:month/:day GetCertainDay
+    @api {get} /calendar/certainday/:year/:month/:day?calendarId=:calendarId GetCertainDay
     @apiName GetCertainDay
     @apiGroup Calendar
     @apiDescription
@@ -195,11 +198,12 @@ router.get('/next/:nextCount', async (req, res, next) => {
         "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
     }
 
-    @apiParam {Number} :year    URL에 가져올 일정의 날짜의 년도를 적습니다. (yyyy)
-    @apiParam {Number} :month   URL에 가져올 일정의 날짜의 월을 적습니다. (m 또는 mm)
-    @apiParam {Number} :day     URL에 가져올 일정의 날짜의 일을 적습니다. (d 또는 dd)
+    @apiParam (params)       {Number}  :year        URL에 가져올 일정의 날짜의 년도를 적습니다. (yyyy)
+    @apiParam (params)       {Number}  :month       URL에 가져올 일정의 날짜의 월을 적습니다. (m 또는 mm)
+    @apiParam (params)       {Number}  :day         URL에 가져올 일정의 날짜의 일을 적습니다. (d 또는 dd)
+    @apiParam (query string) {String}  :calendarId  불러올 캘린더의 id 를 적습니다. (기본 : primary)
     @apiParamExample {path} 파라미터(url) 예제
-    http://169.56.98.117/calendar/certainday/2019/8/29
+    http://169.56.98.117/calendar/certainday/2019/8/29?calendarId=l8162nkuj54205lks5fmkotqtk@group.calendar.google.com
 
     @apiSuccess {String}  _id                       현재 캘린더 정보의 고유 id 값, _id를 통해 PUT, DELETE 할 수 있습니다.
     @apiSuccess {Number}  day                       몇 일인지 나타냅니다. startTime 기준으로 일정의 시작일을 나타냅니다.
@@ -317,6 +321,9 @@ router.get('/certainday/:year/:month/:day', async (req, res, next) => {
         var _month = req.params.month;
         var _day = req.params.day;
 
+        var calendarId = req.query.calendarId;
+        if(!calendarId) calendarId = 'primary';
+
         /* 날짜 유효성 검사 */
         if (_month > 12 || _month < 1 || _day > 31 || _day < 1) {
             throw (errorSet.createError(errorSet.es.INVALID_DATE, new Error().stack));
@@ -328,7 +335,7 @@ router.get('/certainday/:year/:month/:day', async (req, res, next) => {
 
         var authInfo = await authentication.getAuthCode(decoded.userId);
         var authClient = authInfo.oAuth2Client;
-        var resObj = await calendar_call.listEvents(authClient, 'primary', _minDate, _maxDate, null);
+        var resObj = await calendar_call.listEvents(authClient, calendarId, _minDate, _maxDate, null);
 
         next(resObj);
 
@@ -340,7 +347,7 @@ router.get('/certainday/:year/:month/:day', async (req, res, next) => {
 
 /**
 
-    @api {get} /calendar/certainmonth/:year/:month GetCertainMonth
+    @api {get} /calendar/certainmonth/:year/:month?calendarId=:calendarId GetCertainMonth
     @apiName GetCertainMonth
     @apiGroup Calendar
     @apiDescription
@@ -357,10 +364,11 @@ router.get('/certainday/:year/:month/:day', async (req, res, next) => {
         "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
     }
 
-    @apiParam {Number} :year    URL에 가져올 일정의 날짜의 년도를 적습니다. (yyyy)
-    @apiParam {Number} :month   URL에 가져올 일정의 날짜의 월을 적습니다. (m 또는 mm)
+    @apiParam (params)       {Number}  :year        URL에 가져올 일정의 날짜의 년도를 적습니다. (yyyy)
+    @apiParam (params)       {Number}  :month       URL에 가져올 일정의 날짜의 월을 적습니다. (m 또는 mm)
+    @apiParam (query string) {String}  :calendarId  불러올 캘린더의 id 를 적습니다. (기본 : primary)
     @apiParamExample {path} 파라미터(url) 예제
-    http://169.56.98.117/calendar/certainmonth/2019/8
+    http://169.56.98.117/calendar/certainmonth/2019/8?calendarId=l8162nkuj54205lks5fmkotqtk@group.calendar.google.com
 
     @apiSuccess {String}  _id                       현재 캘린더 정보의 고유 id 값, _id를 통해 PUT, DELETE 할 수 있습니다.
     @apiSuccess {Number}  day                       몇 일인지 나타냅니다. startTime 기준으로 일정의 시작일을 나타냅니다.
@@ -488,6 +496,9 @@ router.get('/certainmonth/:year/:month', async (req, res, next) => {
         var _year = req.params.year;
         var _month = req.params.month;
 
+        var calendarId = req.query.calendarId;
+        if(!calendarId) calendarId = 'primary';
+
         if (_month > 12 || _month < 1) {
             throw (errorSet.createError(errorSet.es.INVALID_DATE, new Error().stack));
         }
@@ -497,7 +508,7 @@ router.get('/certainmonth/:year/:month', async (req, res, next) => {
 
         var authInfo = await authentication.getAuthCode(decoded.userId);
         var authClient = authInfo.oAuth2Client;
-        var resObj = await calendar_call.listEvents(authClient, 'primary', _minDate, _maxDate, null);
+        var resObj = await calendar_call.listEvents(authClient, calendarId, _minDate, _maxDate, null);
 
         next(resObj);
 
@@ -509,7 +520,7 @@ router.get('/certainmonth/:year/:month', async (req, res, next) => {
 
 /**
 
-    @api {post} /calendar InsertCalendar
+    @api {post} /calendar?calendarId=:calendarId InsertCalendar
     @apiName InsertCalendar
     @apiGroup Calendar
     @apiDescription
@@ -524,29 +535,30 @@ router.get('/certainmonth/:year/:month', async (req, res, next) => {
         "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
     }
 
-    @apiParam {String}    title         달력 일정의 타이틀
-    @apiParam {String}    memo          달력 일정의 메모
-    @apiParam {Date}      startTime     달력 일정의 시작시간</br>
-                                        ISOString 형태로 전달이 됩니다.</br>
-                                        RFC3339 표준 시간 형식을 사용하며</br>
-                                        JAVA 에서는 new Date().toISOString()</br>
-                                        "2019-08-14T09:25:50.136Z" 의 형식으로 request 하면될겁니다</br>
-                                        (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br>
-                                        new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br>
-                                        ISOString() 화 하여 바디에 startTime 에 넣어주시면 될겁니다.</br>
-    @apiParam {Date}      endTime       달력 일정의 종료시간</br>
-                                        ISOString 형태로 전달이 됩니다.</br>
-                                        RFC3339 표준 시간 형식을 사용하며</br>
-                                        JAVA 에서는 new Date().toISOString()</br>
-                                        "2019-08-14T09:25:50.136Z" 의 형식으로 request 하면될겁니다</br>
-                                        (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br>
-                                        new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br>
-                                        ISOString() 화 하여 바디에 endTime 에 넣어주시면 될겁니다.</br>
-    @apiParam {String}    location      달력 일정의 장소
-    @apiParam {People[]}  people        다른 참여자가 있을 경우 people배열에 이메일을 포함해주시면 됩니다.
-    @apiParam {String}    people-email  각 people 객체에 email 값만 추가해주면 해당 참여자에게도 일정이 표시됩니다.</br>
-                                        단 이때, 타인의 이메일만 넣기만 하면 되고 자기 자신은 추가하지 않습니다.</br>
-                                        다른 사람의 email만 배열에 추가하여 요청하면 자동으로 자기자신도 people에 추가됨.</br>
+    @apiParam (query string) {String}  :calendarId      불러올 캘린더의 id 를 적습니다. (기본 : primary)
+    @apiParam (body)         {String}  title            달력 일정의 타이틀
+    @apiParam (body)         {String}  memo             달력 일정의 메모
+    @apiParam (body)         {Date}    startTime        달력 일정의 시작시간</br>
+                                                        ISOString 형태로 전달이 됩니다.</br>
+                                                        RFC3339 표준 시간 형식을 사용하며</br>
+                                                        JAVA 에서는 new Date().toISOString()</br>
+                                                        "2019-08-14T09:25:50.136Z" 의 형식으로 request 하면될겁니다</br>
+                                                        (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br>
+                                                        new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br>
+                                                        ISOString() 화 하여 바디에 startTime 에 넣어주시면 될겁니다.</br>
+    @apiParam (body)         {Date}    endTime          달력 일정의 종료시간</br>
+                                                        ISOString 형태로 전달이 됩니다.</br>
+                                                        RFC3339 표준 시간 형식을 사용하며</br>
+                                                        JAVA 에서는 new Date().toISOString()</br>
+                                                        "2019-08-14T09:25:50.136Z" 의 형식으로 request 하면될겁니다</br>
+                                                        (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br>
+                                                        new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br>
+                                                        ISOString() 화 하여 바디에 endTime 에 넣어주시면 될겁니다.</br>
+    @apiParam (body)         {String}    location       달력 일정의 장소
+    @apiParam (body)         {People[]}  people         다른 참여자가 있을 경우 people배열에 이메일을 포함해주시면 됩니다.
+    @apiParam (body)         {String}    people-email   각 people 객체에 email 값만 추가해주면 해당 참여자에게도 일정이 표시됩니다.</br>
+                                                        단 이때, 타인의 이메일만 넣기만 하면 되고 자기 자신은 추가하지 않습니다.</br>
+                                                        다른 사람의 email만 배열에 추가하여 요청하면 자동으로 자기자신도 people에 추가됨.</br>
     @apiParamExample {json} 파라미터(body) 예제
     {
     	"title": "POST 달력 등록 테스트",
@@ -567,6 +579,8 @@ router.get('/certainmonth/:year/:month', async (req, res, next) => {
             }
         ]
     }
+    @apiParamExample {path} 파라미터(url) 예제
+    http://169.56.98.117/calendar?calendarId=l8162nkuj54205lks5fmkotqtk@group.calendar.google.com
 
     @apiSuccess {String}  _id                       현재 캘린더 정보의 고유 id 값, _id를 통해 PUT, DELETE 할 수 있습니다.
     @apiSuccess {Number}  day                       몇 일인지 나타냅니다. startTime 기준으로 일정의 시작일을 나타냅니다.
@@ -679,6 +693,9 @@ router.post('/', async (req, res, next) => {
         var decoded = authentication.verifyJwt(req);
         var reqCalendar = req.body;
 
+        var calendarId = req.query.calendarId;
+        if(!calendarId) calendarId = 'primary';
+
         /* FIXME: body 에 대한 예외 처리 더 다양하게! */
         if (!reqCalendar) {
             throw (errorSet.createError(errorSet.es.NO_CALENDARBODY, new Error().stack));
@@ -686,7 +703,7 @@ router.post('/', async (req, res, next) => {
 
         var authInfo = await authentication.getAuthCode(decoded.userId);
         /* FIXME: 현재는 달력을 'primary' 에서만 처리하는데 안드로이드와 협의 후 다양한 달력list 사용하도록. */
-        var resObj = await calendar_call.postEvents(authInfo, 'primary', reqCalendar);
+        var resObj = await calendar_call.postEvents(authInfo, calendarId, reqCalendar);
 
         next(resObj);
 
@@ -698,7 +715,7 @@ router.post('/', async (req, res, next) => {
 
 /**
 
-    @api {put} /calendar/:_id UpdateCalendar
+    @api {put} /calendar/:_id?calendarId=:calendarId UpdateCalendar
     @apiName UpdateCalendar
     @apiGroup Calendar
     @apiDescription
@@ -716,30 +733,31 @@ router.post('/', async (req, res, next) => {
         "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
     }
 
-    @apiParam {String}    title         달력 일정의 타이틀
-    @apiParam {String}    memo          달력 일정의 메모
-    @apiParam {Date}      startTime     달력 일정의 시작시간</br>
-                                        ISOString 형태로 전달이 됩니다.</br>
-                                        RFC3339 표준 시간 형식을 사용하며</br>
-                                        JAVA 에서는 new Date().toISOString()</br>
-                                        "2019-08-14T09:25:50.136Z" 의 형식으로 request 하면될겁니다</br>
-                                        (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br>
-                                        new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br>
-                                        ISOString() 화 하여 바디에 startTime 에 넣어주시면 될겁니다.</br>
-    @apiParam {Date}      endTime       달력 일정의 종료시간</br>
-                                        ISOString 형태로 전달이 됩니다.</br>
-                                        RFC3339 표준 시간 형식을 사용하며</br>
-                                        JAVA 에서는 new Date().toISOString()</br>
-                                        "2019-08-14T09:25:50.136Z" 의 형식으로 request 하면될겁니다</br>
-                                        (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br>
-                                        new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br>
-                                        ISOString() 화 하여 바디에 endTime 에 넣어주시면 될겁니다.</br>
-    @apiParam {String}    location      달력 일정의 장소
-    @apiParam {People[]}  people        다른 참여자가 있을 경우 people배열에 이메일을 포함해주시면 됩니다.
-    @apiParam {String}    people-email  각 people 객체에 email 값만 추가해주면 해당 참여자에게도 일정이 표시됩니다.</br>
-                                        단 이때, 타인의 이메일만 넣기만 하면 되고 자기 자신은 추가하지 않습니다.</br>
-                                        다른 사람의 email만 배열에 추가하여 요청하면 자동으로 자기자신도 people에 추가됨.</br>
-    @apiParam {String}    :_id          URL 의 path 에 올려야 하는 해당 일정의 고유번호입니다.
+    @apiParam (query string) {String}    :calendarId      불러올 캘린더의 id 를 적습니다. (기본 : primary)   
+    @apiParam (params)       {String}    :_id             URL 의 path 에 올려야 하는 해당 일정의 고유번호입니다.
+    @apiParam (body)         {String}    title            달력 일정의 타이틀
+    @apiParam (body)         {String}    memo             달력 일정의 메모
+    @apiParam (body)         {Date}      startTime        달력 일정의 시작시간</br>
+                                                          ISOString 형태로 전달이 됩니다.</br>
+                                                          RFC3339 표준 시간 형식을 사용하며</br>
+                                                          JAVA 에서는 new Date().toISOString()</br>
+                                                          "2019-08-14T09:25:50.136Z" 의 형식으로 request 하면될겁니다</br>
+                                                          (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br>
+                                                          new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br>
+                                                          ISOString() 화 하여 바디에 startTime 에 넣어주시면 될겁니다.</br>
+    @apiParam (body)         {Date}      endTime          달력 일정의 종료시간</br>
+                                                          ISOString 형태로 전달이 됩니다.</br>
+                                                          RFC3339 표준 시간 형식을 사용하며</br>
+                                                          JAVA 에서는 new Date().toISOString()</br>
+                                                          "2019-08-14T09:25:50.136Z" 의 형식으로 request 하면될겁니다</br>
+                                                          (자바 클래스로는 테스트 안해봤음, 실험필요)</br></br>
+                                                          new Date() 로 원하는 날짜, 시간을 설정한 다음 그 Date 객체를</br>
+                                                          ISOString() 화 하여 바디에 endTime 에 넣어주시면 될겁니다.</br>
+    @apiParam (body)         {String}    location         달력 일정의 장소
+    @apiParam (body)         {People[]}  people           다른 참여자가 있을 경우 people배열에 이메일을 포함해주시면 됩니다.
+    @apiParam (body)         {String}    people-email     각 people 객체에 email 값만 추가해주면 해당 참여자에게도 일정이 표시됩니다.</br>
+                                                          단 이때, 타인의 이메일만 넣기만 하면 되고 자기 자신은 추가하지 않습니다.</br>
+                                                          다른 사람의 email만 배열에 추가하여 요청하면 자동으로 자기자신도 people에 추가됨.</br>
 
     @apiParamExample {json} 파라미터(body) 예제
     {
@@ -772,7 +790,7 @@ router.post('/', async (req, res, next) => {
         ]
     }
     @apiParamExample {path} 파라미터(url) 예제
-    URL : http://169.56.98.117/calendar/b25dtstnmhjk4rploc5gl2vvks
+    URL : http://169.56.98.117/calendar/b25dtstnmhjk4rploc5gl2vvks?calendarId=l8162nkuj54205lks5fmkotqtk@group.calendar.google.com
 
     @apiSuccess {String}  _id                       현재 캘린더 정보의 고유 id 값, _id를 통해 PUT, DELETE 할 수 있습니다.
     @apiSuccess {Number}  day                       몇 일인지 나타냅니다. startTime 기준으로 일정의 시작일을 나타냅니다.
@@ -880,13 +898,16 @@ router.put('/:_id', async (req, res, next) => {
         var reqCalendar = req.body;
         var _id = req.params._id;
 
+        var calendarId = req.query.calendarId;
+        if(!calendarId) calendarId = 'primary';
+
         /* FIXME: body 에 대한 예외 처리 더 다양하게! */
         if (!reqCalendar) {
             throw (errorSet.createError(errorSet.es.NO_CALENDARBODY, new Error().stack));
         }
 
         var authInfo = await authentication.getAuthCode(decoded.userId);
-        var resObj = await calendar_call.putEvents(authInfo, 'primary', _id, reqCalendar);
+        var resObj = await calendar_call.putEvents(authInfo, calendarId, _id, reqCalendar);
 
         next(resObj);
 
@@ -898,7 +919,7 @@ router.put('/:_id', async (req, res, next) => {
 
 /**
 
-    @api {delete} /calendar/:_id DeleteCalendar
+    @api {delete} /calendar/:_id?calendarId=:calendarId DeleteCalendar
     @apiName DeleteCalendar
     @apiGroup Calendar
     @apiDescription
@@ -914,9 +935,10 @@ router.put('/:_id', async (req, res, next) => {
         "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
     }
 
-    @apiParam {String}    :_id          URL 의 path 에 올려야 하는 해당 일정의 고유번호입니다.
+    @apiParam (query string) {String}    :calendarId      불러올 캘린더의 id 를 적습니다. (기본 : primary)    
+    @apiParam (params)       {String}    :_id             URL 의 path 에 올려야 하는 해당 일정의 고유번호입니다.
     @apiParamExample {path} 파라미터(url) 예제
-    URL : http://169.56.98.117/calendar/b25dtstnmhjk4rploc5gl2vvks
+    URL : http://169.56.98.117/calendar/b25dtstnmhjk4rploc5gl2vvks?l8162nkuj54205lks5fmkotqtk@group.calendar.google.com
 
     @apiSuccess {String}  message           캘린더 삭제에 성공 메세지가 담겨있습니다.
     @apiSuccess {Number}  status            캘린더 삭제 api 통신 상태는 200 입니다.
@@ -968,8 +990,11 @@ router.delete('/:_id', async (req, res, next) => {
         var decoded = authentication.verifyJwt(req);
         var _id = req.params._id;
 
+        var calendarId = req.query.calendarId;
+        if(!calendarId) calendarId = 'primary';
+
         var authInfo = await authentication.getAuthCode(decoded.userId);
-        var resObj = await calendar_call.deleteEvents(authInfo, 'primary', _id);
+        var resObj = await calendar_call.deleteEvents(authInfo, calendarId, _id);
 
         next(resObj);
 
@@ -979,11 +1004,89 @@ router.delete('/:_id', async (req, res, next) => {
 
 });
 
-/*
+/**
 
-    /calendar/calendar-list    
+    @api {get} /calendar/calendar-list GetCalendarLists
+    @apiName GetCalendarLists
+    @apiGroup Calendar
+    @apiDescription
+    해당 계정이 보유한 캘린더 리스트의 종류를 가져옵니다.</br>
 
-    사용자의 캘린더 목록을 array로 가진 객체를 반환한다.
+    _id 값을 통해 어떠한 캘린더의 정보를 CRUD 할 것인지 다른 api 호출을 쿼리스트링으로 지정할 수 있습니다.</br>
+
+    @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
+    @apiHeaderExample {form} 헤더 예제
+    {
+        // retrofit2 : HashMap 에 key값은 "jwt", value값은 "eyJ..." 로 설정
+        "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
+    }
+
+    @apiParam {null} No Parameter 요청 파라미터 없음.
+    @apiParamExample {null} 파라미터(x) 예제
+    No Parameter    
+
+    @apiSuccess {String}  _id           각 캘린더 종류의 고유 id 값을 나타냅니다</br>
+                                        캘린더 이벤트의 CRUD api 를 호출할 때 ?calendarId=_id 로 </br>
+                                        어떤 캘린더의 이벤트를 조작할 것인지 선택할 수 있습니다.
+    @apiSuccess {String}  summary       해당 캘린더의 제목
+    @apiSuccess {Boolean} primary       계정의 기본 캘린더를 의미합니다.</br>
+                                        다른 api 를 호출할때 쿼리스트링을 지정하지 않으면 </br>
+                                        primary=true 로 지정된 캘린더 id 가 자동으로 지정됩니다. </br>
+    @apiSuccessExample 성공 시 응답 :
+    HTTP/1.1 200 OK
+    [
+        {
+            "_id": "l8162nkuj54205lks5fmkotqtk@group.calendar.google.com",
+            "summary": "Us"
+        },
+        {
+            "_id": "dfjung4254@gmail.com",
+            "summary": "dfjung4254@gmail.com",
+            "primary": true
+        },
+        {
+            "_id": "addressbook#contacts@group.v.calendar.google.com",
+            "summary": "Contacts"
+        },
+        {
+            "_id": "ko.south_korea#holiday@group.v.calendar.google.com",
+            "summary": "대한민국의 휴일"
+        }
+    ]
+
+    @apiError NO_JWT JWT 가 헤더에 실려있지 않습니다.
+    @apiError INVALID_JWT JWT 가 유효하지 않습니다.
+    @apiError NOUSER_DB 해당 유저의 정보가 DB에서 찾을 수 없습니다.
+    @apiError FAILED_GOOGLE Google API 를 호출하는데 실패하였습니다.
+
+    @apiErrorExample 실패 : NO_JWT
+    HTTP/1.1 401 Unauthorized
+    {
+        "name" : "NO_JWT",
+        "message": "Please put JWT in your request header!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : INAVLID_JWT
+    HTTP/1.1 401 Unauthorized
+    {
+        "name" : "INVALID_JWT",
+        "message": "Your JWT is invalid!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : NOUSER_DB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "NOUSER_DB",
+        "message": "Cannot find userId in database!",
+        "status": 500
+    }
+    @apiErrorExample 실패 : FAILED_GOOGLE
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "FAILED_GOOGLE",
+        "message": "Failed to GET google calendar api!",
+        "status": 500
+    }
 
 */
 router.get('/calendar-list', async (req, res, next) => {
