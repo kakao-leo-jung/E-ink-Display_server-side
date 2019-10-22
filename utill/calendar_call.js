@@ -153,7 +153,7 @@ exports.deleteEvents = async (authInfo, calendarId, eventId) => {
 
     await calendar.events.delete(params)
         .catch(err => {
-            throw (err);
+            throw (errorSet.createError(errorSet.es.FAILED_GOOGLE, err.stack));
         });
 
     var res = {
@@ -168,7 +168,7 @@ exports.deleteEvents = async (authInfo, calendarId, eventId) => {
 /*
 
     사용자의 캘린더 리스트들을 가져온다.
-    key값은 retObj.calendarName
+    리스트들을 캘린더[] 배열형태로 반환한다.
 
 */
 exports.listCalendars = async (auth) => {
@@ -185,14 +185,53 @@ exports.listCalendars = async (auth) => {
     for (const curItem of calendarList.data.items) {
 
         var retObj = {
-            _id : curItem.id,
-            summary : curItem.summary,
-            primary : curItem.primary
+            _id: curItem.id,
+            summary: curItem.summary,
+            description: curItem.description,
+            timeZone: curItem.timeZone,
+            primary: curItem.primary
         }
         retObjArray.push(retObj);
     }
 
     return retObjArray;
+
+}
+
+/*
+
+    사용자의 새로운 캘린더 리스트를 추가한다.
+    추가한 리스트의 정보를 반환한다.
+
+*/
+exports.addCalendarList = async (auth, calendarListBody) => {
+
+    const calendar = google.calendar({
+        version: 'v3',
+        auth
+    });
+
+    var params = new Object();
+
+    params.requestBody = {
+        summary: calendarListBody.summary,
+        description: calendarListBody.description,
+        timeZone: calendarListBody.timeZone
+    }
+
+    var res = await calendar.calendars.insert(params)
+        .catch(err => {
+            throw (errorSet.createError(errorSet.es.FAILED_GOOGLE, err.stack));
+        });
+
+    var retObj = {
+        _id: res.data.id,
+        summary: res.data.summary,
+        description: res.data.description,
+        timeZone: res.data.timeZone
+    }
+
+    return retObj;
 
 }
 
