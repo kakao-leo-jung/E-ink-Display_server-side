@@ -20,6 +20,10 @@ module.exports = (app) => {
     var users = require('../routes/users');
     app.use('/users', users);
 
+    /* 달력 리스트 정보 '/calendarList' 라우팅 */
+    var calendarList = require('../routes/calendarList');
+    app.use('/calendarList', calendarList);
+
     /* 달력 정보 '/calendar' 라우팅 */
     var calendar = require('../routes/calendar');
     app.use('/calendar', calendar);
