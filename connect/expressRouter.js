@@ -40,4 +40,9 @@ module.exports = (app) => {
     var alarm = require('../routes/alarm');
     app.use('/alarm', alarm);
 
+    /* Medicine 정보 '/medicine' 라우팅 */
+    var medicine = require('../routes/medicine');
+    app.use('/medicine',medicine)
+
+
 }

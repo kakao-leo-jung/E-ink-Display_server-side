@@ -10,4 +10,4 @@ var medicineSchema = new Schema({
   selected : Boolean
 });
 
-module.export = mongoose.model('medicine',medicineSchema);
+module.exports = mongoose.model('medicine',medicineSchema);
