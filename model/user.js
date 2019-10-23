@@ -22,7 +22,7 @@ var Schema = mongoose.Schema;
     given_name(string)      : 유저 이름
     family_name(string)     : 유저 이름(성)
     locale(string)          : 지역(한국은 ko)
-    tokens(string)          : 구글에서 발급받은 token 오브젝트로 [access_token, refresh_token, id_token] 을 지니고 있다.
+    tokens(Object)          : 구글에서 발급받은 token 오브젝트로 [access_token, refresh_token, id_token] 을 지니고 있다.
 
 */
 var userSchema = new Schema({

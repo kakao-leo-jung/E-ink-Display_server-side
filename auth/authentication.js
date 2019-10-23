@@ -17,7 +17,10 @@ const errorSet = require('../utill/errorSet');
 */
 
 /* JWT 인증을 위한 secret 키 */
-const SECRET = config.JWT_SECRET;
+const JWT_SECRET = config.JWT_SECRET;
+const JWT_EXP = config.JWT_EXP;
+const JWT_ISS = config.JWT_ISS;
+const JWT_SUB = config.JWT_SUB;
 
 /* google API 호출을 위한 credential 인증 정보 */
 const CLIENT_ID = config.WEB_CLIENT_ID;
@@ -41,8 +44,17 @@ exports.verifyJwt = (req) => {
     }
 
     try {
+        var decoded = Jwt.verify(reqJwt, JWT_SECRET, {
+            /* verify options */
+            expiresIn: JWT_EXP,
+            issuer: JWT_ISS,
+            subject: JWT_SUB
+        });
 
-        var decoded = Jwt.verify(reqJwt, SECRET);
+        if(decoded.jti == 'refresh'){
+            throw(errorSet.createError(errorSet.es.NOT_JWT_REFRESH, new Error().stack));
+        }
+
         return decoded;
     } catch (err) {
         throw (errorSet.createError(errorSet.es.INVALID_JWT, err.stack));
@@ -83,12 +95,16 @@ exports.getAuthCode = async (user_id) => {
 
 /*
 
+    Google token
     accessToken 은 기한이 만료된다.
     oAuthClient.on 으로 기한이 만료되면 다음 refreshToken 을
     보급한다. 이때 토큰을 DB 에 갱신하여 저장해준다.
 
     FIXME: Refresh 가 항시 작동하지 않아서 추후에 제대로 DB 에 갱신되는지 테스트 해봐야함.
     -> 테스트 확인함, 정상작동
+
+    FIXME: 여기서 만약 ERR_REFRESH 오류가 발생한다면 google refreshtoken 이 만료된 것이므로
+    아예 로그아웃 해야 함.
 
 */
 exports.refreshToken = async (authClient, resultUser) => {
