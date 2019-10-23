@@ -6,8 +6,10 @@ const {
     google
 } = require('googleapis');
 var User = require('../model/user');
+var Refresh = require('../model/refresh');
 const Jwt = require('jsonwebtoken');
 const config = require('../config');
+var errorSet = require('../utill/errorSet');
 var router = express.Router();
 
 /* TODO: Author : 정근화 */
@@ -19,12 +21,35 @@ var router = express.Router();
     새로 생성한 커스텀 JWT를 안드로이드와의 통신 인증 수단으로 발급한다.
 
 */
+/* JWT 토큰의 유효성을 검증한다 - Google AccessToken 까지 유효성 확인 */
+/* 
 
+    Google refresh token 의 만료여부 확인
+
+    A refresh token might stop working for one of these reasons:
+
+    The user has revoked your app's access. -> 안드로이드 클라이언트 상에서 revoke 할 시 사용불가.
+    The refresh token has not been used for six months. -> google refresh token의 재사용 주기는 6개월
+    The user changed passwords and the refresh token contains Gmail scopes.
+    The user account has exceeded a maximum number of granted (live) refresh tokens.
+
+    https://developers.google.com/identity/protocols/OAuth2
+
+    You can try to getAccessToken which will use refresh token for that purpose. If the call fails, that means refresh token is not valid.
+
+*/
 /* 구글 프로젝트에 등록한 안드로이드 어플리케이션의 웹 클라이언트ID 값 */
 const CLIENT_ID = config.WEB_CLIENT_ID;
 const CLIENT_SECRET = config.WEB_CLIENT_SECRET;
 const CLIENT_REDIRECT_URIS = config.WEB_REDIRECT_URIS;
 const client = new OAuth2Client(CLIENT_ID);
+
+/* JWT 토큰 정보 */
+const JWT_SECRET = config.JWT_SECRET;
+const JWT_EXP = config.JWT_EXP;
+const JWT_EXP_REFRESH = config.JWT_EXP_REFRESH;
+const JWT_ISS = config.JWT_ISS;
+const JWT_SUB = config.JWT_SUB;
 
 /* authCode 를 분석하기 위한 credentials.json 을 사용하여 authclient를 생성. */
 const oAuth2Client = new google.auth.OAuth2(
@@ -33,174 +58,293 @@ const oAuth2Client = new google.auth.OAuth2(
     CLIENT_REDIRECT_URIS
 );
 
-/* JWT 발급을 위한 secret 키 */
-const SECRET = config.JWT_SECRET;
+/**
 
-/*
+    @api {get} /loginToken GetJWTSignIn
+    @apiName GetJWTSignIn
+    @apiGroup loginToken
+    @apiDescription
+    LoginToken 구글 로그인 받은 AuthCode을 분석해서 처리한다.</br>
+    구글로그인을 하고 AuthCode를 이곳으로 요청하여 jwt를 받아 로그인 구현</br>
+    구현할 로직은 다음과 같다.</br>
 
-    /loginToken/
+    0. authCode 를 받아 accessToken, refreshToken, idToken 으로 분리한다.</br>
+    1. 받은 아이디 토큰의 유효성을 검사하고 Payload를 불러온다.</br>
+    2. userID 값을 이용해 DB를 조회한다.</br>
+        - DB에 존재안함 : 새 user를 등록 한다.</br>
+    3. Google Token과 함께 user를 DB에 등록(업데이트) 한다.</br>
+    4. 새로운 jwt와 jwt_refresh 를 생성하여 refresh token은 DB에 저장한 후</br>
+       리턴한다.</br>
 
-    LoginToken 구글 로그인 받은 토큰을 분석해서 처리한다.
-    구현할 로직은 다음과 같다.
+    @apiHeader {null} NoHeader 필요한 헤더값 없음(jwt X)
+    @apiHeaderExample {null} 헤더(x) 예제
+    No JWT and other Header type
 
-    0. authCode 를 받아 accessToken, refreshToken, idToken 으로 분리한다.
-    1. 받은 아이디 토큰의 유효성을 검사하고 Payload를 불러온다.
-    2. userID 값을 이용해 DB를 조회한다.
-        - DB에 존재안함 : 새 user를 등록 한다.
+    @apiParam (query string) {String} code      구글 로그인 후 받은 AuthCode 값</br>
+                                                단 scope 에 openId, profile, email, calendar 가 추가된 상태여야 한다</br>
+    @apiParamExample {path} 파라미터(url) 예제
+    (GET) http://169.56.98.117/loginToken?code={$Google Auth Code}
 
-*/
-router.get('/', (req, res) => {
-    /* 인증 코드를 담는다. */
-    const authCode = req.query.code;
-    console.log("Receive AuthCode from client : " + authCode);
-    returnJWT(authCode, res);
-});
+    @apiSuccess {String}  jwt                   본 서버의 AccessToken, 주기는 5분이며,</br>
+                                                클라이언트의 메모리영역에 보관해놓고 API 호출 시 헤더에 넣어 활용한다.</br>
+    @apiSuccess {String}  jwt_refresh           본 서버의 RefreshToken, 주기는 14일이며,</br>
+                                                SharedPreference 같은 보안영역에 저장해놓고 jwt 만료시 갱신한다.</br>
+                                                (GET)/loginToken/refresh 로 요청</br>
+    @apiSuccessExample 성공 시 응답 :
+    HTTP/1.1 200 OK
+    {
+        "jwt":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        "jwt_refresh":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    }
 
-/*
+    @apiError FAILED_GOOGLEAUTH 구글 인증서버에서 Authcode를 파싱하는데 실패하였습니다.
+    @apiError ERR_CRUDDB 데이터베이스 CRUD 작업에 실패하였습니다.
 
-    모든 구글 토큰의 인증과정과 DB 생성 및 조회,
-    리턴의 과정을 순차적으로 처리한다.
-
-    * 각 단계의 오류 및 예외 처리를 해주어야 함.
-
-*/
-async function returnJWT(authCode, res) {
-
-    /* authCode 로 부터 토큰을 추출해 낸다. */
-    console.log("Enter oAuth2Client.getToken : resultUser.google_authCode : " + authCode);
-    const {
-        tokens
-    } = await oAuth2Client.getToken(authCode);
-
-    console.log("Tokens : " + JSON.stringify(tokens, null, 2));
-
-    console.log("getToken Method Result [access_tokens] : " + tokens.access_token);
-    console.log("getToken Method Result [refresh_tokens] : " + tokens.refresh_token);
-    console.log("getToken Method Result [id_tokens] : " + tokens.id_token);
-
-    /* 구글 ID 토큰 유효성 검사 및 payload 추출 */
-    const payload = await verify(tokens).catch(console.error);
-
-    /* 추출한 payload 에서 userid(sub 값)을 이용하여 DB 를 조회한다. */
-    const searchedUser = await searchDB(tokens, payload).catch(console.error);
-
-    /* JWT 를 생성한다. */
-    const newJwt = Jwt.sign({
-            _id: searchedUser._id,
-            userId: searchedUser.userId
-        },
-        SECRET, {
-            expiresIn: '24h',
-            issuer: 'com.jcp.magicapplication',
-            subject: 'userAuth'
-        }
-    );
-
-    console.log("newJWT -----------------------------");
-    console.log(newJwt);
-
-    /* JWT를 리턴한다. */
-    res.writeHead(200);
-    res.write(newJwt);
-    res.end();
-
-}
-
-/*
-
-    인증한 토큰의 Payload 를 가지고 DB를 조회 하는 함수
-    유저를 조회해보고 유저가 없으면 새 유저를 생성한다.
-    결과적으로 userId와 일치하는 유저를 반환한다.
+    @apiErrorExample 실패 : FAILED_GOOGLEAUTH
+    HTTP/1.1 401 Authentication
+    {
+        "name" : "FAILED_GOOGLEAUTH",
+        "message": "Failed to decode your Google Auth-code!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : ERR_CRUDDB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "ERR_CRUDDB",
+        "message": "Cannot CRUD your request in database!",
+        "status": 500
+    }
 
 */
-async function searchDB(tokens, payload) {
+router.get('/', async (req, res, next) => {
 
     try {
 
-        /* userId 가 일치하는 유저가 DB에 존재하는지 조회한다. */
-        var resultUser = await User.findOne({
-            userId: payload.sub
+        const authCode = req.query.code;
+        const {
+            tokens
+        } = await oAuth2Client.getToken(authCode).catch(err => {
+            throw errorSet.createError(errorSet.es.FAILED_GOOGLEAUTH, err.stack);
         });
 
-        /* DB 에 기존 유저 없음 */
+        const ticket = await client.verifyIdToken({
+            idToken: tokens.id_token,
+            audience: CLIENT_ID
+        }).catch(err => {
+            throw errorSet.createError(errorSet.es.FAILED_GOOGLEAUTH, err.stack);
+        });
+
+        const payload = ticket.getPayload();
+
+        var resultUser = await User.findOne({
+            userId: payload.sub
+        }).catch(err => {
+            throw errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack);
+        });
+
         if (!resultUser) {
+            const newUser = new User({
+                userId: payload.sub,
+                email: payload.email,
+                name: payload.name,
+                picture: payload.picture,
+                given_name: payload.given_name,
+                family_name: payload.family_name,
+                locale: payload.locale,
+                tokens: ""
+            });
+            resultUser = await newUser.save().catch(err => {
+                throw errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack);
+            });
+        }
+        resultUser.tokens = tokens;
+        await resultUser.save().catch(err => {
+            throw errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack);
+        });
 
-            /* DB 에 새 유저 등록 */
-            try {
-
-                const newUser = new User({
-                    userId: payload.sub,
-                    email: payload.email,
-                    name: payload.name,
-                    picture: payload.picture,
-                    given_name: payload.given_name,
-                    family_name: payload.family_name,
-                    locale: payload.locale,
-                    tokens: ""
-                });
-
-                resultUser = await newUser.save();
-
-            } catch (err) {
-                console.error(err);
+        /* make jwt */
+        const newJwt = Jwt.sign({
+                _id: resultUser._id,
+                userId: resultUser.userId
+            },
+            JWT_SECRET, {
+                expiresIn: JWT_EXP,
+                issuer: JWT_ISS,
+                subject: JWT_SUB,
+                jwtid: 'origin'
             }
+        );
+
+        /* make jwt_refresh and save db */
+        const newJwtRefresh = Jwt.sign({
+            _id: resultUser._id,
+            userId: resultUser.userId
+        }, JWT_SECRET, {
+            expiresIn: JWT_EXP_REFRESH,
+            issuer: JWT_ISS,
+            subject: JWT_SUB,
+            jwtid: 'refresh'
+        });
+
+        await Refresh.findOneAndUpdate({
+            userId: resultUser.userId
+        }, {
+            userId: resultUser.userId,
+            refresh: newJwtRefresh
+        }, {
+            upsert: true
+        }).catch(err => {
+            throw errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack);
+        });
+
+        var resObj = {
+            jwt: newJwt,
+            jwt_refresh: newJwtRefresh
         }
 
-        /* 조회한 유저의 구글 토큰값을 갱신한다. */
-        resultUser.tokens = tokens;
-        resultUser = await resultUser.save();
-
-        console.log("resultUser(googleToken set) --------------------");
-        console.log(resultUser);
-
-        /* 조회한 유저 객체를 반환한다. */
-        return resultUser;
+        next(resObj);
 
     } catch (err) {
-
-        console.error(err);
-
+        next(err);
     }
 
-}
+});
 
+/* JWT 토큰의 유효성을 검증하고 재발급한다. - refresh token */
 /*
 
-    구글 토큰의 유효성을 검사하는 함수, 유효하면 JSON 오브젝트 형태의 PAYLOAD 부분을 리턴한다.
-
-    홈페이지 : https://developers.google.com/identity/sign-in/web/backend-auth
-
-*/
-/*
-
-        PAYLOAD -- (안드로이드에서 구글에 권한 요청할 때 일단 email, profile 옵션만 요청 함.)
-        aud(string)             : 토큰 대상자 - 웹 클라이언트ID(내가 구글에서 발급 받은) 일치해야함.
-        iss(string)             : 토큰 발급자 - 구글토큰사용(https://accounts.google.com)
-        sub(string)             : 유저 토큰 아이디 숫자 값
-        email(string)           : 유저 이메일
-        email_verified(bool)    : 이메일 유효성 검사 값
-        name(string)            : 유저 풀 네임
-        picture(string)         : 유저 사진 url
-        given_name(string)      : 유저 이름
-        family_name(string)     : 유저 이름(성)
-        locale(string)          : 지역(한국은 ko)
-        exp(string)             : 토큰만료시간
-        iat(string)             : 토큰발급시간 -> iat를 통해 토큰의 나이를 확인 가능
+    1. header 에 jwt_refresh(refresh token) 을 가져옴.
+    2. jwt_refresh verify
+    3. decoded.userId 와 jwt_refresh 가 일치하는 정보가 db에서 찾아야 함.
+    4. 모든 단계를 통과했다면 new jwt 발급.
 
 */
-async function verify(tokens) {
+/**
 
-    const ticket = await client.verifyIdToken({
-        idToken: tokens.id_token,
-        audience: CLIENT_ID,
-    });
+    @api {get} /loginToken/refresh GetJWTRefresh
+    @apiName GetJWTRefresh
+    @apiGroup loginToken
+    @apiDescription
+    RefreshToken 을 통해 AccessToken을 재발급 합니다.</br>
+    서버에서 API를 요청하기 전에 항상 클라이언트에서 가진 JWT 의 유효성(만료여부)을</br>
+    검증하고 만료되었을 경우 먼저 해당 요청을 통해 AccessToken(JWT)을 재발급 받습니다.</br>
 
-    /* 아래 코드는 verify 가 성공하였을 때 해야 할 역할 */
-    const payload = ticket.getPayload();
-    console.log("Token Payload -----------------------");
-    console.log(payload);
-    return payload;
+    1. header 에 jwt_refresh(refresh token) 을 가져옴.</br>
+    2. jwt_refresh verify</br>
+    3. decoded.userId 와 jwt_refresh 가 일치하는 정보가 db에서 찾아야 함.</br>
+    4. 모든 단계를 통과했다면 new jwt 발급.</br>
 
-}
+    @apiHeader {String} jwt_refresh RefreshToken 을 헤더에 넣어 요청
+    @apiHeaderExample {form} 헤더 예제
+    {
+        jwt_refresh : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    }
+
+    @apiParam {null} No Parameter 요청 파라미터 없음.
+    @apiParamExample {null} 파라미터(x) 예제
+    No Parameter/
+
+    @apiSuccess {String}  jwt                   본 서버의 AccessToken, 주기는 5분이며,</br>
+                                                클라이언트의 메모리영역에 보관해놓고 API 호출 시 헤더에 넣어 활용한다.</br>
+    
+    @apiSuccessExample 성공 시 응답 :
+    HTTP/1.1 200 OK
+    {
+        "jwt":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    }
+
+    @apiError NO_JWT_REFRESH 헤더에서 jwt_refresh 를 찾을 수 없습니다.
+    @apiError ERR_CRUDDB 데이터베이스 CRUD 작업에 실패하였습니다.
+    @apiError INVALID_JWT_REFRESH RefreshToken이 만료되었습니다. 이 경우 다시 로그인 하여 토큰을 발급받아야 합니다.
+    @apiError NOT_JWT 요청 헤더에 AccessToken 이 들어왔습니다.</br>
+              엑세스토큰을 갱신하기 위해서는 RefreshToken 이 필요합니다.
+
+    @apiErrorExample 실패 : NO_JWT_REFRESH
+    HTTP/1.1 401 Authentication
+    {
+        "name" : "NO_JWT_REFRESH",
+        "message": "Please put JWT_REFRESH in your request header to refresh your token!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : ERR_CRUDDB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "ERR_CRUDDB",
+        "message": "Cannot CRUD your request in database!",
+        "status": 500
+    }
+    @apiErrorExample 실패 : INVALID_JWT_REFRESH
+    HTTP/1.1 401 Authentication
+    {
+        "name" : "INVALID_JWT_REFRESH",
+        "message": "Your JWT_REFRESH is invalid!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : NOT_JWT
+    HTTP/1.1 400 Authentication
+    {
+        "name" : "NOT_JWT",
+        "message": "This is JWT AccessToken, to refresh JWT, you should request with RefreshToken",
+        "status": 400
+    }
+
+*/
+router.get('/refresh', async (req, res, next) => {
+
+    try {
+
+        /* 1. header request */
+        var jwt_refresh = req.headers.jwt_refresh;
+        if (!jwt_refresh) {
+            throw (errorSet.createError(errorSet.es.NO_JWT_REFRESH, new Error().stack));
+        }
+
+        /* 2. jwt_refresh verify */
+        var decoded = Jwt.verify(jwt_refresh, JWT_SECRET, {
+            expiresIn: JWT_EXP_REFRESH,
+            issuer: JWT_ISS,
+            subject: JWT_SUB
+        });
+        if(decoded.jti != 'refresh'){
+            /* refresh token이 아니라 accesstoken 임 */
+            throw(errorSet.createError(errorSet.es.NOT_JWT, new Error().stack));
+        }
+
+        /* 3. find refresh in database */
+        var refreshModel = await Refresh.findOne({
+            userId: decoded.userId,
+            refresh: jwt_refresh
+        }).catch(err => {
+            throw err;
+        });
+        if (!refreshModel) {
+            throw (errorSet.createError(errorSet.es.INVALID_JWT_REFRESH, new Error().stack));
+        }
+
+        /* 4. new jwt */
+        const newJwt = Jwt.sign({
+                _id: decoded._id,
+                userId: decoded.userId
+            },
+            JWT_SECRET, {
+                expiresIn: JWT_EXP,
+                issuer: JWT_ISS,
+                subject: JWT_SUB,
+                jwtid: 'origin'
+            }
+        );
+
+        /* response */
+        var resObj = {
+            jwt: newJwt
+        }
+
+        next(resObj);
+
+    } catch (err) {
+        next(err);
+    }
+
+});
 
 module.exports = router;

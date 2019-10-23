@@ -7,17 +7,22 @@
 */
 exports.es = {
     /* Authentication */
+    FAILED_GOOGLEAUTH: ['FAILED_GOOGLEAUTH', 'Failed to decode your Google Auth-code!', 401],
     NO_JWT: ['NO_JWT','Please put JWT in your request header!', 401],
+    NO_JWT_REFRESH: ['NO_JWT_REFRESH', 'Please put JWT_REFRESH in your request header to refresh your token!', 400],
     INVALID_JWT: ['INVALID_JWT','Your JWT is invalid!', 401],
+    INVALID_JWT_REFRESH: ['INVALID_JWT_REFRESH', 'Your JWT_REFRESH is invalid!', 401],
     NOUSER_DB: ['NOUSER_DB','Cannot find userId in database!', 500],
-    ERR_REFRESH: ['ERR_REFRESH', 'There is err in refreshin google token!', 500],
+    ERR_REFRESH: ['ERR_REFRESH', 'There is err in refreshing google token!', 401],
+    NOT_JWT: ['NOT_JWT', 'This is JWT AccessToken, to refresh JWT, you should request with RefreshToken', 400],
+    NOT_JWT_REFRESH:['NOT_JWT_REFRESH', 'This is JWT RefreshToken, to request API, you should request with AccessToken', 400],
 
     /* /weather */
     NO_LONANDLAT: ['NO_LONANDLAT','Please put latitude and longitude in your request parameter!', 400],
     FAILED_OWM : ['FAILED_OWM','Failed to GET openweathermap!', 500],
 
     /* /todo */
-    ERR_CRUDDB : ['ERR_CRUDDB','Cannot CRUD your Todo in database!', 500],
+    ERR_CRUDDB : ['ERR_CRUDDB','Cannot CRUD your request in database!', 500],
     INVALID_TODOBODYKEY: ['INVALID_TODOBODYKEY','Invalid body property is included! : userId', 400],
 
     /* /news */
