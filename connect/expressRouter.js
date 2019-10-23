@@ -9,7 +9,7 @@
 module.exports = (app) => {
 
     /* 로그인 '/loginToken' 라우팅 */
-    var login = require('../auth/login');
+    var login = require('../routes/login');
     app.use('/loginToken', login);
 
     /* JWT 디버깅웹 '/debug/webjwt' 라우팅 */

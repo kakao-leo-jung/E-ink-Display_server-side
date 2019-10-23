@@ -62,12 +62,11 @@ const oAuth2Client = new google.auth.OAuth2(
 
     @api {get} /loginToken GetJWTSignIn
     @apiName GetJWTSignIn
-    @apiGroup loginToken
+    @apiGroup LoginToken
     @apiDescription
     LoginToken 구글 로그인 받은 AuthCode을 분석해서 처리한다.</br>
     구글로그인을 하고 AuthCode를 이곳으로 요청하여 jwt를 받아 로그인 구현</br>
-    구현할 로직은 다음과 같다.</br>
-
+    구현할 로직은 다음과 같다.</br></br>
     0. authCode 를 받아 accessToken, refreshToken, idToken 으로 분리한다.</br>
     1. 받은 아이디 토큰의 유효성을 검사하고 Payload를 불러온다.</br>
     2. userID 값을 이용해 DB를 조회한다.</br>
@@ -210,25 +209,15 @@ router.get('/', async (req, res, next) => {
 
 });
 
-/* JWT 토큰의 유효성을 검증하고 재발급한다. - refresh token */
-/*
-
-    1. header 에 jwt_refresh(refresh token) 을 가져옴.
-    2. jwt_refresh verify
-    3. decoded.userId 와 jwt_refresh 가 일치하는 정보가 db에서 찾아야 함.
-    4. 모든 단계를 통과했다면 new jwt 발급.
-
-*/
 /**
 
     @api {get} /loginToken/refresh GetJWTRefresh
     @apiName GetJWTRefresh
-    @apiGroup loginToken
+    @apiGroup LoginToken
     @apiDescription
     RefreshToken 을 통해 AccessToken을 재발급 합니다.</br>
     서버에서 API를 요청하기 전에 항상 클라이언트에서 가진 JWT 의 유효성(만료여부)을</br>
-    검증하고 만료되었을 경우 먼저 해당 요청을 통해 AccessToken(JWT)을 재발급 받습니다.</br>
-
+    검증하고 만료되었을 경우 먼저 해당 요청을 통해 AccessToken(JWT)을 재발급 받습니다.</br></br>
     1. header 에 jwt_refresh(refresh token) 을 가져옴.</br>
     2. jwt_refresh verify</br>
     3. decoded.userId 와 jwt_refresh 가 일치하는 정보가 db에서 찾아야 함.</br>

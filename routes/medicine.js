@@ -8,7 +8,7 @@ var router = express.Router();
 
     @api {get} /medicine GetMedicine
     @apiName GetMedicine
-    @apiGroup medicine
+    @apiGroup Medicine
     @apiDescription
     유저의 투약 정보를 배열로 받아옵니다.
 
@@ -64,7 +64,7 @@ router.get('/', async (req,res,next)=>{
 /**
       @api {post} /medicine InsertMedicine
       @apiName PostMedicine
-      @apiGroup medicine
+      @apiGroup Medicine
       @apiDescription
       새로운 medicine 목록을 저장합니다.
 

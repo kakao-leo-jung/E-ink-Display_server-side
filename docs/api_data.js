@@ -1045,143 +1045,6 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/calendar/calendar-list",
-    "title": "GetCalendarLists",
-    "name": "GetCalendarLists",
-    "group": "Calendar",
-    "description": "<p>해당 계정이 보유한 캘린더 리스트의 종류를 가져옵니다.</br></p> <pre><code>_id 값을 통해 어떠한 캘린더의 정보를 CRUD 할 것인지 다른 api 호출을 쿼리스트링으로 지정할 수 있습니다.&lt;/br&gt;</code></pre>",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "jwt",
-            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "헤더 예제",
-          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
-          "type": "form"
-        }
-      ]
-    },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "null",
-            "optional": false,
-            "field": "No",
-            "description": "<p>Parameter 요청 파라미터 없음.</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "파라미터(x) 예제",
-          "content": "No Parameter",
-          "type": "null"
-        }
-      ]
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "_id",
-            "description": "<p>각 캘린더 종류의 고유 id 값을 나타냅니다</br> 캘린더 이벤트의 CRUD api 를 호출할 때 ?calendarId=_id 로 </br> 어떤 캘린더의 이벤트를 조작할 것인지 선택할 수 있습니다.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "summary",
-            "description": "<p>해당 캘린더의 제목</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "primary",
-            "description": "<p>계정의 기본 캘린더를 의미합니다.</br> 다른 api 를 호출할때 쿼리스트링을 지정하지 않으면 </br> primary=true 로 지정된 캘린더 id 가 자동으로 지정됩니다. </br></p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "성공 시 응답 :",
-          "content": "HTTP/1.1 200 OK\n[\n    {\n        \"_id\": \"l8162nkuj54205lks5fmkotqtk@group.calendar.google.com\",\n        \"summary\": \"Us\"\n    },\n    {\n        \"_id\": \"dfjung4254@gmail.com\",\n        \"summary\": \"dfjung4254@gmail.com\",\n        \"primary\": true\n    },\n    {\n        \"_id\": \"addressbook#contacts@group.v.calendar.google.com\",\n        \"summary\": \"Contacts\"\n    },\n    {\n        \"_id\": \"ko.south_korea#holiday@group.v.calendar.google.com\",\n        \"summary\": \"대한민국의 휴일\"\n    }\n]",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "NO_JWT",
-            "description": "<p>JWT 가 헤더에 실려있지 않습니다.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "INVALID_JWT",
-            "description": "<p>JWT 가 유효하지 않습니다.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "NOUSER_DB",
-            "description": "<p>해당 유저의 정보가 DB에서 찾을 수 없습니다.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "FAILED_GOOGLE",
-            "description": "<p>Google API 를 호출하는데 실패하였습니다.</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "실패 : NO_JWT",
-          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"NO_JWT\",\n    \"message\": \"Please put JWT in your request header!\",\n    \"status\": 401\n}",
-          "type": "json"
-        },
-        {
-          "title": "실패 : INAVLID_JWT",
-          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"INVALID_JWT\",\n    \"message\": \"Your JWT is invalid!\",\n    \"status\": 401\n}",
-          "type": "json"
-        },
-        {
-          "title": "실패 : NOUSER_DB",
-          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"NOUSER_DB\",\n    \"message\": \"Cannot find userId in database!\",\n    \"status\": 500\n}",
-          "type": "json"
-        },
-        {
-          "title": "실패 : FAILED_GOOGLE",
-          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"FAILED_GOOGLE\",\n    \"message\": \"Failed to GET google calendar api!\",\n    \"status\": 500\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "version": "0.0.0",
-    "filename": "routes/calendar.js",
-    "groupTitle": "Calendar"
-  },
-  {
-    "type": "get",
     "url": "/calendar/certainday/:year/:month/:day?calendarId=:calendarId",
     "title": "GetCertainDay",
     "name": "GetCertainDay",
@@ -2118,6 +1981,157 @@ define({ "api": [
     "groupTitle": "Calendar"
   },
   {
+    "type": "get",
+    "url": "/calendarList",
+    "title": "GetCalendarLists",
+    "name": "GetCalendarLists",
+    "group": "CalendarList",
+    "description": "<p>해당 계정이 보유한 캘린더 리스트의 종류를 가져옵니다.</br></p> <pre><code>_id 값을 통해 어떠한 캘린더의 정보를 CRUD 할 것인지 다른 api 호출을 쿼리스트링으로 지정할 수 있습니다.&lt;/br&gt;</code></pre>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "null",
+            "optional": false,
+            "field": "No",
+            "description": "<p>Parameter 요청 파라미터 없음.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(x) 예제",
+          "content": "No Parameter",
+          "type": "null"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>각 캘린더 종류의 고유 id 값을 나타냅니다</br> 캘린더 이벤트의 CRUD api 를 호출할 때 ?calendarId=_id 로 </br> 어떤 캘린더의 이벤트를 조작할 것인지 선택할 수 있습니다.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "summary",
+            "description": "<p>해당 캘린더의 제목</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "description",
+            "description": "<p>해당 캘린더의 설명</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "timeZone",
+            "description": "<p>해당 캘린더의 타임존 - IANA Timezone database 형식을 따릅니다.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "primary",
+            "description": "<p>계정의 기본 캘린더를 의미합니다.</br> 다른 api 를 호출할때 쿼리스트링을 지정하지 않으면 </br> primary=true 로 지정된 캘린더 id 가 자동으로 지정됩니다. </br></p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n[\n    {\n        \"_id\": \"l8162nkuj54205lks5fmkotqtk@group.calendar.google.com\",\n        \"summary\": \"Us\",\n        \"description\": \"ㅇ\",\n        \"timeZone\": \"Asia/Seoul\"\n    },\n    {\n        \"_id\": \"dfjung4254@gmail.com\",\n        \"summary\": \"dfjung4254@gmail.com\",\n        \"timeZone\": \"Asia/Seoul\",\n        \"primary\": true\n    },\n    {\n        \"_id\": \"addressbook#contacts@group.v.calendar.google.com\",\n        \"summary\": \"Contacts\",\n        \"timeZone\": \"Asia/Seoul\"\n    },\n    {\n        \"_id\": \"ko.south_korea#holiday@group.v.calendar.google.com\",\n        \"summary\": \"대한민국의 휴일\",\n        \"timeZone\": \"Asia/Seoul\"\n    }\n]",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NO_JWT",
+            "description": "<p>JWT 가 헤더에 실려있지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_JWT",
+            "description": "<p>JWT 가 유효하지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NOUSER_DB",
+            "description": "<p>해당 유저의 정보가 DB에서 찾을 수 없습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "FAILED_GOOGLE",
+            "description": "<p>Google API 를 호출하는데 실패하였습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "실패 : NO_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"NO_JWT\",\n    \"message\": \"Please put JWT in your request header!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INAVLID_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"INVALID_JWT\",\n    \"message\": \"Your JWT is invalid!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : NOUSER_DB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"NOUSER_DB\",\n    \"message\": \"Cannot find userId in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : FAILED_GOOGLE",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"FAILED_GOOGLE\",\n    \"message\": \"Failed to GET google calendar api!\",\n    \"status\": 500\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/calendarList.js",
+    "groupTitle": "CalendarList"
+  },
+  {
     "type": "put",
     "url": "/calendar/:_id?calendarId=:calendarId",
     "title": "UpdateCalendar",
@@ -2392,6 +2406,578 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "routes/calendar.js",
     "groupTitle": "Calendar"
+  },
+  {
+    "type": "get",
+    "url": "/loginToken/refresh",
+    "title": "GetJWTRefresh",
+    "name": "GetJWTRefresh",
+    "group": "LoginToken",
+    "description": "<p>RefreshToken 을 통해 AccessToken을 재발급 합니다.</br> 서버에서 API를 요청하기 전에 항상 클라이언트에서 가진 JWT 의 유효성(만료여부)을</br> 검증하고 만료되었을 경우 먼저 해당 요청을 통해 AccessToken(JWT)을 재발급 받습니다.</br></br> 1. header 에 jwt_refresh(refresh token) 을 가져옴.</br> 2. jwt_refresh verify</br> 3. decoded.userId 와 jwt_refresh 가 일치하는 정보가 db에서 찾아야 함.</br> 4. 모든 단계를 통과했다면 new jwt 발급.</br></p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt_refresh",
+            "description": "<p>RefreshToken 을 헤더에 넣어 요청</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    jwt_refresh : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "null",
+            "optional": false,
+            "field": "No",
+            "description": "<p>Parameter 요청 파라미터 없음.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(x) 예제",
+          "content": "No Parameter/",
+          "type": "null"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>본 서버의 AccessToken, 주기는 5분이며,</br> 클라이언트의 메모리영역에 보관해놓고 API 호출 시 헤더에 넣어 활용한다.</br></p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n{\n    \"jwt\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NO_JWT_REFRESH",
+            "description": "<p>헤더에서 jwt_refresh 를 찾을 수 없습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ERR_CRUDDB",
+            "description": "<p>데이터베이스 CRUD 작업에 실패하였습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_JWT_REFRESH",
+            "description": "<p>RefreshToken이 만료되었습니다. 이 경우 다시 로그인 하여 토큰을 발급받아야 합니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NOT_JWT",
+            "description": "<p>요청 헤더에 AccessToken 이 들어왔습니다.</br> 엑세스토큰을 갱신하기 위해서는 RefreshToken 이 필요합니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "실패 : NO_JWT_REFRESH",
+          "content": "HTTP/1.1 401 Authentication\n{\n    \"name\" : \"NO_JWT_REFRESH\",\n    \"message\": \"Please put JWT_REFRESH in your request header to refresh your token!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : ERR_CRUDDB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"ERR_CRUDDB\",\n    \"message\": \"Cannot CRUD your request in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INVALID_JWT_REFRESH",
+          "content": "HTTP/1.1 401 Authentication\n{\n    \"name\" : \"INVALID_JWT_REFRESH\",\n    \"message\": \"Your JWT_REFRESH is invalid!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : NOT_JWT",
+          "content": "HTTP/1.1 400 Authentication\n{\n    \"name\" : \"NOT_JWT\",\n    \"message\": \"This is JWT AccessToken, to refresh JWT, you should request with RefreshToken\",\n    \"status\": 400\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/login.js",
+    "groupTitle": "LoginToken"
+  },
+  {
+    "type": "get",
+    "url": "/loginToken",
+    "title": "GetJWTSignIn",
+    "name": "GetJWTSignIn",
+    "group": "LoginToken",
+    "description": "<p>LoginToken 구글 로그인 받은 AuthCode을 분석해서 처리한다.</br> 구글로그인을 하고 AuthCode를 이곳으로 요청하여 jwt를 받아 로그인 구현</br> 구현할 로직은 다음과 같다.</br></br> 0. authCode 를 받아 accessToken, refreshToken, idToken 으로 분리한다.</br> 1. 받은 아이디 토큰의 유효성을 검사하고 Payload를 불러온다.</br> 2. userID 값을 이용해 DB를 조회한다.</br> - DB에 존재안함 : 새 user를 등록 한다.</br> 3. Google Token과 함께 user를 DB에 등록(업데이트) 한다.</br> 4. 새로운 jwt와 jwt_refresh 를 생성하여 refresh token은 DB에 저장한 후</br> 리턴한다.</br></p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "null",
+            "optional": false,
+            "field": "NoHeader",
+            "description": "<p>필요한 헤더값 없음(jwt X)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더(x) 예제",
+          "content": "No JWT and other Header type",
+          "type": "null"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "query string": [
+          {
+            "group": "query string",
+            "type": "String",
+            "optional": false,
+            "field": "code",
+            "description": "<p>구글 로그인 후 받은 AuthCode 값</br> 단 scope 에 openId, profile, email, calendar 가 추가된 상태여야 한다</br></p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(url) 예제",
+          "content": "(GET) http://169.56.98.117/loginToken?code={$Google Auth Code}",
+          "type": "path"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>본 서버의 AccessToken, 주기는 5분이며,</br> 클라이언트의 메모리영역에 보관해놓고 API 호출 시 헤더에 넣어 활용한다.</br></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jwt_refresh",
+            "description": "<p>본 서버의 RefreshToken, 주기는 14일이며,</br> SharedPreference 같은 보안영역에 저장해놓고 jwt 만료시 갱신한다.</br> (GET)/loginToken/refresh 로 요청</br></p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n{\n    \"jwt\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"jwt_refresh\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "FAILED_GOOGLEAUTH",
+            "description": "<p>구글 인증서버에서 Authcode를 파싱하는데 실패하였습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ERR_CRUDDB",
+            "description": "<p>데이터베이스 CRUD 작업에 실패하였습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "실패 : FAILED_GOOGLEAUTH",
+          "content": "HTTP/1.1 401 Authentication\n{\n    \"name\" : \"FAILED_GOOGLEAUTH\",\n    \"message\": \"Failed to decode your Google Auth-code!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : ERR_CRUDDB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"ERR_CRUDDB\",\n    \"message\": \"Cannot CRUD your request in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/login.js",
+    "groupTitle": "LoginToken"
+  },
+  {
+    "type": "delete",
+    "url": "/medicine/:id",
+    "title": "DeleteMedicine",
+    "name": "DeleteMedicine",
+    "group": "Medicine",
+    "description": "<p>jwt 토큰과 medicine의 _id값을 통해 현재 유저의 해당 meidicine 알림을 삭제합니다. </br> url parameter에 넣는 _id 값은 GET을 통해 medicine Lists를 호출했을 때 </br> 각 medicine 객체가 지니고 있는 &quot;_id&quot;의 value값 입니다. </br></p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": ":_id",
+            "description": "<p>URL에 지울 todo 정보의 고유 아이디 값을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(url) 예제",
+          "content": "URL : http://169.56.98.117/todo/5d9ed8a64d73a91bcc4526d7",
+          "type": "path"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>삭제 완료 메세지</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "status",
+            "description": "<p>성공 상태 200</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n{\n    \"message\": \"medicine info delete success\".\n    \"status\": 200\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/medicine.js",
+    "groupTitle": "Medicine"
+  },
+  {
+    "type": "get",
+    "url": "/medicine",
+    "title": "GetMedicine",
+    "name": "GetMedicine",
+    "group": "Medicine",
+    "description": "<p>유저의 투약 정보를 배열로 받아옵니다.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "null",
+            "optional": false,
+            "field": "No",
+            "description": "<p>Parameter 요청 파라미터 없음.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(x) 예제",
+          "content": "No Parameter/",
+          "type": "null"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/medicine.js",
+    "groupTitle": "Medicine"
+  },
+  {
+    "type": "post",
+    "url": "/medicine",
+    "title": "InsertMedicine",
+    "name": "PostMedicine",
+    "group": "Medicine",
+    "description": "<p>새로운 medicine 목록을 저장합니다.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "yakname",
+            "description": "<p>투약할 약의 이름</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "hour",
+            "description": "<p>시간</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "minute",
+            "description": "<p>분</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Boolean",
+            "optional": false,
+            "field": "selected",
+            "description": "<p>체크되었는지의 여부</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(body) 예제",
+          "content": "{\n  \"yakname\": \"head\",\n  \"hour\": 12,\n  \"minute\": 24,\n  \"ampm\": \"AM\",\n  \"selected\": false\n\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>해당 알람의 고유 id값, put, delete 호출 때 사용.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "yakname",
+            "description": "<p>투약 정보</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "hour",
+            "description": "<p>알람 시, 범위는 0~23.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "minute",
+            "description": "<p>알람 분, 범위는 0~59.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "ampm",
+            "description": "<p>오전/오후 여부를 &quot;AM&quot;, &quot;PM&quot; 으로 나타냅니다.</br> ampm 은 hour, minute 에 의해 자동으로 세팅됩니다.</br></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "boolean",
+            "optional": false,
+            "field": "selected",
+            "description": "<p>체크 되었는지 여부</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/medicine.js",
+    "groupTitle": "Medicine"
+  },
+  {
+    "type": "put",
+    "url": "/medicine/:_id",
+    "title": "UpdateMedicine",
+    "name": "PutMedicine",
+    "group": "Medicine",
+    "description": "<p>jwt 토큰과 medicine의 _id 값을 통해 해당 medicine 을 요청받은 body의 내용으로 업데이트 합니다. url parameter에 넣는 _id 값은 GET을 통해 medicineLists를 호출 했을 때 </br> 각 medicine 객체가 지니고 있는 &quot;_id&quot;의 value값. </br></p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "yakname",
+            "description": "<p>요청 바디의 medicine 약 이름</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "hour",
+            "description": "<p>알람을 울릴 시간</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "minute",
+            "description": "<p>알람을 울릴 분</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Boolean",
+            "optional": false,
+            "field": "selected",
+            "description": "<p>요청 바디의 medicine 체크 여부</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(body) 예제",
+          "content": "{\n  \"yakname\": \"head\",\n  \"hour\": 12,\n  \"minute\": 24,\n  \"ampm\": \"AM\",\n  \"selected\": false\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>DB에 저장된 medicine의 고유값 - put,delete 요청시 필요</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답:",
+          "content": " {\n   \"_id\": \"5daf0530f7dcec27842bd671\",\n   \"yakname\": \"def\",\n   \"hour\": 12,\n   \"minute\": 24,\n   \"ampm\": \"AM\",\n   \"selected\": false\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/medicine.js",
+    "groupTitle": "Medicine"
   },
   {
     "type": "get",
