@@ -4,8 +4,6 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var logHandler = require('./utill/logHandler');
-var errorHandler = require('./utill/errorHandler');
 
 var app = express();
 
@@ -44,6 +42,15 @@ dbConnect('user_auth');
 */
 var mqttConnect = require('./connect/mqttConnect');
 mqttConnect();
+
+/*
+
+    Node 서버가 실행되면 Alarm Pusher 의
+    Child Process 도 실행한다.
+
+*/
+var pusherConnect = require('./connect/pusherConnect');
+pusherConnect();
 
 /// catch 404 and forwarding to error handler
 app.use(require('./utill/logHandler'));

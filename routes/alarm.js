@@ -34,7 +34,7 @@ var errorSet = require('../utill/errorSet');
     @apiSuccess {String}    ampm              오전/오후 여부를 "AM", "PM" 으로 나타냅니다.</br>
                                               ampm 은 hour, minute 에 의해 자동으로 세팅됩니다.</br>
     @apiSuccess {boolean[]} day_selected      각 요일에 알람이 on 상태인지 여부를 나타냅니다</br>
-                                              배열의 사이즈는 7이며 [0-6] 인덱스는 [월-일] 을 표시합니다.</br>
+                                              배열의 사이즈는 7이며 [0-6] 인덱스는 [일, 월, 화, 수, 목, 금, 토] 을 표시합니다.</br>
     @apiSuccess {boolean}   isAlarmOn         현재 알람이 켜져있는지 여부를 나타냅니다.
     @apiSuccessExample 성공 시 응답 :
     HTTP/1.1 200 OK
@@ -157,7 +157,7 @@ router.get('/', async (req, res, next) => {
     @apiParam {Number}    hour              알람 시, 범위는 0~23
     @apiParam {Number}    minute            알람 분, 범위는 0~59
     @apiParam {boolean[]} day_selected      각 요일에 알람여부를 뜻합니다. 배열의 사이즈는 반드시 7이여야 하고</br>
-                                            [0 - 6] 까지의 인덱스는 각각 [월 - 일]을 나타냅니다</br>
+                                            [0 - 6] 까지의 인덱스는 각각 [일, 월, 화, 수, 목, 금, 토]을 나타냅니다</br>
     @apiSuccess {boolean}   isAlarmOn       현재 알람이 켜져있는지 여부를 나타냅니다.
     @apiParamExample {json} 파라미터(body) 예제
     {
@@ -175,7 +175,7 @@ router.get('/', async (req, res, next) => {
     @apiSuccess {String}    ampm              오전/오후 여부를 "AM", "PM" 으로 나타냅니다.</br>
                                               ampm 은 hour, minute 에 의해 자동으로 세팅됩니다.</br>
     @apiSuccess {boolean[]} day_selected      각 요일에 알람이 on 상태인지 여부를 나타냅니다</br>
-                                              배열의 사이즈는 7이며 [0-6] 인덱스는 [월-일] 을 표시합니다.</br>
+                                              배열의 사이즈는 7이며 [0-6] 인덱스는 [일, 월, 화, 수, 목, 금, 토] 을 표시합니다.</br>
     @apiSuccess {boolean}   isAlarmOn         현재 알람이 켜져있는지 여부를 나타냅니다.
     @apiSuccessExample 성공 시 응답 :
     HTTP/1.1 200 OK
@@ -319,7 +319,7 @@ router.post('/', async (req, res, next) => {
     @apiSuccess {String}    ampm              오전/오후 여부를 "AM", "PM" 으로 나타냅니다.</br>
                                               ampm 은 hour, minute 에 의해 자동으로 세팅됩니다.</br>
     @apiSuccess {boolean[]} day_selected      각 요일에 알람이 on 상태인지 여부를 나타냅니다</br>
-                                              배열의 사이즈는 7이며 [0-6] 인덱스는 [월-일] 을 표시합니다.</br>
+                                              배열의 사이즈는 7이며 [0-6] 인덱스는 [일, 월, 화, 수, 목, 금, 토] 을 표시합니다.</br>
     @apiSuccess {boolean}   isAlarmOn         현재 알람이 켜져있는지 여부를 나타냅니다.
     @apiSuccessExample 성공 시 응답 :
     HTTP/1.1 200 OK
@@ -425,7 +425,7 @@ router.put('/onoff/:_id', async (req, res, next) => {
     @apiParam {Number}    hour              알람 시, 범위는 0~23
     @apiParam {Number}    minute            알람 분, 범위는 0~59
     @apiParam {boolean[]} day_selected      각 요일에 알람여부를 뜻합니다. 배열의 사이즈는 반드시 7이여야 하고</br>
-                                            [0 - 6] 까지의 인덱스는 각각 [월 - 일]을 나타냅니다</br>
+                                            [0 - 6] 까지의 인덱스는 각각 [일, 월, 화, 수, 목, 금, 토]을 나타냅니다</br>
     @apiSuccess {boolean}   isAlarmOn         현재 알람이 켜져있는지 여부를 나타냅니다.
     @apiParamExample {json} 파라미터(body) 예제
     {
@@ -445,7 +445,7 @@ router.put('/onoff/:_id', async (req, res, next) => {
     @apiSuccess {String}    ampm              오전/오후 여부를 "AM", "PM" 으로 나타냅니다.</br>
                                               ampm 은 hour, minute 에 의해 자동으로 세팅됩니다.</br>
     @apiSuccess {boolean[]} day_selected      각 요일에 알람이 on 상태인지 여부를 나타냅니다</br>
-                                              배열의 사이즈는 7이며 [0-6] 인덱스는 [월-일] 을 표시합니다.</br>
+                                              배열의 사이즈는 7이며 [0-6] 인덱스는 [일, 월, 화, 수, 목, 금, 토] 을 표시합니다.</br>
     @apiSuccess {boolean}   isAlarmOn         현재 알람이 켜져있는지 여부를 나타냅니다.
     @apiSuccessExample 성공 시 응답 :
     HTTP/1.1 200 OK
