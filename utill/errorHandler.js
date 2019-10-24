@@ -10,7 +10,12 @@
 */
 module.exports = (err, req, res, next) => {
 
-    res.status(err.status || 400);
+    /* refresh token expired */
+    if(err.message == 'jwt expired'){
+        err.status = 401;
+    }
+
+    res.status(err.status);
     res.json(err);
 
 };
