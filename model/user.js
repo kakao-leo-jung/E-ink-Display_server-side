@@ -23,6 +23,8 @@ var Schema = mongoose.Schema;
     family_name(string)     : 유저 이름(성)
     locale(string)          : 지역(한국은 ko)
     tokens(Object)          : 구글에서 발급받은 token 오브젝트로 [access_token, refresh_token, id_token] 을 지니고 있다.
+    fcm_token(String)       : 안드로이드 기기에 푸시를 주기 위한 안드로이드 기기 토큰이다. 이 토큰정보를 통해 해당 기기에 로그인 중임을 파악.
+    display_token(String)   : 해당 계정에 연결된 기기 고유정보(맥주소 등)
 
 */
 var userSchema = new Schema({
@@ -34,7 +36,9 @@ var userSchema = new Schema({
     given_name : String,
     family_name : String,
     locale : String,
-    tokens : Object
+    tokens : Object,
+    fcm_token : String,
+    display_token : String
 
 });
 

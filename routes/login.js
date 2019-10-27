@@ -10,6 +10,8 @@ var Refresh = require('../model/refresh');
 const Jwt = require('jsonwebtoken');
 const config = require('../config');
 var errorSet = require('../utill/errorSet');
+var authentication = require('../auth/authentication');
+var User = require('../model/user');
 var router = express.Router();
 
 /* TODO: Author : 정근화 */
@@ -150,7 +152,8 @@ router.get('/', async (req, res, next) => {
                 given_name: payload.given_name,
                 family_name: payload.family_name,
                 locale: payload.locale,
-                tokens: ""
+                tokens: "",
+                fcm_token: ""
             });
             resultUser = await newUser.save().catch(err => {
                 throw errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack);
@@ -294,9 +297,9 @@ router.get('/refresh', async (req, res, next) => {
             issuer: JWT_ISS,
             subject: JWT_SUB
         });
-        if(decoded.jti != 'refresh'){
+        if (decoded.jti != 'refresh') {
             /* refresh token이 아니라 accesstoken 임 */
-            throw(errorSet.createError(errorSet.es.NOT_JWT, new Error().stack));
+            throw (errorSet.createError(errorSet.es.NOT_JWT, new Error().stack));
         }
 
         /* 3. find refresh in database */
