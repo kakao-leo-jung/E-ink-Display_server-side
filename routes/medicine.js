@@ -388,7 +388,7 @@ router.put('/onoff/:_id', async (req, res, next) => {
             selected : req.body.selected
         }
 
-        var document = await Alarm.findOneAndUpdate({
+        var document = await Medicine.findOneAndUpdate({
             userId : decoded.userId,
             _id : req.params._id
         }, changedOnOff).catch(err => {
