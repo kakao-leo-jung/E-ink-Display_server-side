@@ -299,6 +299,117 @@ router.delete('/:_id', async (req, res, next) => {
     }
 })
 
+/**
 
+    @api {put} /medicine/onoff/:_id UpdateMedicineOnoff
+    @apiName UpdateMedicineOnoff
+    @apiGroup Medicine
+    @apiDescription
+    유저의 투약정보의 ON/OFF 정보만 수정합니다. </br>
+    투약이 ON 상태여야만 매일 정해진 hour, minute 에 푸시를 받을 수 있습니다.</br>
+
+    @apiHeader {String} jwt 헤더에 JWT 토큰을 넣습니다.
+    @apiHeaderExample {form} 헤더 예제
+    {
+        // retrofit2 : HashMap 에 key값은 "jwt", value값은 "eyJ..." 로 설정
+        "jwt" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM"
+    }
+
+    @apiParam {String}      :_id              투약의 id 값, /medicine/:_id 로 해당 투약의 put, delete 를 호출합니다.
+    @apiSuccess {boolean}   selected          현재 투약이 켜져있는지 여부를 나타냅니다.
+    @apiParamExample {json} 파라미터(body) 예제
+    {
+        "selected": true
+    }
+    @apiParamExample {path} 파라미터(url) 예제
+    URL Http://169.56.98.117/alarm/5da6bee89d02807cd9288a5a
+
+    @apiSuccess {String}    _id               해당 투약의 고유 id값, put, delete 호출 때 사용.
+    @apiSuccess {String}    title             투약 제목
+    @apiSuccess {Number}    hour              투약 시, 범위는 0~23.
+    @apiSuccess {Number}    minute            투약 분, 범위는 0~59.
+    @apiSuccess {String}    ampm              오전/오후 여부를 "AM", "PM" 으로 나타냅니다.</br>
+                                              ampm 은 hour, minute 에 의해 자동으로 세팅됩니다.</br>
+    @apiSuccess {boolean}   selected          현재 투약이 켜져있는지 여부를 나타냅니다.
+    @apiSuccessExample 성공 시 응답 :
+    HTTP/1.1 200 OK
+    {
+        "_id": "5da6bee89d02807cd9288a5a",
+        "title": "투약테스트3 - modified",
+        "hour": 10,
+        "minute": 20,
+        "ampm": "AM",
+        "selected"": true
+    }
+
+    @apiError NO_JWT JWT 가 헤더에 실려있지 않습니다.
+    @apiError INVALID_JWT JWT 가 유효하지 않습니다.
+    @apiError NOUSER_DB 해당 유저의 정보가 DB에서 찾을 수 없습니다.
+    @apiError ERR_CRUDDB 내부 DB 작업에 실패하였습니다.
+    @apiError INVALID_TIME 시간 값이 유효하지 않습니다 hour(0-23), minute(0-59)
+    @apiError LENGTH_ARRAY day_selected 배열의 사이즈가 7이 아닙니다.
+
+    @apiErrorExample 실패 : NO_JWT
+    HTTP/1.1 401 Unauthorized
+    {
+        "name" : "NO_JWT",
+        "message": "Please put JWT in your request header!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : INAVLID_JWT
+    HTTP/1.1 401 Unauthorized
+    {
+        "name" : "INVALID_JWT",
+        "message": "Your JWT is invalid!",
+        "status": 401
+    }
+    @apiErrorExample 실패 : NOUSER_DB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "NOUSER_DB",
+        "message": "Cannot find userId in database!",
+        "status": 500
+    }    
+    @apiErrorExample 실패 : ERR_CRUDDB
+    HTTP/1.1 500 Internal Server Error
+    {
+        "name" : "ERR_CRUDDB",
+        "message": "Cannot CRUD your Todo in database!",
+        "status": 400
+    }   
+    
+*/
+router.put('/onoff/:_id', async (req, res, next) => {
+
+    try{
+        var decoded = authentication.verifyJwt(req);
+
+        var changedOnOff = {
+            selected : req.body.selected
+        }
+
+        var document = await Alarm.findOneAndUpdate({
+            userId : decoded.userId,
+            _id : req.params._id
+        }, changedOnOff).catch(err => {
+            throw (errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack));
+        });
+
+        var resObj = {
+            _id: document._id,
+            title: document.title,
+            hour: document.hour,
+            minute: document.minute,
+            ampm: document.ampm,
+            selected: changedOnOff.selected
+        }
+
+        next(resObj);
+
+    }catch(err){
+        next(err);
+    }
+
+});
 
 module.exports = router;

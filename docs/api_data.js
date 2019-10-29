@@ -2980,6 +2980,181 @@ define({ "api": [
     "groupTitle": "Medicine"
   },
   {
+    "type": "put",
+    "url": "/medicine/onoff/:_id",
+    "title": "UpdateMedicineOnoff",
+    "name": "UpdateMedicineOnoff",
+    "group": "Medicine",
+    "description": "<p>유저의 투약정보의 ON/OFF 정보만 수정합니다. </br> 투약이 ON 상태여야만 매일 정해진 hour, minute 에 푸시를 받을 수 있습니다.</br></p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": ":_id",
+            "description": "<p>투약의 id 값, /medicine/:_id 로 해당 투약의 put, delete 를 호출합니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(body) 예제",
+          "content": "{\n    \"selected\": true\n}",
+          "type": "json"
+        },
+        {
+          "title": "파라미터(url) 예제",
+          "content": "URL Http://169.56.98.117/alarm/5da6bee89d02807cd9288a5a",
+          "type": "path"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "boolean",
+            "optional": false,
+            "field": "selected",
+            "description": "<p>현재 투약이 켜져있는지 여부를 나타냅니다.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>해당 투약의 고유 id값, put, delete 호출 때 사용.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "title",
+            "description": "<p>투약 제목</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "hour",
+            "description": "<p>투약 시, 범위는 0~23.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "minute",
+            "description": "<p>투약 분, 범위는 0~59.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "ampm",
+            "description": "<p>오전/오후 여부를 &quot;AM&quot;, &quot;PM&quot; 으로 나타냅니다.</br> ampm 은 hour, minute 에 의해 자동으로 세팅됩니다.</br></p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5da6bee89d02807cd9288a5a\",\n    \"title\": \"투약테스트3 - modified\",\n    \"hour\": 10,\n    \"minute\": 20,\n    \"ampm\": \"AM\",\n    \"selected\"\": true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NO_JWT",
+            "description": "<p>JWT 가 헤더에 실려있지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_JWT",
+            "description": "<p>JWT 가 유효하지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NOUSER_DB",
+            "description": "<p>해당 유저의 정보가 DB에서 찾을 수 없습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ERR_CRUDDB",
+            "description": "<p>내부 DB 작업에 실패하였습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_TIME",
+            "description": "<p>시간 값이 유효하지 않습니다 hour(0-23), minute(0-59)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "LENGTH_ARRAY",
+            "description": "<p>day_selected 배열의 사이즈가 7이 아닙니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "실패 : NO_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"NO_JWT\",\n    \"message\": \"Please put JWT in your request header!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INAVLID_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"name\" : \"INVALID_JWT\",\n    \"message\": \"Your JWT is invalid!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : NOUSER_DB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"NOUSER_DB\",\n    \"message\": \"Cannot find userId in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : ERR_CRUDDB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"ERR_CRUDDB\",\n    \"message\": \"Cannot CRUD your Todo in database!\",\n    \"status\": 400\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/medicine.js",
+    "groupTitle": "Medicine"
+  },
+  {
     "type": "get",
     "url": "/news",
     "title": "GetNews",
@@ -3683,12 +3858,184 @@ define({ "api": [
     "groupTitle": "Todo"
   },
   {
+    "type": "delete",
+    "url": "/users/fcm",
+    "title": "DeleteUserFcm",
+    "name": "DeleteUserFcm",
+    "group": "User",
+    "description": "<p>서버에 저장된 해당 계정의 안드로이드 기기 FCM 토큰을 삭제합니다.</br> 더 이상 해당 기기로 알람이나 투약이 전송되지 않습니다.</br> 로그아웃 후, 알람, 투약 수신의 일괄 on/off 설정기능이 있다면 해당 api 를 통해 off 시킬 수 있습니다.</br></p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "null",
+            "optional": false,
+            "field": "No",
+            "description": "<p>Parameter 요청 파라미터 없음.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(x) 예제",
+          "content": "No Parameter",
+          "type": "null"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "userId",
+            "description": "<p>유저 고유 번호 값(구글)</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>유저 이메일 값</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>유저 풀네임</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "picture",
+            "description": "<p>유저 구글 사진 URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "given_name",
+            "description": "<p>유저 이름</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "family_name",
+            "description": "<p>유저 이름(성)</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "locale",
+            "description": "<p>유저 지역 정보</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "fcm_token",
+            "description": "<p>유저 현재 기기 토큰 값</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n{\n    \"userId\": \"100828347037604660700\",\n    \"email\": \"dfjung4254@gmail.com\",\n    \"name\": \"KH J\",\n    \"picture\": \"https://lh4.googleusercontent.com/-3WsHZ5SaYco/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3reBRCZFXpXnux85nyxUAdlQxv6rVw/s96-c/photo.jpg\",\n    \"given_name\": \"KH\",\n    \"family_name\": \"J\",\n    \"locale\": \"ko\",\n    // fcm_token 값이 사라진 것을 확인 할 수 있음.\n    \"fcm_token\": \"\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NO_JWT",
+            "description": "<p>JWT 가 헤더에 실려있지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_JWT",
+            "description": "<p>JWT 가 유효하지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NOUSER_DB",
+            "description": "<p>해당 유저의 정보가 DB에서 찾을 수 없습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ERR_CRUDDB",
+            "description": "<p>내부 DB 작업에 실패하였습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "실패 : NO_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"message\": \"Please put JWT in your request header!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INAVLID_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"message\": \"Your JWT is invalid!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : NOUSER_DB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"message\": \"Cannot find userId in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : ERR_CRUDDB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"ERR_CRUDDB\",\n    \"message\": \"Cannot CRUD your Todo in database!\",\n    \"status\": 400\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/users.js",
+    "groupTitle": "User"
+  },
+  {
     "type": "get",
     "url": "/users",
     "title": "GetUserInfo",
     "name": "GetUser",
     "group": "User",
-    "description": "<p>헤더에 JWT 를 실어 /user 로 GET 요청을 해주세요.</br> 서버는 해당 JWT를 통해 현재 구글 로그인된 계정의 개인정보를 반환합니다.</br></p>",
+    "description": "<p>헤더에 JWT 를 실어 /users 로 GET 요청을 해주세요.</br> 서버는 해당 JWT를 통해 현재 구글 로그인된 계정의 개인정보를 반환합니다.</br></p>",
     "header": {
       "fields": {
         "Header": [
@@ -3828,6 +4175,178 @@ define({ "api": [
         {
           "title": "실패 : NOUSER_DB",
           "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"message\": \"Cannot find userId in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/users.js",
+    "groupTitle": "User"
+  },
+  {
+    "type": "post",
+    "url": "/users/fcm",
+    "title": "UpdateUserFcm",
+    "name": "UpdateUserFcm",
+    "group": "User",
+    "description": "<p>안드로이드 기기 등록 </br> 해당 api 를 통해 안드로이드 Firebase SDK 를 통해 얻은 기기 토큰을 서버에 저장합니다.</br> 해당 기기의 토큰이 저장 또는 업데이트 되면 해당 기기로 알람이나 투약 푸시가 전송됩니다.</br> 로그인 후, 또는 기기 토큰이 변경되었을 때 업데이트 해주세요</br></p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "jwt",
+            "description": "<p>헤더에 JWT 토큰을 넣습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "헤더 예제",
+          "content": "{\n    // retrofit2 : HashMap 에 key값은 \"jwt\", value값은 \"eyJ...\" 로 설정\n    \"jwt\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDUxODRjMWU5ZDMxZjRmYmYzNDQ3NDQiLCJ1c2VySWQiOiIxMDA4MjgzNDcwMzc2MDQ2NjA3MDAiLCJpYXQiOjE1NzEwNDAxNTcsImV4cCI6MTU3MTEyNjU1NywiaXNzIjoiY29tLmpjcC5tYWdpY2FwcGxpY2F0aW9uIiwic3ViIjoidXNlckF1dGgifQ.RcjjVWBSd5LOXPqqPIV-ZXVsBKOxob7vWm7tBJi4rjM\"\n}",
+          "type": "form"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "fcm_token",
+            "description": "<p>FCM을 위한 기기의 고유 토큰</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "파라미터(body) 예제",
+          "content": "{\n    \"fcm_token\": \"cyejeyJfaWQiOiI1ZDUxODRjMWU5ZDM...\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "userId",
+            "description": "<p>유저 고유 번호 값(구글)</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>유저 이메일 값</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>유저 풀네임</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "picture",
+            "description": "<p>유저 구글 사진 URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "given_name",
+            "description": "<p>유저 이름</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "family_name",
+            "description": "<p>유저 이름(성)</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "locale",
+            "description": "<p>유저 지역 정보</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "fcm_token",
+            "description": "<p>유저 현재 기기 토큰 값</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공 시 응답 :",
+          "content": "HTTP/1.1 200 OK\n{\n    \"userId\": \"100828347037604660700\",\n    \"email\": \"dfjung4254@gmail.com\",\n    \"name\": \"KH J\",\n    \"picture\": \"https://lh4.googleusercontent.com/-3WsHZ5SaYco/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3reBRCZFXpXnux85nyxUAdlQxv6rVw/s96-c/photo.jpg\",\n    \"given_name\": \"KH\",\n    \"family_name\": \"J\",\n    \"locale\": \"ko\",\n    \"fcm_token\": \"cyejeyJfaWQiOiI1ZDUxODRjMWU5ZDM...\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NO_JWT",
+            "description": "<p>JWT 가 헤더에 실려있지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "INVALID_JWT",
+            "description": "<p>JWT 가 유효하지 않습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NOUSER_DB",
+            "description": "<p>해당 유저의 정보가 DB에서 찾을 수 없습니다.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ERR_CRUDDB",
+            "description": "<p>내부 DB 작업에 실패하였습니다.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "실패 : NO_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"message\": \"Please put JWT in your request header!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : INAVLID_JWT",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n    \"message\": \"Your JWT is invalid!\",\n    \"status\": 401\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : NOUSER_DB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"message\": \"Cannot find userId in database!\",\n    \"status\": 500\n}",
+          "type": "json"
+        },
+        {
+          "title": "실패 : ERR_CRUDDB",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n    \"name\" : \"ERR_CRUDDB\",\n    \"message\": \"Cannot CRUD your Todo in database!\",\n    \"status\": 400\n}",
           "type": "json"
         }
       ]
