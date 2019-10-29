@@ -43,15 +43,6 @@ dbConnect('user_auth');
 var mqttConnect = require('./connect/mqttConnect');
 mqttConnect();
 
-/*
-
-    Node 서버가 실행되면 Alarm Pusher 의
-    Child Process 도 실행한다.
-
-*/
-var pusherConnect = require('./connect/pusherConnect');
-pusherConnect();
-
 /// catch 404 and forwarding to error handler
 app.use(require('./utill/logHandler'));
 app.use(require('./utill/successHandler'));
