@@ -27,36 +27,36 @@ var router = express.Router();
 
 */
 
-router.get('/', async (req,res,next)=>{
+router.get('/', async (req, res, next) => {
 
-  try{
+    try {
 
-    var decoded = authentication.verifyJwt(req);
+        var decoded = authentication.verifyJwt(req);
 
-    var medicineLists = await Medicine.find({
-      userId: decoded.userId
-    }).catch(err => {
-        throw (errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack));
-    })
+        var medicineLists = await Medicine.find({
+            userId: decoded.userId
+        }).catch(err => {
+            throw (errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack));
+        })
 
-    var retObj = new Object();
-    retObj.medicineLists = new Array();
-    for (medicine of medicineLists){
-      var obj = {
-        _id : medicine._id,
-        yakname: medicine.yakname,
-        hour : medicine.hour,
-        minute : medicine.minute,
-        ampm : medicine.ampm,
-        selected : medicine.selected
-      };
-      retObj.medicineLists.push(obj);
+        var retObj = new Object();
+        retObj.medicineLists = new Array();
+        for (medicine of medicineLists) {
+            var obj = {
+                _id: medicine._id,
+                yakname: medicine.yakname,
+                hour: medicine.hour,
+                minute: medicine.minute,
+                ampm: medicine.ampm,
+                selected: medicine.selected
+            };
+            retObj.medicineLists.push(obj);
+        }
+        next(retObj);
+
+    } catch (err) {
+        next(err);
     }
-    next(retObj);
-
-  } catch(err){
-    next(err);
-  }
 
 });
 
@@ -119,15 +119,15 @@ router.post('/', async (req, res, next) => {
 
         var newMedicine = new Medicine({
             userId: decoded.userId,
-            yakname : req.body.yakname,
-            hour : req.body.hour,
-            minute : req.body.minute,
-            ampm : (req.body.hour > 12)? "PM" : "AM",
-            selected : req.body.selected
+            yakname: req.body.yakname,
+            hour: req.body.hour,
+            minute: req.body.minute,
+            ampm: (req.body.hour > 12) ? "PM" : "AM",
+            selected: req.body.selected
         });
 
-        if(newMedicine.hour > 23 || newMedicine.hour < 0 || newMedicine.minute > 59 || newMedicine.minute < 0){
-            throw(errorSet.createError(errorSet.es.INVALID_TIME, new Error().stack));
+        if (newMedicine.hour > 23 || newMedicine.hour < 0 || newMedicine.minute > 59 || newMedicine.minute < 0) {
+            throw (errorSet.createError(errorSet.es.INVALID_TIME, new Error().stack));
         }
 
         var savedMedicine = await newMedicine.save()
@@ -138,10 +138,10 @@ router.post('/', async (req, res, next) => {
         var resObj = {
             _id: savedMedicine._id,
             yakname: savedMedicine.yakname,
-            hour : savedMedicine.hour,
-            minute : savedMedicine.minute,
-            ampm : savedMedicine.ampm,
-            selected : savedMedicine.selected
+            hour: savedMedicine.hour,
+            minute: savedMedicine.minute,
+            ampm: savedMedicine.ampm,
+            selected: savedMedicine.selected
         }
 
         next(resObj);
@@ -203,41 +203,42 @@ router.post('/', async (req, res, next) => {
 
 router.put('/:_id', async (req, res, next) => {
 
-  try{
-      var decoded = authentication.verifyJwt(req);
+    try {
+        var decoded = authentication.verifyJwt(req);
 
-      var changedMedicine = {
-        yakname : req.body.yakname,
-        hour : req.body.hour,
-        minute : req.body.minute,
-        ampm : (req.body.hour>12)?"PM":"AM",
-        selected : req.body.selected
-      }
+        var changedMedicine = {
+            yakname: req.body.yakname,
+            hour: req.body.hour,
+            minute: req.body.minute,
+            ampm: (req.body.hour > 12) ? "PM" : "AM",
+            selected: req.body.selected
+        }
 
-      if(changedMedicine.hour > 23 || changedMedicine.hour < 0 || changedMedicine.minute > 59 || changedMedicine.minute < 0){
-          throw(errorSet.createError(errorSet.es.INVALID_TIME, new Error().stack));
-      }
+        if (changedMedicine.hour > 23 || changedMedicine.hour < 0 || changedMedicine.minute > 59 || changedMedicine.minute < 0) {
+            throw (errorSet.createError(errorSet.es.INVALID_TIME, new Error().stack));
+        }
 
-      var document = await Medicine.findOneAndUpdate({
-        userId : decoded.userId
-      }, changedMedicine).catch(err =>{
-        throw (errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack));
-      });
+        var document = await Medicine.findOneAndUpdate({
+            userId: decoded.userId,
+            _id:req.params._id
+        }, changedMedicine).catch(err => {
+            throw (errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack));
+        });
 
-      var resObj = {
-        _id : document._id,
-        yakname : changedMedicine.yakname,
-        hour : changedMedicine.hour,
-        minute : changedMedicine.minute,
-        ampm : changedMedicine.ampm,
-        selected : changedMedicine.selected
-      };
+        var resObj = {
+            _id: document._id,
+            yakname: changedMedicine.yakname,
+            hour: changedMedicine.hour,
+            minute: changedMedicine.minute,
+            ampm: changedMedicine.ampm,
+            selected: changedMedicine.selected
+        };
 
-      next(resObj);
+        next(resObj);
 
-  } catch (err){
-      next(err);
-  }
+    } catch (err) {
+        next(err);
+    }
 
 });
 
@@ -276,26 +277,26 @@ router.put('/:_id', async (req, res, next) => {
 */
 router.delete('/:_id', async (req, res, next) => {
 
-  try{
-    var decoded = authentication.verifyJwt(req);
+    try {
+        var decoded = authentication.verifyJwt(req);
 
-    var document = await Medicine.findOneAndDelete({
-      _id : req.params._id,
-      userId : decoded.userId
-    }).catch(err => {
-        throw(errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack));
-    });
+        var document = await Medicine.findOneAndDelete({
+            _id: req.params._id,
+            userId: decoded.userId
+        }).catch(err => {
+            throw (errorSet.createError(errorSet.es.ERR_CRUDDB, err.stack));
+        });
 
-    var resObj = {
-      message: "medicine info delete success!",
-      status: 200
+        var resObj = {
+            message: "medicine info delete success!",
+            status: 200
+        }
+
+        next(resObj);
+
+    } catch (err) {
+        next(err);
     }
-
-    next(resObj);
-
-  }catch(err){
-      next(err);
-  }
 })
 
 
